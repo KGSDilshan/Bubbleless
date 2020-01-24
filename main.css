@@ -58,49 +58,7 @@ p {
 	text-align: center;
 }
 
-/* Navbar hover effects and selection effects */
-
-.navbar {
-	margin-bottom: 0px;
-	border-bottom: 1px solid #4D8FD1;
-}
-
-.nav-glow-effects {
-    text-align: center;
-    color: black;
-    // when unhovering, it should animate back to normal state, rather than swap immediately
-    -webkit-transition: all 0.5s linear;
-    transition: all 0.5s linear;
-}
-
-.nav-glow-effects:hover:not(.active) {
-    background-color: #9BC3FF; // background color of everything when not selected, but hovered
-    -webkit-transition: all 0.5s linear;
-    transition: all 0.5s linear;
-}
-
-.selected {
-	text-align: center;
-    background-color: #DDDDDD; // background color of everything when not selected, but hovered
-    -webkit-transition: all 0.5s linear;
-    transition: all 0.5s linear;
-}
-
-
-.selected:hover {
-	text-align: center;
-    background-color: #6FA3F2; // background color of everything when not selected, but hovered
-    -webkit-transition: all 0.5s linear;
-    transition: all 0.5s linear;
-}
-
-
-.navbar .navbar-nav {
-  display: inline-block;
-  float: none;
-  vertical-align: top;
-}
-
-.navbar .navbar-collapse {
-  text-align: center;
+div.scrollhorizontal {
+  overflow: auto;
+  white-space: nowrap;
 }
