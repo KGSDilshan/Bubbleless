@@ -1,0 +1,106 @@
+/* Faint and dotted Horizontal Rule tag (<hr>) */
+.subtle_section {
+	ocupacity: 0.4;
+	display: block;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    border-style: solid;
+    border-width: 0px;
+    border-top: 1px dotted   #1476FF;
+}
+
+/* Inherits from Bootstrap Jumbotron */
+#webpage-title {
+	background-color: #4D8FD1;
+	margin-bottom: 1px;
+	padding-bottom: 0px
+	border-style: solid;
+	border-width:  0px;
+	border-radius:0;
+}
+
+/* Section class for white block */
+.section-block {
+	background-color: #FFFFFF;
+	border-radius: 10px;
+	box-shadow: 0 0 1px black;
+	text-align: center;
+}
+
+.section-heading {
+	font-family: 'Harmattan';
+	font-size: 5vh;
+	color: #323433;
+	padding-left: 20px;
+}
+
+
+
+/* Paragraph add some default indentation and  alignment */
+p {
+	text-align: left;
+	padding-left: 30px;
+    padding-right: 30px;
+	font-family: 'TimesNewRoman';
+	font-size: 17px
+	color: black;
+
+}
+
+/* Footer copy right text format */
+#CR_text {
+	background-color: #4D8FD1;
+	position: relative;
+	display:block;
+	font-family: Arial;
+	color: white;
+	font-size: x-small;
+	text-align: center;
+}
+
+/* Navbar hover effects and selection effects */
+
+.navbar {
+	margin-bottom: 0px;
+	border-bottom: 1px solid #4D8FD1;
+}
+
+.nav-glow-effects {
+    text-align: center;
+    color: black;
+    // when unhovering, it should animate back to normal state, rather than swap immediately
+    -webkit-transition: all 0.5s linear;
+    transition: all 0.5s linear;
+}
+
+.nav-glow-effects:hover:not(.active) {
+    background-color: #9BC3FF; // background color of everything when not selected, but hovered
+    -webkit-transition: all 0.5s linear;
+    transition: all 0.5s linear;
+}
+
+.selected {
+	text-align: center;
+    background-color: #DDDDDD; // background color of everything when not selected, but hovered
+    -webkit-transition: all 0.5s linear;
+    transition: all 0.5s linear;
+}
+
+
+.selected:hover {
+	text-align: center;
+    background-color: #6FA3F2; // background color of everything when not selected, but hovered
+    -webkit-transition: all 0.5s linear;
+    transition: all 0.5s linear;
+}
+
+
+.navbar .navbar-nav {
+  display: inline-block;
+  float: none;
+  vertical-align: top;
+}
+
+.navbar .navbar-collapse {
+  text-align: center;
+}

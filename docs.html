@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Quotus400 Docs</title>
+    <meta name="description" content="webport">
+    <meta name ="author" content="Dilshan Gunasekera">
+    <link rel="icon" href="favicon.ico">
+    <link rel="stylesheet" type="text/css" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="main.css">
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="animation.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Mono|Harmattan" rel="stylesheet">
+    <link href='font-awesome-4.7.0/css/font-awesome.min.css' rel='stylesheet'/>
+
+    <style type="text/css">
+      html, body {
+        margin: 0px;
+        top: 0px;
+        background-color: #FFFFFF;
+        overflow-x: hidden;
+        width: 100%;
+      }
+
+    </style>
+  </head>
+
+  <body>
+    <!-- Navbar -->
+  <nav class="navbar navbar-default navbar-fixed-top" style="border-radius: 0; width:100%">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <img src="icons/initials.PNG" style="padding-top: 13px; padding-left: 10px"></img>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav justified" style="margin-left: -50px;">
+        <li class="nav-glow-effects"><a href="index.html"><span class="glyphicon glyphicon-home" aria-hidden="true"> Home</span></a></li>
+        <li class="nav-glow-effects"><a href="articles.html"><i class="fa fa-book" aria-hidden="true"> Documentation</i></a></li>
+        <li class="nav-glow-effects"><a href="https://github.com/eternalcode"><i class="fa fa-github" aria-hidden="true"> Source</i></a></li>
+      </ul>
+
+
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+
+  <!-- Header -->
+<div class="container" style="padding: 0px;width:100%">
+  <div class="jumbotron text-center" id="webpage-title" style="margin-top: 20px;padding-bottom: 10px">
+      <font style="color: white"><h1><strong>Documentation</strong> <br>
+      <small style="color: #FFFFFF;" size="1">Examples and Documentation of Quotus400.</small>
+      </h1></font>
+      <div style="text-align: right">
+        <font size="4vh" style="color: white">v400</font>
+      </div>
+    </div>
+  </div>
+
+<div style="background-color: #EEEEEE;">
+<br>
+<br>
+  <div class="container section-block">
+    <br>
+    <br>
+    <font class="section-heading">Basic Usage</font>
+    <hr class="subtle_section">
+    <br>
+
+    <div style="opacity: 0.3">
+      <center><font face="TimesNewRoman" size="3">Page updated: 1/21/2020 </font></center>
+    </div>
+    <br>
+    <hr class="subtle_section">
+    <br>
+        <div style="text-align: left;margin-left: 20px">
+            <div align="left">
+            <button class="btn btn-outline-info" type="button" data-toggle="collapse" data-target="#partOne" aria-expanded="false" aria-controls="collapseExample" align="left">
+                <h3>Setting up the Codesheet:</h3>
+            </button>
+            </div>
+
+            <div class="card card-body collapse" id="partOne">
+                <br>
+                <br>
+                Typically, the Codesheet will be formatted in a certain way. We need to adjust the formatting
+                so that data is ordered in a way Quotus can understand.
+                <br>
+                <br>
+                Generally, Quotus expects data to look like this template:
+                <br>
+                <br>
+
+                <table class="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th scope="col" colspan=4>Quota Group Name</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row">Quota1</th>
+                      <td>Percentage/Or N</td>
+                      <td>Question in Survey/Precode Name</td>
+                      <td>Code</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Quota2</th>
+                        <td>Percentage/Or N</td>
+                        <td>Question in Survey/Precode Name</td>
+                        <td>Code</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Quota3</th>
+                        <td>Percentage/Or N</td>
+                        <td>Question in Survey/Precode Name</td>
+                        <td>Code</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <br>
+                Here is an example with real data:
+                <br>
+                <br>
+                <table class="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th scope="col" colspan=4>Gender</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row">male</th>
+                      <td>45%</td>
+                      <td>pGender</td>
+                      <td>1</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">female</th>
+                        <td>51%</td>
+                        <td>pGender</td>
+                        <td>2</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">other</th>
+                        <td>4%</td>
+                        <td>pGender</td>
+                        <td>3</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <br>
+            </div>
+            <br>
+            <div align="left">
+            <button class="btn btn-outline-info" type="button" data-toggle="collapse" data-target="#partTwo" aria-expanded="false" aria-controls="collapseExample" align="left">
+                <h3>Importing your data:</h3>
+            </button>
+            </div>
+            <div class="card card-body collapse" id="partTwo">
+                <br>
+                Once you've set up your spreadsheet like this, copy the sections you need quotas for:
+                <img src="imgs/properFormat1.PNG" class="img-fluid" alt="excel screenshot">
+                <br>
+                Paste them into the input space:
+                <img src="imgs/paste_ins.png" class="img-fluid" alt="pasteing">
+                <br>
+                Next, fill in the form for your desired output. For projects which aren't trimode or dualmode, those fields can be left blank (along with the Client name).
+                <img src="imgs/continue_1.png" class="img-fluid" alt="press a button.">
+                <br>
+                Once the process button is clicked, you want to scroll down into the Report section and see if all the fields are inputted correctly.
+                You will get a warning for not filling in Mode fields, but that's OK for Phone projects. It serves as a reminder.
+                <img src="imgs/report_1.png" class="img-fluid" alt="read a warning.">
+                <br>
+                Upon reading the warning, you can click the continue button if everything is intended. This will proceed to validate the data and create a CSV sheet.
+            </div>
+            <br>
+            <div align="left">
+            <button class="btn btn-outline-info" type="button" data-toggle="collapse" data-target="#partThree" aria-expanded="false" aria-controls="collapseExample" align="left">
+                <h3>Exporting and viewing data</h3>
+            </button>
+            </div>
+            <div class="card card-body collapse" id="partThree">
+                <br>
+                When the data is processed, buttons will appear in the Report section of the page. One is a toggle-based button which will display the data for viewing on the webpage, the other
+                allows you to export your data as a csv file for direct importing with Limesurvey. Before you do either, it's important you read and understand the warnings provided.
+            </div>
+        </div>
+        <br>
+        <br>
+
+    <br>
+    <br>
+  </div>
+  <div style="height: 30px"></div>
+  <div class="container section-block">
+      <br>
+      <br>
+      <font class="section-heading">Group Level Customizations</font>
+      <hr class="subtle_section">
+      <p>
+      <br>
+      These are modifiers you can add infront of Quota Group names to export them differently.
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+              <th scope="col">Name</th>
+            <th scope="col">Label</th>
+            <th scope="col">Functionality</th>
+            <th scope="col">Example</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Tri-Split</th>
+            <th scope="row">(tri)</th>
+            <td align="left">All Quotas in the group will be treated as Trimode quotas. The Trisplit will be used and quotas will additionally be represented as Phone, Email, and Text.</td>
+            <td align="left">(tri)Party</td>
+          </tr>
+          <tr>
+              <th scope="row">Dual-Split</th>
+              <th scope="row">(dual)</th>
+              <td align="left">All Quotas in the group will be treared as Dualmode quotas. The Dualsplit will be used and quotas will additionally be represented as Phone and Email.</td>
+              <td align="left">(dual)Gender</td>
+          </tr>
+          <tr>
+              <th scope="row">Raw N Values</th>
+              <th scope="row">(raw)</th>
+              <td align="left">All Quotas in the group will treat the percentage field as raw number to use as the Quota limit.</td>
+              <td align="left">(raw)PhoneType</td>
+          </tr>
+          <tr>
+              <th scope="row">UnSplit</th>
+              <th scope="row">(us)</th>
+              <td align="left">When Split Quotas are enabled, this will not generate split quotas for the specific Group.</td>
+              <td align="left">(us)SplitAB</td>
+          </tr>
+          <tr>
+              <th scope="row">Flex percentage</th>
+              <th scope="row">(flex N%)</th>
+              <td align="left">Applies an N% Flex to the Quota Limit. The Quota's name will be modified to indicate it's added Flex.</td>
+              <td align="left">(Flex 6%)Region</td>
+          </tr>
+          <tr>
+              <th scope="row">Lake Table</th>
+              <th scope="row">(lake RegionCount)</th>
+              <td align="left">Include at the start of a formatted table to mark it as a Lake Table.</td>
+              <td align="left">
+                  <table class="table table-bordered">
+                      <thead>
+                        <tr>
+                        <th>(lake 5)Gender</th>
+                  		<th>Region</th>
+                  		<th>ACE</th>
+                  		<th>ACF</th>
+                  		<th>ADE</th>
+                  		<th>ADF</th>
+                  		<th>BCE</th>
+                  		<th>BCF</th>
+                  		<th>BDE</th>
+                  		<th>BDF</th>
+                  		</tr>
+                      </thead>
+                      <tbody>
+                       <tr>
+                        <td>1</td>
+                  		<td>North</td>
+                  		<td>6</td>
+                  		<td>6</td>
+                  		<td>6</td>
+                  		<td>8</td>
+                  		<td>6</td>
+                  		<td>7</td>
+                  		<td>6</td>
+                  		<td>6</td>
+                       </tr>
+                       <tr>
+                        <td>&nbsp;</td>
+                  		<td>Chittenden</td>
+                  		<td>8</td>
+                  		<td>9</td>
+                  		<td>7</td>
+                  		<td>7</td>
+                  		<td>9</td>
+                  		<td>7</td>
+                  		<td>9</td>
+                  		<td>7</td>
+                       </tr>
+                       <tr>
+                        <td>&nbsp;</td>
+                  		<td>Central</td>
+                  		<td>5</td>
+                  		<td>4</td>
+                  		<td>6</td>
+                  		<td>4</td>
+                  		<td>4</td>
+                  		<td>4</td>
+                  		<td>4</td>
+                  		<td>6</td>
+                       </tr>
+                       <tr>
+                        <td>&nbsp;</td>
+                  		<td>East</td>
+                  		<td>6</td>
+                  		<td>6</td>
+                  		<td>6</td>
+                  		<td>7</td>
+                  		<td>6</td>
+                  		<td>7</td>
+                  		<td>6</td>
+                  		<td>6</td>
+                       </tr>
+                       <tr>
+                        <td>&nbsp;</td>
+                  		<td>South</td>
+                  		<td>4</td>
+                  		<td>5</td>
+                  		<td>4</td>
+                  		<td>4</td>
+                  		<td>5</td>
+                  		<td>4</td>
+                  		<td>4</td>
+                  		<td>4</td>
+                       </tr>
+                       <tr>
+                        <td>&nbsp;</td>
+                  		<td>&nbsp;</td>
+                  		<td>29</td>
+                  		<td>30</td>
+                  		<td>29</td>
+                  		<td>30</td>
+                  		<td>30</td>
+                  		<td>29</td>
+                  		<td>29</td>
+                  		<td>29</td>
+                       </tr>
+                      </tbody>
+                  </table>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+      <br>
+      <center>
+  <br>
+  <br>
+  </div>
+  <div style="height: 30px"></div>
+
+  <div class="container section-block">
+      <br>
+      <br>
+      <font class="section-heading">Client List</font>
+      <hr class="subtle_section">
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th scope="col">Client Name</th>
+            <th scope="col">Customization</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Tulchin</th>
+            <td align="left">All DNQs and Reschedules will be split into Online, Cell and Phone modes.</td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+      <center>
+      <br>
+      <br>
+  </div>
+
+  </body>
+
+  <footer>
+    <div id="CR_text">
+    <br>
+    <br>
+    <br>
+    This site and it's contents are without warrenty or guarentee of functionality.
+    <br>
+    <br>
+    <br>
+    </div>
+  </footer>
+
+</html>

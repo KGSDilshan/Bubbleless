@@ -1,0 +1,20 @@
+{
+  "name": "Scrubber",
+  "version": "1.0.0",
+  "description": "A tool to help sampling",
+  "main": "index.js",
+  "scripts": {
+    "test": "running"
+  },
+  "keywords": [
+    "website",
+    "Bubbless",
+    "Dilshan",
+  ],
+  "author": "Dilshan Gunasekera",
+  "license": "ISC",
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "bower": "^1.8.0"
+  }
+}
