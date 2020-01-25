@@ -1,7 +1,8 @@
-var SAMPLE;
+var SAMPLE = undefined;
 var SCRUB_PARSE;
 var UNCHANGED_ROWS = 6;
 var DATA_LENGTH = 0;
+var WARNINGS = [];
 var ALPHABET = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q",
  				"R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
 
@@ -47,7 +48,6 @@ function PreviewSample(fdata) {
 
 
 function ProcessEntireSample(fdata) {
-	console.log("starting to process");
 	let data = fdata.split("\n");
 	SAMPLE = new Sample(data);
 	console.log("done");
@@ -70,36 +70,62 @@ function CalcIndexColumn(s) {
 
 
 function ProcessInput() {
+	if (SAMPLE == undefined) {
+		alert("Upload a sample first.");
+		return;
+	}
+	WARNINGS = [];
+	$("button#continue2").remove();
+	$("button#continue3").remove();
 	// reparse all arguments
 	let contents = document.getElementById("bubblesInput").value;
     contents = contents.split("\n");
-	console.log(contents);
 	currentCol = undefined;
+	isDelete = false;
 	for (let i = 0; i < contents.length; i++) {
 		let line = contents[i].trim();
 		if (line == "")
 			continue;
 		line = line.split("\t");
-		console.log(line);
 		if (line.length == 1) {
-			// this is column
-			currentCol = line[0];
-			console.log("Column is ", line[0], CalcIndexColumn(line[0]) - 1);
-
+			line[0] = line[0].toUpperCase();
+			if (line[0].includes("DELETE")) {
+				// this is a delete
+				currentCol = line[0].toUpperCase().split("DELETE").join("").trim();
+				isDelete = true;
+			} else if (line[0].includes("STOP DELETE")) {
+				isDelete = false;
+			} else if (isDelete) {
+				SAMPLE.DeleteRecords(currentCol, line[0].toUpperCase());
+			} else {
+				// this is column
+				currentCol = line[0];
+				isDelete = false;
+			}
 		} else {
 			// this is a replacement
-			let original = line[0].split(",");
+			let original = line[0].toUpperCase().split(",");
 			let replacement = line[1];
 			for (let j = 0; j < original.length; j++) {
-				console.log("In column ", currentCol, "replace", original[j], "with", replacement)
-				SAMPLE.FindAndReplace(currentCol, original[j], replacement);
+				if (original[j].includes("-")) {
+					// this is a range
+					SAMPLE.FindAndReplaceRange(currentCol, original[j].split("-"), replacement);
+				} else {
+					SAMPLE.FindAndReplace(currentCol, original[j], replacement);
+				}
 			}
 		}
 	}
 	SAMPLE.PrepareExport();
-	DownloadCSV(SAMPLE.records);
-	console.log("export ready!");
-	//DisplayWarnings();
+	if (WARNINGS.length == 0){
+		WARNINGS.push("<b>ALL OK.</b>");
+		let buttonHTML = '<button type="submit" class="btn btn-primary mb-2" id="continue2" onClick=SAMPLE.DownloadCSV()>Download CSV</button>'
+		$("div#ButtonBuffer").append(buttonHTML);
+	} else {
+		let buttonHTML = '<button type="submit" class="btn btn-primary mb-2" id="continue2" onClick=SAMPLE.DownloadCSV() >Acknowledged Warnings & Download CSV</button>'
+		$("div#ButtonBuffer").append(buttonHTML);
+	}
+	DisplayWarnings();
 }
 
 function DisplayWarnings() {
@@ -109,23 +135,4 @@ function DisplayWarnings() {
 	}
 	// write
 	document.getElementById("WarningBuffer").innerHTML = message + "<br><br>";
-}
-
-
-function DownloadCSV(csv, filename="YourFilename.csv") {
-    let csvFile;
-    let downloadLink;
-
-	if (window.Blob == undefined || window.URL == undefined || window.URL.createObjectURL == undefined) {
-		alert("Your browser doesn't support Blobs");
-		return;
-	}
-
-    csvFile = new Blob(csv, {type:"text/csv"});
-    downloadLink = document.createElement("a");
-    downloadLink.download = filename;
-    downloadLink.href = window.URL.createObjectURL(csvFile);
-    downloadLink.style.display = "none";
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
 }
