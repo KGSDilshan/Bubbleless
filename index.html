@@ -52,7 +52,7 @@
           <a class="nav-item nav-link active" href="docs.html"><i class="fa fa-book" aria-hidden="true"> Documentation</i></a>
         </li>
       <li class="nav-item">
-          <a class="nav-item nav-link active" href="https://github.com/KGSDilshan"><i class="fa fa-github" aria-hidden="true"> Source</i></a>
+          <a class="nav-item nav-link active" href="https://github.com/KGSDilshan/Bubbleless"><i class="fa fa-github" aria-hidden="true"> Source</i></a>
       </li>
         </ul>
       </div>
@@ -65,7 +65,7 @@
       <small style="color: #FFFFFF;" size="1">Scrubbing without the bubbles</small>
       </h1></font>
       <div style="text-align: right">
-        <font size="4vh" style="color: white">v400</font>
+        <font size="4vh" style="color: white">v1.0.0</font>
       </div>
     </div>
 
@@ -80,25 +80,26 @@
     <br>
     <br>
     <form>
-        <div class="form-group row">
-            <label for="sampleFile" align="center">Upload Sample</label>
-            <div class="col-sm-10" align="center">
-                <input type="file" accept='*csv' onchange='OpenFile(event)' class="form-control-file" id="sampleFile">
+        <div class="form-group" align=center>
+            <div class="custom-file">
+                <input type="file" class="custom-file-input" accept='*csv' onchange='OpenFile(event)' id="sampleFile" required>
+                <label class="custom-file-label" for="sampleFile">Choose file...</label>
+                <div class="invalid-feedback">A Sample is Required</div>
             </div>
         </div>
-        <div class="form-group row">
+        <div class="form-group">
             <label for="displayRecords">Sample Preview</label>
-            <div class="col-sm-10 scrollhorizontal" id="samplePreview" align="center" width="100%">
-                Requires sample.
+            <div class="scrollhorizontal" id="samplePreview" align="center" width="100%">
+                <b>Requires sample.</b>
             </div>
-            <br>
         </div>
-        <div class="form-group row">
+        <br>
+        <div class="form-group">
             <label for="bubblesInput">Paste your conversions here</label>
             <textarea class="form-control" id="bubblesInput" rows="10" placeholder="Paste your conversions here.">
             </textarea>
-            <br>
         </div>
+        <br>
     </form>
     <button class="btn btn-primary" onClick=ProcessInput()>Process</button>
     <br>

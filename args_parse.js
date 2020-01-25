@@ -3,8 +3,6 @@ var SCRUB_PARSE;
 var UNCHANGED_ROWS = 6;
 var DATA_LENGTH = 0;
 var WARNINGS = [];
-var ALPHABET = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q",
- 				"R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
 
 function OpenFile(event) {
 	let input = event.target;
@@ -62,9 +60,9 @@ function CalcColumnID(num) {
 
 function CalcIndexColumn(s) {
 	let n = 0;
-    for(let p = 0; p < s.length; p++){
-        n = s[p].charCodeAt() - 64 + n * 26;
-    }
+	for(let p = 0; p < s.length; p++){
+		n = s[p].charCodeAt() - 64 + n * 26;
+	}
 	return n;
 }
 
@@ -79,7 +77,7 @@ function ProcessInput() {
 	$("button#continue3").remove();
 	// reparse all arguments
 	let contents = document.getElementById("bubblesInput").value;
-    contents = contents.split("\n");
+	contents = contents.split("\n");
 	currentCol = undefined;
 	isDelete = false;
 	for (let i = 0; i < contents.length; i++) {

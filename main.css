@@ -62,3 +62,8 @@ div.scrollhorizontal {
   overflow: auto;
   white-space: nowrap;
 }
+
+
+.no-stretch {
+	max-width:100%
+}
