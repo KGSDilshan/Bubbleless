@@ -20,7 +20,14 @@ class FlaggedColumn {
     }
 
     InsertIntoSample() {
-        this.additions[0] = "FLAGGED_" + this.additions[0];
+        let parentColName = ""
+        if (CalcIndexColumn(this.name) - 1 < UNCHANGED_ROWS) {
+            parentColName = this.name;
+        } else {
+            parentColName = CalcColumnID(CalcIndexColumn(this.name) + (SAMPLE.flagged_start - UNCHANGED_ROWS));
+        }
+        console.log(parentColName, this.name, SAMPLE.flagged_start);
+        this.additions[0] = this.additions[0] + "_Flagged_(" + parentColName + ")";
         let unaccounted = [];
         for (let i = 0; i < SAMPLE.records.length; i++) {
             if (!this.changes.includes(this.additions[i])) {
@@ -66,6 +73,7 @@ class Sample {
         this.modifiedCols = [];
         this.flagged_additions = [];
         this.flagged_start = UNCHANGED_ROWS;
+        this.backup = [];
 
         for (let i = 0; i < data.length; i++) {
             this.records.push(data[i].split(","));
@@ -159,6 +167,7 @@ class Sample {
     }
 
     PrepareExport() {
+        this.backup = [...this.records];
         for (let i = 0; i <this.flagged_additions.length; i++) {
             this.flagged_additions[i].InsertIntoSample();
         }

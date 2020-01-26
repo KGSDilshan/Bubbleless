@@ -184,22 +184,36 @@ function ProcessInput() {
 		}
 	}
 	SAMPLE.PrepareExport();
+	let good = false;
 	if (WARNINGS.length == 0){
 		WARNINGS.push("<b>ALL OK.</b>");
 		let buttonHTML = '<button type="submit" class="btn btn-primary mb-2" id="continue2" onClick=SAMPLE.DownloadCSV()>Download CSV</button>'
 		$("div#ButtonBuffer").append(buttonHTML);
+		good = true;
 	} else {
-		let buttonHTML = '<button type="submit" class="btn btn-primary mb-2" id="continue2" onClick=SAMPLE.DownloadCSV() >Acknowledged Warnings & Download CSV</button>'
+		let buttonHTML = '<button type="submit" class="btn btn-danger mb-2" id="continue2" onClick=SAMPLE.DownloadCSV() >Acknowledged Warnings & Download CSV</button>'
 		$("div#ButtonBuffer").append(buttonHTML);
 	}
-	DisplayWarnings();
+	DisplayWarnings(good);
 }
 
-function DisplayWarnings() {
+function DisplayWarnings(good) {
 	let message = "";
+	alertMsg = "";
 	for (let i = 0; i < WARNINGS.length; i++) {
-		message += WARNINGS[i] + "<br>";
+		let htmlAlert;
+		if (good)
+			htmlAlert = '<div class="alert alert-success alert-dismissible fade show" role="alert">';
+		else
+			htmlAlert = '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
+		htmlAlert += WARNINGS[i] + "<br>";
+		htmlAlert += '<button type="button" class="close" data-dismiss="alert" aria-label="Close">';
+		htmlAlert += '<span aria-hidden="true">&times;</span></button></div>';
+		message += htmlAlert;
+		alertMsg += WARNINGS[i].split("<b>").join("").split("</b>").join("") + "\n"
 	}
 	// write
 	document.getElementById("WarningBuffer").innerHTML = message + "<br><br>";
+	if (!good)
+		alert(alertMsg);
 }
