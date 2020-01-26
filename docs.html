@@ -28,12 +28,6 @@
       }
 
     </style>
-    <script>
-        $( document ).ready(function() {
-            document.getElementById("bubblesInput").innerHTML = "";
-            document.getElementById("bubblesInput").innerText = "";
-        });
-    </script>
   </head>
 
   <body>
@@ -250,7 +244,7 @@
       <hr class="subtle_section">
       <p>
       <br>
-      These are used as a "title" inplace of the typical cellname and produces a custom behaviour.
+      These are used as a "title" inplace of the typical cellname and produces a custom behaviour. None of these are case or space sensitive.
       <table class="table table-bordered">
         <thead>
           <tr>
@@ -287,6 +281,33 @@
                   <br>
                   18-34&nbsp;&nbsp;&nbsp;&nbsp;1
               </td>
+          </tr>
+          <tr>
+              <th scope="row">Other X</th>
+              <th scope="row">OTHER</th>
+              <td align="left">Anything that hasn't been accounted for is changed to a given value "X".</td>
+              <td align="left">
+                  A
+                  <br>
+                  18-34&nbsp;&nbsp;&nbsp;&nbsp;1
+                  <br>
+                  other&nbsp;&nbsp;&nbsp;&nbsp;5
+              </td>
+          </tr>
+          <tr>
+              <th scope="row">Combine REPLACEMENT_VALUE</th>
+              <th scope="row">COMBINE</th>
+              <td align="left">If Conditions are all TRUE, then the given record will be set to the REPLACEMENT_VALUE for an active column.</td>
+              <td align="left">
+                  Combine GrandmaWithACell
+                  <br>
+                  AW&nbsp;&nbsp;&nbsp;&nbsp;60-1000
+                  <br>
+                  P&nbsp;&nbsp;&nbsp;&nbsp;2
+                  <br>
+                  F&nbsp;&nbsp;&nbsp;&nbsp;2
+                  <br>
+                  End combine
           </tr>
         </tbody>
       </table>
