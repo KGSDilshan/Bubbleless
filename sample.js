@@ -25,7 +25,7 @@ class FlaggedColumn {
         for (let i = 0; i < SAMPLE.records.length; i++) {
             if (!this.changes.includes(this.additions[i])) {
                 if (!unaccounted.includes(this.additions[i]) && i > 0) {
-                    WARNINGS.push("<b>WARNINGS:</b> In column " + this.name + " found unaccounted value " + this.additions[i]);
+                    WARNINGS.push("<b>WARNINGS:</b> In column '" + this.name + "' found unaccounted value '" + this.additions[i] + "'");
                     unaccounted.push(this.additions[i]);
                 }
             }
@@ -38,6 +38,14 @@ class FlaggedColumn {
         for (let i = 0; i < this.additions.length; i++) {
             if (this.additions[i] == find)
                 this.additions[i] = "ReplacementString" + replace;
+        }
+    }
+
+    OtherReplace(replacementCode) {
+        this.changes.push("ReplacementString" + replacementCode);
+        for (let i = 1; i < this.additions.length; i++) {
+            if (!this.additions[i].includes("ReplacementString"))
+                this.additions[i] = "ReplacementString" + replacementCode;
         }
     }
 
@@ -58,6 +66,7 @@ class Sample {
         this.modifiedCols = [];
         this.flagged_additions = [];
         this.flagged_start = UNCHANGED_ROWS;
+
         for (let i = 0; i < data.length; i++) {
             this.records.push(data[i].split(","));
             if (this.records[i] == "")
@@ -116,7 +125,13 @@ class Sample {
             // Flagged column doesn't exist
             // loop through records and do the replacements
             let flag = new FlaggedColumn(col, this.flagged_start);
+            flag.changes.push("ReplacementString" + value);
             this.flagged_start++;
+            if (item.toUpperCase() == "OTHER") {
+                flag.OtherReplace(value);
+                this.flagged_additions.push(flag);
+                return;
+            }
             for (let i = 0; i < this.records.length; i++) {
                 if (this.records[i][colID] == item) {
                     flag.Add("ReplacementString" + value);
@@ -124,10 +139,13 @@ class Sample {
                     flag.Add(this.records[i][colID]);
                 }
             }
-            flag.changes.push("ReplacementString" + value);
             this.flagged_additions.push(flag);
         } else {
             // Flagged column exists
+            if (item.toUpperCase() == "OTHER") {
+                this.flagged_additions[flaggedCol].OtherReplace(value);
+                return;
+            }
             this.flagged_additions[flaggedCol].FindAndReplace(item, value);
         }
     }
