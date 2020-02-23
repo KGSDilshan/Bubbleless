@@ -23,7 +23,7 @@
 .section-block {
 	background-color: #FFFFFF;
 	border-radius: 10px;
-	box-shadow: 0 0 1px black;
+	box-shadow: 0 0 2px black;
 	text-align: center;
 }
 
@@ -66,4 +66,9 @@ div.scrollhorizontal {
 
 .no-stretch {
 	max-width:100%
+}
+
+
+#dataChartArea {
+	height: 40%;
 }

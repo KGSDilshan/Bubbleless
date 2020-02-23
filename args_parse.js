@@ -3,17 +3,69 @@ var SCRUB_PARSE;
 var UNCHANGED_ROWS = 6;
 var DATA_LENGTH = 0;
 var WARNINGS = [];
+var TEXTWARNINGS = [];
+var FileWorker = new Worker("worker.js");
+var FileState = 0;
+
+FileWorker.onmessage = function(event) {
+	switch (FileState) {
+		case 0:
+			console.log("finished..", event.data);
+			if (event.data == 4) {
+				FileState = 1;
+			}
+			break;
+		case 1:
+			SAMPLE = event.data.slice(3, event.data.length);
+			PreviewSample(SAMPLE);
+			ProcessEntireSample(SAMPLE, "sample_uploader");
+			FileWorker.terminate();
+			$("div#sampleuploadtimer").remove();
+			break;
+	};
+
+};
 
 function OpenFile(event) {
-	let input = event.target;
-	let reader = new FileReader();
-	reader.onload = function(e) {
-		SAMPLE = e.target.result;
-		PreviewSample(SAMPLE);
-		ProcessEntireSample(SAMPLE);
-	};
-	reader.readAsText(input.files[0]);
+	AltLoadBar();
+	let files = document.getElementById("sampleFile").files;
+	if (files[0].name.includes(".csv")) {
+		let input = event.target;
+		let reader = new FileReader();
+		reader.readAsText(input.files[0]);
+		reader.onload = function(e) {
+			SAMPLE = e.target.result;
+			PreviewSample(SAMPLE);
+			ProcessEntireSample(SAMPLE);
+			$("div#sampleuploadtimer").remove();
+		};
+	} else {
+		FileWorker.postMessage(files);
+	}
 };
+
+
+function LoadBar(id) {
+	let data = '<div class="progress">';
+	data += '<div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" id="' + id.toString() + 'loadbar"' +  'aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>'
+	data += '</div>';
+
+	$("div#" + id.toString()).append(data);
+	return id.toString() + "loadbar";
+}
+
+
+function AltLoadBar(id="sample_uploader") {
+	let data = '<br><div class="spinner-border" id="sampleuploadtimer" role="status">';
+	data += '<span class="sr-only">Loading...</span>'
+	data += '</div>';
+	$("div#" + id.toString()).append(data);
+}
+
+
+function LoadBarSetValue(id, value) {
+	document.getElementById(id).style.width = value.toString() + "%";
+}
 
 
 function PreviewSample(fdata) {
@@ -45,9 +97,9 @@ function PreviewSample(fdata) {
 }
 
 
-function ProcessEntireSample(fdata) {
+function ProcessEntireSample(fdata, id) {
 	let data = fdata.split("\n");
-	SAMPLE = new Sample(data);
+	SAMPLE = new Sample(data, id);
 	console.log("done");
 }
 
@@ -72,129 +124,57 @@ function ProcessInput() {
 		alert("Upload a sample first.");
 		return;
 	}
+	let flagstart = document.getElementById("bubbless-flagstart-input").value;
+	if (parseInt(flagstart) < 0) {
+		alert("Invalid input for flag start field.");
+	} else {
+		UNCHANGED_ROWS = parseInt(flagstart) - 1;
+		SAMPLE.flagged_start = UNCHANGED_ROWS;
+	}
 	WARNINGS = [];
+	TEXTWARNINGS = [];
 	$("button#continue2").remove();
 	$("button#continue3").remove();
 	// reparse all arguments
 	let contents = document.getElementById("bubblelessInput").value;
 	contents = contents.split("\n");
-	let currentCol = undefined;
-	let isDelete = false;
 	for (let i = 0; i < contents.length; i++) {
-		let line = contents[i].trim();
-		if (line == "")
-			continue;
-		line = line.split("\t");
-		if (line.length == 1) {
-			line[0] = line[0].toUpperCase();
-			if (line[0].includes("STOP DELETE")) {
-				isDelete = false;
-			} else if (line[0].includes("DELETE")) {
-				// this is a delete
-				currentCol = line[0].toUpperCase().split("DELETE").join("").trim();
-				isDelete = true;
-			} else if (isDelete) {
-				SAMPLE.DeleteRecords(currentCol, line[0].toUpperCase());
-			} else if (line[0].includes("COMBINE")) {
-				let replacement =  line[0].split("COMBINE").join("").trim();
-				let j = i + 1;
-				let conds = [];
-				while (true) {
-					let temp = contents[j].trim().toUpperCase().split("\t");
-					if (temp.includes("END COMBINE")) {
-						i = j;
-						break;
-					} else {
-						let rangeVals = temp[1].split("-");
-						let vmin = rangeVals[0];
-						let vmax = rangeVals.length > 1 ? rangeVals[1] : rangeVals[0];
-						if (vmin != vmax) {
-							// is an actual range
-							vmin = parseInt(vmin);
-							vmax = parseInt(vmax);
-						}
-						conds.push({col: (CalcIndexColumn(temp[0]) - 1), min: vmin, max : vmax});
-						j++;
-					}
-				}
-				if (conds.length > 0) {
-					i = j;
-					let flaggedCol = SAMPLE.FlagExists(currentCol);
-					let col = CalcIndexColumn(currentCol) - 1;
-					let needAppend = true;
-					if (flaggedCol == -1) {
-						// column is empty, create it
-						SAMPLE.flagged_additions.push(new FlaggedColumn(currentCol, SAMPLE.flagged_start));
-						SAMPLE.flagged_start++;
-						flaggedCol = SAMPLE.flagged_additions.length - 1;
-					} else {
-						needAppend = false;
-					}
-					SAMPLE.flagged_additions[flaggedCol].changes.push("ReplacementString" + replacement);
-					for (let k = 0; k < SAMPLE.records.length; k++) {
-						let setRecord = true;
-						for (let j = 0; j < conds.length; j++) {
-							let colID = conds[j].col;
-							let min = conds[j].min;
-							let max = conds[j].max;
-							if (max != min) {
-								if (!(parseInt(SAMPLE.records[k][colID]) >= min && parseInt(SAMPLE.records[k][colID]) <= max)) {
-									setRecord = false;
-									break;
-								}
-							} else {
-								// normal comparison
-								if (SAMPLE.records[k][colID] != min) {
-									setRecord = false;
-									break;
-								} else {
-								}
-							}
-						}
-						if (setRecord) {
-							if (needAppend) {
-								SAMPLE.flagged_additions[flaggedCol].Add("ReplacementString" + replacement);
-							} else {
-								SAMPLE.flagged_additions[flaggedCol].additions[k] = ("ReplacementString" + replacement);
-							}
-						} else {
-							if (needAppend)
-								SAMPLE.flagged_additions[flaggedCol].Add(SAMPLE.records[k][col]);
-						}
-					}
-				}
-
-			} else {
-				// this is column
-				currentCol = line[0];
-				isDelete = false;
-			}
-		} else {
-			// this is a replacement
-			let original = line[0].toUpperCase().split(",");
-			let replacement = line[1];
-			for (let j = 0; j < original.length; j++) {
-				if (original[j].includes("-")) {
-					// this is a range
-					SAMPLE.FindAndReplaceRange(currentCol, original[j].split("-"), replacement);
-				} else {
-					SAMPLE.FindAndReplace(currentCol, original[j], replacement);
-				}
-			}
-		}
+		i = RunCommand(contents, i);
 	}
+
 	SAMPLE.PrepareExport();
 	let good = false;
-	if (WARNINGS.length == 0){
+	if (WARNINGS.length == 0) {
 		WARNINGS.push("<b>ALL OK.</b>");
-		let buttonHTML = '<button type="submit" class="btn btn-primary mb-2" id="continue2" onClick=SAMPLE.DownloadCSV()>Download CSV</button>'
+		TEXTWARNINGS.push("ALL OK\n");
+		let buttonHTML = '<button type="submit" class="btn btn-primary mb-2" id="continue2" onClick=SAMPLE.DownloadCSV(SAMPLE.records)>Download CSV</button>'
 		$("div#ButtonBuffer").append(buttonHTML);
 		good = true;
 	} else {
-		let buttonHTML = '<button type="submit" class="btn btn-danger mb-2" id="continue2" onClick=SAMPLE.DownloadCSV() >Acknowledged Warnings & Download CSV</button>'
+		let buttonHTML = '<button type="submit" class="btn btn-danger mb-2" id="continue2" onClick=SAMPLE.DownloadCSV(SAMPLE.records) >Acknowledged Warnings & Download CSV</button>'
 		$("div#ButtonBuffer").append(buttonHTML);
 	}
 	DisplayWarnings(good);
+	ViewRawData();
+	document.getElementById("dataChartArea").innerHTML = "";
+	for (let i = 0; i < SAMPLE.flagged_additions.length; i++) {
+		if (!SAMPLE.flagged_additions[i].isCopied) {
+			let x = new DataVisual(SAMPLE.flagged_additions[i].breakdown, SAMPLE.flagged_additions[i].breakdownNames, SAMPLE.flagged_additions[i].parentName);
+			x.RenderGraph();
+		}
+	}
+}
+
+function ViewRawData() {
+	if (SAMPLE.deletedRecords.size > 0) {
+		// check how many deletes we have
+		let count = 0;
+    	for (const [key, value] of SAMPLE.deletedRecords.entries()) {
+            count += value.length;
+    	}
+		let buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-primary mb-2" id="continue3" onClick=SAMPLE.ExportDeleted()>Download Deletes (' + count + ')</button>'
+		$("div#ButtonBuffer").append(buttonHTML);
+	}
 }
 
 function DisplayWarnings(good) {
