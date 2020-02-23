@@ -4,27 +4,8 @@ var UNCHANGED_ROWS = 6;
 var DATA_LENGTH = 0;
 var WARNINGS = [];
 var TEXTWARNINGS = [];
-var FileWorker = new Worker("worker.js");
+var FileWorker;
 var FileState = 0;
-
-FileWorker.onmessage = function(event) {
-	switch (FileState) {
-		case 0:
-			console.log("finished..", event.data);
-			if (event.data == 4) {
-				FileState = 1;
-			}
-			break;
-		case 1:
-			SAMPLE = event.data.slice(3, event.data.length);
-			PreviewSample(SAMPLE);
-			ProcessEntireSample(SAMPLE, "sample_uploader");
-			FileWorker.terminate();
-			$("div#sampleuploadtimer").remove();
-			break;
-	};
-
-};
 
 function OpenFile(event) {
 	AltLoadBar();
@@ -40,6 +21,24 @@ function OpenFile(event) {
 			$("div#sampleuploadtimer").remove();
 		};
 	} else {
+		FileWorker = new Worker("worker.js");
+		FileWorker.onmessage = function(event) {
+			switch (FileState) {
+				case 0:
+					console.log("finished..", event.data);
+					if (event.data == 4) {
+						FileState = 1;
+					}
+					break;
+				case 1:
+					SAMPLE = event.data.slice(3, event.data.length);
+					PreviewSample(SAMPLE);
+					ProcessEntireSample(SAMPLE, "sample_uploader");
+					FileWorker.terminate();
+					$("div#sampleuploadtimer").remove();
+					break;
+			};
+		};
 		FileWorker.postMessage(files);
 	}
 };
@@ -56,7 +55,7 @@ function LoadBar(id) {
 
 
 function AltLoadBar(id="sample_uploader") {
-	let data = '<br><div class="spinner-border" id="sampleuploadtimer" role="status">';
+	let data = '<div class="spinner-border" id="sampleuploadtimer" role="status">';
 	data += '<span class="sr-only">Loading...</span>'
 	data += '</div>';
 	$("div#" + id.toString()).append(data);
