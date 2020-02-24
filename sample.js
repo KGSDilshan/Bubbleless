@@ -150,9 +150,14 @@ class Sample {
         this.backup = [];
         this.deletedRecords = new Map();
 
+        // this.sampleWorker = new Worker("sampleProcess_worker.js");
+		// this.sampleWorker.onmessage = function(event) {
+		// 	this.records = event.data;
+		// };
+		// this.sampleWorker.postMessage(data);
         for (let i = 0; i < data.length; i++) {
-            this.records.push(data[i].split(","));
-            if (this.records[i] == "")
+            this.records[i] = $.csv.toArray(data[i]);
+            if (this.records[i] === undefined)
                 this.records.splice(i, 1);
         }
         this.replacements = [];
@@ -365,19 +370,39 @@ class Sample {
     }
 
 
-    DownloadCSV(csvVar, filename="RENAME_ME.csv") {
+    DownloadCSV(csvVar) {
     	if (window.Blob == undefined || window.URL == undefined || window.URL.createObjectURL == undefined) {
     		alert("Your browser doesn't support Blobs");
     		return;
     	}
+        let fBlob;
+        if (INITIAL_FILETYPE == "csv") {
+            fBlob = new Blob(csvVar, {type:"text/csv"});
+            let downloadLink = document.createElement("a");
+            downloadLink.download = "RENAME_ME." + INITIAL_FILETYPE;
+            downloadLink.href = window.URL.createObjectURL(fBlob);
+            downloadLink.style.display = "none";
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+        } else {
 
-        let csvFile = new Blob(csvVar, {type:"text/csv"});
-        let downloadLink = document.createElement("a");
-        downloadLink.download = filename;
-        downloadLink.href = window.URL.createObjectURL(csvFile);
-        downloadLink.style.display = "none";
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
+            let fileExporter = new Worker("export_worker.js");
+            let buff;
+    		fileExporter.onmessage = function(event) {
+    			fBlob = new Blob([event.data], {type:"application/octet-stream"});
+                let downloadLink = document.createElement("a");
+                downloadLink.download = "RENAME_ME.xlsx";
+                downloadLink.href = window.URL.createObjectURL(fBlob);
+                downloadLink.style.display = "none";
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                fileExporter.terminate();
+    		};
+            for (var i = 0; i < csvVar.length; i++) {
+                csvVar[i] = $.csv.toArray(csvVar[i]);
+            }
+    		fileExporter.postMessage(csvVar);
+        }
 
         // download warnings too
         if (TEXTWARNINGS[0].includes("ALL OK")) {

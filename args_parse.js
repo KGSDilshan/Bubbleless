@@ -6,6 +6,7 @@ var WARNINGS = [];
 var TEXTWARNINGS = [];
 var FileWorker;
 var FileState = 0;
+var INITIAL_FILETYPE = "csv";
 
 function OpenFile(event) {
 	AltLoadBar();
@@ -21,6 +22,8 @@ function OpenFile(event) {
 			$("div#sampleuploadtimer").remove();
 		};
 	} else {
+		INITIAL_FILETYPE = files[0].name.split(".");
+		INITIAL_FILETYPE = INITIAL_FILETYPE[INITIAL_FILETYPE.length - 1];
 		FileWorker = new Worker("worker.js");
 		FileWorker.onmessage = function(event) {
 			switch (FileState) {
@@ -142,6 +145,7 @@ function ProcessInput() {
 	}
 
 	SAMPLE.PrepareExport();
+	console.log("filetype: ", INITIAL_FILETYPE);
 	let good = false;
 	if (WARNINGS.length == 0) {
 		WARNINGS.push("<b>ALL OK.</b>");
