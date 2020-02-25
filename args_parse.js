@@ -19,6 +19,7 @@ function OpenFile(event) {
 			SAMPLE = e.target.result;
 			PreviewSample(SAMPLE);
 			ProcessEntireSample(SAMPLE);
+			$("div#loadingStatusMsg").remove();
 			$("div#sampleuploadtimer").remove();
 		};
 	} else {
@@ -28,9 +29,10 @@ function OpenFile(event) {
 		FileWorker.onmessage = function(event) {
 			switch (FileState) {
 				case 0:
-					console.log("finished..", event.data);
 					if (event.data == 4) {
 						FileState = 1;
+					} else {
+						document.getElementById("loadingStatusMsg").innerText = "finished..." + event.data;
 					}
 					break;
 				case 1:
@@ -38,6 +40,7 @@ function OpenFile(event) {
 					PreviewSample(SAMPLE);
 					ProcessEntireSample(SAMPLE, "sample_uploader");
 					FileWorker.terminate();
+					$("div#loadingStatusMsg").remove();
 					$("div#sampleuploadtimer").remove();
 					break;
 			};
@@ -60,7 +63,7 @@ function LoadBar(id) {
 function AltLoadBar(id="sample_uploader") {
 	let data = '<div class="spinner-border" id="sampleuploadtimer" role="status">';
 	data += '<span class="sr-only">Loading...</span>'
-	data += '</div>';
+	data += '</div><div id="loadingStatusMsg">' + "" + '</div>';
 	$("div#" + id.toString()).append(data);
 }
 

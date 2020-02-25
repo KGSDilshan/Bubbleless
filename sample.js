@@ -140,7 +140,7 @@ class FlaggedColumn {
 
 }
 
-
+var sampleWorker;
 class Sample {
     constructor(data) {
         this.records = [];
@@ -150,19 +150,19 @@ class Sample {
         this.backup = [];
         this.deletedRecords = new Map();
 
-        // this.sampleWorker = new Worker("sampleProcess_worker.js");
-		// this.sampleWorker.onmessage = function(event) {
-		// 	this.records = event.data;
-		// };
-		// this.sampleWorker.postMessage(data);
-        for (let i = 0; i < data.length; i++) {
-            this.records[i] = $.csv.toArray(data[i]);
-            if (this.records[i] === undefined)
-                this.records.splice(i, 1);
-        }
+        sampleWorker = new Worker("sampleProcess_worker.js");
+		sampleWorker.onmessage = function(event) {
+            SAMPLE.records = event.data.slice();
+            sampleWorker.terminate();
+		};
+		sampleWorker.postMessage(data);
+        // for (let i = 0; i < data.length; i++) {
+        //     this.records[i] = $.csv.toArray(data[i]);
+        //     if (this.records[i] === undefined)
+        //         this.records.splice(i, 1);
+        // }
         this.replacements = [];
     }
-
 
     GenerateTokens(cname) {
         const tokenFlag = new FlaggedColumn(cname, this.flagged_start);
@@ -351,8 +351,17 @@ class Sample {
         for (let i = 0; i <this.flagged_additions.length; i++) {
             this.flagged_additions[i].InsertIntoSample();
         }
-        for (let i = 0; i < this.records.length; i++) {
-            this.records[i] = this.records[i].join(",");
+
+        if (INITIAL_FILETYPE == "csv") {
+            // for (let i = 0; i < this.records.length; i++) {
+            //     this.records[i] = $.csv.fromArrays([this.records[i]]);
+            // }
+            sampleWorker = new Worker("samplePrepExport.js");
+    		sampleWorker.onmessage = function(event) {
+                SAMPLE.records = event.data.slice();
+                sampleWorker.terminate();
+    		};
+    		sampleWorker.postMessage(this.records);
         }
     }
 
@@ -376,7 +385,9 @@ class Sample {
     		return;
     	}
         let fBlob;
+        AltLoadBar("LoadingMessages");
         if (INITIAL_FILETYPE == "csv") {
+            console.log(csvVar);
             fBlob = new Blob(csvVar, {type:"text/csv"});
             let downloadLink = document.createElement("a");
             downloadLink.download = "RENAME_ME." + INITIAL_FILETYPE;
@@ -384,23 +395,29 @@ class Sample {
             downloadLink.style.display = "none";
             document.body.appendChild(downloadLink);
             downloadLink.click();
+            $("div#loadingStatusMsg").remove();
+			$("div#sampleuploadtimer").remove();
         } else {
 
             let fileExporter = new Worker("export_worker.js");
             let buff;
     		fileExporter.onmessage = function(event) {
-    			fBlob = new Blob([event.data], {type:"application/octet-stream"});
-                let downloadLink = document.createElement("a");
-                downloadLink.download = "RENAME_ME.xlsx";
-                downloadLink.href = window.URL.createObjectURL(fBlob);
-                downloadLink.style.display = "none";
-                document.body.appendChild(downloadLink);
-                downloadLink.click();
-                fileExporter.terminate();
+                if (event.data[0] == 6) {
+                    fBlob = new Blob([event.data[1]], {type:"application/octet-stream"});
+                    let downloadLink = document.createElement("a");
+                    downloadLink.download = "RENAME_ME.xlsx";
+                    downloadLink.href = window.URL.createObjectURL(fBlob);
+                    downloadLink.style.display = "none";
+                    document.body.appendChild(downloadLink);
+                    downloadLink.click();
+                    fileExporter.terminate();
+                    $("div#loadingStatusMsg").remove();
+        			$("div#sampleuploadtimer").remove();
+                } else {
+                    document.getElementById("loadingStatusMsg").innerText = event.data[1];
+                }
+
     		};
-            for (var i = 0; i < csvVar.length; i++) {
-                csvVar[i] = $.csv.toArray(csvVar[i]);
-            }
     		fileExporter.postMessage(csvVar);
         }
 
