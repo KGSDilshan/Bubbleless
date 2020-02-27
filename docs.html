@@ -75,7 +75,7 @@
     <br>
 
     <div style="opacity: 0.3">
-      <center><font face="TimesNewRoman" size="3">Page updated: 1/24/2020 </font></center>
+      <center><font face="TimesNewRoman" size="3">Page updated: 2/26/2020 </font></center>
     </div>
     <br>
     <hr class="subtle_section">
@@ -90,7 +90,7 @@
             <div class="card card-body collapse" id="partOne">
                 <br>
                 <br>
-                Bubbleless can do coloumn level replacements and record level deletions given a column of interest.
+                Bubbleless can do column level replacements and record level deletions given a column of interest.
                 <br>
                 <br>
                 Inorder to work, data is expected to be formatted in this way:
@@ -256,20 +256,96 @@
         </thead>
         <tbody>
           <tr>
+            <th scope="row">Comments</th>
+            <th scope="row">//</th>
+            <td align="left">If a line starts with double slash (//), then that line is ignored. Use this to give comments bubbless will ignore.</td>
+            <td align="left">
+                <table class="table">
+                    <tr><td colspan="2"><b>// This is for Gender</b></td></tr>
+                    <tr><td colspan="2">L</td></tr>
+                    <tr><td>M</td><td>1</td></tr>
+                    <tr><td>F</td><td>2</td></tr>
+                    <tr><td>other</td><td>3</td></tr>
+                </table>
+                </td>
+          </tr>
+          <tr>
+            <th scope="row">Merge Phones</th>
+            <th scope="row">MERGEPHONENUM</th>
+            <td align="left">Merges two columns with numbers together. The first column is the priority column, if a value exists there, that value is used.
+                Blanks and 0 are ignored for this prioritization.</td>
+            <td align="left">
+                <table class="table">
+                    <tr><td><b>MERGEPHONENUM</b></td><td>A,B</td></tr>
+                </table>
+                </td>
+          </tr>
+          <tr>
             <th scope="row">Delete CellName</th>
             <th scope="row">DELETE</th>
             <td align="left">Deletes all records which contain a value in a given column. This command is not case sensitive.</td>
             <td align="left">
-                <b>DELETE A</b>
-                <br>
-                John
-                <br>
-                Emily
-                <br>
-                Lucas
-                <br>
-                <b>STOP DELETE</b>
-                <br>
+                <table class="table">
+                    <tr><td><b>DELETE A</b></td></tr>
+                    <tr><td>John</td></tr>
+                    <tr><td>Emily</td></tr>
+                    <tr><td>Lucas</td></tr>
+                    <tr><td><b>STOP DELETE</b></td></tr>
+                </table>
+                </td>
+          </tr>
+          <tr>
+            <th scope="row">Scrub names</th>
+            <th scope="row">NAMESLIST</th>
+            <td align="left">Merges Firstname and Lastname column text into one word and compares it to given names list.</td>
+            <td align="left">
+                <table class="table">
+                    <tr><td><b>NAMESLIST</b></td><td><b>AX, BY</b></td></tr>
+                    <tr><td colspan="2">DonaldTrump</td></tr>
+                    <tr><td colspan="2">BarackObama</td></tr>
+                    <tr><td colspan="2">GeorgeWBush</td></tr>
+                    <tr><td colspan="2"><b>STOP NAMES</b></td></tr>
+                </table>
+                </td>
+          </tr>
+          <tr>
+            <th scope="row">Copy Column</th>
+            <th scope="row">COPYCOLUMN</th>
+            <td align="left">Copies the contents of a given column.</td>
+            <td align="left">
+                <table class="table">
+                    <tr><td><b>COPYCOLUMN</b></td><td><b>AX</b></td></tr>
+                </table>
+                </td>
+          </tr>
+          <tr>
+            <th scope="row">Create Token</th>
+            <th scope="row">CREATETOKENS</th>
+            <td align="left">Fills the column with randomly generated and encrypted tokens.</td>
+            <td align="left">
+                <table class="table">
+                    <tr><td><b>CREATETOKENS</b></td></tr>
+                </table>
+                </td>
+          </tr>
+          <tr>
+            <th scope="row">Evaluate emails</th>
+            <th scope="row">EVALEMAILS</th>
+            <td align="left">If first column has an email, use that, otherwise pull from second column. Validates the given emails with surface level matching.</td>
+            <td align="left">
+                <table class="table">
+                    <tr><td><b>EVALEMAILS</b></td><td>A, B</td></tr>
+                </table>
+                </td>
+          </tr>
+          <tr>
+            <th scope="row">Graph Column</th>
+            <th scope="row">GRAPH</th>
+            <td align="left">Without flagging a column, graph it's contents. Giving a sample breakdown and graph to visualize it.</td>
+            <td align="left">
+                <table class="table">
+                    <tr><td><b>GRAPH</b></td><td>y</td><td>ChartName</td></tr>
+                </table>
                 </td>
           </tr>
           <tr>
@@ -277,21 +353,26 @@
               <th scope="row">X-Y</th>
               <td align="left">Integer Ranges can be given, where the "-" indicates a seperator between the min and the max values (inclusive)</td>
               <td align="left">
-                  A
-                  <br>
-                  18-34&nbsp;&nbsp;&nbsp;&nbsp;1
+                  <table class="table">
+                      <tr><td colspan="2">A</td></tr>
+                      <tr><td><b>18-34</b></td><td>1</td></tr>
+                      <tr><td><b>35-65</b></td><td>2</td></tr>
+                      <tr><td><b>65-999999999</b></td><td>3</td></tr>
+                  </table>
               </td>
           </tr>
           <tr>
-              <th scope="row">Other X</th>
+              <th scope="row">Other</th>
               <th scope="row">OTHER</th>
               <td align="left">Anything that hasn't been accounted for is changed to a given value "X".</td>
               <td align="left">
-                  A
-                  <br>
-                  18-34&nbsp;&nbsp;&nbsp;&nbsp;1
-                  <br>
-                  other&nbsp;&nbsp;&nbsp;&nbsp;5
+                  <table class="table">
+                      <tr><td colspan="2">A</td></tr>
+                      <tr><td>18-34</td><td>1</td></tr>
+                      <tr><td>35-65</td><td>2</td></tr>
+                      <tr><td>65-999999999</td><td>3</td></tr>
+                      <tr><td><b>other</td><td>4</b></td></tr>
+                  </table>
               </td>
           </tr>
           <tr>
@@ -299,15 +380,14 @@
               <th scope="row">COMBINE</th>
               <td align="left">If Conditions are all TRUE, then the given record will be set to the REPLACEMENT_VALUE for an active column.</td>
               <td align="left">
-                  Combine GrandmaWithACell
-                  <br>
-                  AW&nbsp;&nbsp;&nbsp;&nbsp;60-1000
-                  <br>
-                  P&nbsp;&nbsp;&nbsp;&nbsp;2
-                  <br>
-                  F&nbsp;&nbsp;&nbsp;&nbsp;2
-                  <br>
-                  End combine
+                  <table class="table">
+                      <tr><td colspan="2">X</td></tr>
+                      <tr><td colspan="2"><b>Combine 1</b></td></tr>
+                      <tr><td>AW</td><td>60-10000</td></tr>
+                      <tr><td>P</td><td>2</td></tr>
+                      <tr><td>F</td><td>2</td></tr>
+                      <tr><td colspan="2"><b>End combine</b></td></tr>
+                  </table>
           </tr>
         </tbody>
       </table>
