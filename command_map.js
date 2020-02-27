@@ -7,6 +7,12 @@ var Syntax = [
         callback: CommentCallback,
     },
     {
+        name: "MERGEPHONENUMS",
+        length : 3,
+        validation: IsMerge,
+        callback: MergeCallback,
+    },
+    {
         name: "DELETE",
         length : 1,
         validation: IsDeleteCmd,
@@ -37,6 +43,12 @@ var Syntax = [
         callback: EvalEmailsCallback,
     },
     {
+        name: "GRAPH",
+        length: 2,
+        validation: IsGraphCmd,
+        callback: GraphCmdCallback,
+    },
+    {
         name: "FindAndReplace",
         length: 1,
         validation: IsDefault,
@@ -45,8 +57,20 @@ var Syntax = [
 ];
 
 
+function IsGraphCmd(line) {
+    return line.toUpperCase().includes("GRAPH");
+}
+
+
 function IsCommentCmd(line) {
     return line.startsWith("//");
+}
+
+
+function IsMerge(line) {
+    //MERGEPHONENUMS\tCOLUMNA,COLUMNB
+    let val = line.split("\t");
+    return val[0].toUpperCase().includes("MERGEPHONENUM");
 }
 
 
@@ -88,8 +112,22 @@ function CommentCallback(contents, index) {
 }
 
 
+function GraphCmdCallback(contents, index) {
+    // GRAPH/tcol
+    let line = contents[index].split("\t");
+    if (line.length > 2) {
+        let name = line[2].split(" ").join("").trim();
+        if (name != "")
+            SAMPLE.VisualizationQueueCol(line[1].trim().toString(), name);
+    } else {
+        SAMPLE.VisualizationQueueCol(line[1].trim().toString());
+    }
+    return index;
+}
+
+
 function CopyColumnCallback(contents, index) {
-    // COPYCOLUMN/col
+    // COPYCOLUMN/tcol
     let line = contents[index].split("\t");
     SAMPLE.CopyCol(line[1].trim().toString());
     return index;
@@ -105,7 +143,7 @@ function NamesListCallback(contents, index) {
     }
     let i = index + 1;
     let comparisons = [];
-    while (!contents[i].includes("STOP NAMES")) {
+    while (!contents[i].toUpperCase().includes("STOP NAMES")) {
         comparisons.push(contents[i].toUpperCase().split(" ").join("").trim());
         i++;
     }
@@ -137,6 +175,16 @@ function EvalEmailsCallback(contents, index) {
     }
     console.log("email cols: ", emailCols);
     SAMPLE.CreateEmails("EMAIL", emailCols);
+    return index;
+}
+
+
+function MergeCallback(contents, index) {
+    // MERGEPHONENUM\ColA, ColB
+    let line = contents[index].split("\t");
+    let cols = line[1].split(" ").join("").split(",");
+    console.log(line, cols);
+    SAMPLE.MergePhone(cols);
     return index;
 }
 

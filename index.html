@@ -41,8 +41,13 @@
     <script>
         $( document ).ready(function() {
             document.getElementById("bubblelessInput").innerHTML = "";
-            document.getElementById("bubblelessInput").innerText = "";
-            document.getElementById("bubbless-flagstart-input").value = 7;
+            document.getElementById("bubblelessScrubNamesInput").innerHTML = "";
+            let placeholderText = ["COPYCOLUMN	XX_FN","COPYCOLUMN	XX_LN", "", "EMAIL","other	rf@rf.com",
+                                    "","EVALEMAILS	XX_Col1, XX_Col2", "", "CREATETOKENS", "",
+                                    "MERGEPHONENUM	XX_Cell, XX_LL", "", "XX_Cell","1-999999999999999	2","other	1"];
+            //document.getElementById("bubblelessInput").placeholder = placeholderText.join("\n");
+            document.getElementById("bubblelessInput").value = placeholderText.join("\n");
+            document.getElementById("bubbless-flagstart-input").value = 1;
         });
     </script>
   </head>
@@ -107,8 +112,14 @@
         <div class="form-group row">
             <label for="bubbless-flagstart-input" class="col-2 col-form-label">Flags start:</label>
             <div class="col-10">
-                <input class="form-control" type="number" value="7" id="bubbless-flagstart-input">
+                <input class="form-control" type="number" value="1" id="bubbless-flagstart-input">
             </div>
+        </div>
+        <br>
+        <div class="form-group">
+            <label for="bubblelessScrubNamesInput">Paste Scrubbing data here</label>
+            <textarea class="form-control" id="bubblelessScrubNamesInput" rows="6" placeholder="Names of people, deletes, scrubs in here">
+            </textarea>
         </div>
         <br>
         <div class="form-group">

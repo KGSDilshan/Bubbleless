@@ -16,6 +16,7 @@ class FlaggedColumn {
         this.breakdown = new Map();
         this.breakdownNames = "";
         this.isCopied = false;
+        this.createCol = true;
 
         // from column name, populate additions column
         let colID = CalcIndexColumn(columnName) - 1;
@@ -28,7 +29,7 @@ class FlaggedColumn {
 
     UseAsIs() {
         for (let i = 0; i < this.additions.length; i++) {
-            this.changes.push(this.additions[i])
+            this.changes.push(this.additions[i]);
         }
         this.isCopied = true;
     }
@@ -36,10 +37,27 @@ class FlaggedColumn {
 
     InsertIntoSample() {
         let parentColName = "";
-        if (CalcIndexColumn(this.name) - 1 < UNCHANGED_ROWS) {
+        let cIndex = CalcIndexColumn(this.name);
+        if (cIndex- 1 < UNCHANGED_ROWS) {
+            parentColName = this.name;
+        } else if (cIndex > SAMPLE.records.length) {
             parentColName = this.name;
         } else {
-            parentColName = CalcColumnID(CalcIndexColumn(this.name) + (SAMPLE.flagged_start - UNCHANGED_ROWS));
+            parentColName = CalcColumnID(cIndex + (SAMPLE.flagged_start - UNCHANGED_ROWS));
+        }
+
+        if (this.createCol == false) {
+            // only do breakdown
+            this.breakdownNames = this.name;
+            for (let i = 1; i < SAMPLE.records.length; i++) {
+                let val = this.additions[i];
+                if (this.breakdown.has(val)) {
+                    this.breakdown.set(val, this.breakdown.get(val) + 1);
+                } else {
+                    this.breakdown.set(val, 1);
+                }
+            }
+            return;
         }
 
         if (this.additions[0] === undefined) {
@@ -49,10 +67,26 @@ class FlaggedColumn {
             this.additions[0] = this.name + "_Flagged_(" + parentColName + ")";
             this.breakdownNames = this.additions[0];
         }
+
+
+        SAMPLE.records[0].splice(this.index, 0, this.additions[0]);
         let unaccounted = [];
         let addedBlank = false;
-        for (let i = 0; i < SAMPLE.records.length; i++) {
-            if (!this.changes.includes(this.additions[i]) && !unaccounted.includes(this.additions[i]) && i > 0) {
+        console.log("insert parsing: ", this.name);
+        // if the flag is copied, then no need for validation
+        if (this.isCopied) {
+            for (let i = 1; i < SAMPLE.records.length; i++) {
+                if (this.additions[i] !== undefined) {
+                    this.additions[i] = this.additions[i].replace(/ReplacementString/g, '');
+                }
+                SAMPLE.records[i].splice(this.index, 0, this.additions[i]);
+            }
+            console.log("Done parsing: ", this.name);
+            return;
+        }
+
+        for (let i = 1; i < SAMPLE.records.length; i++) {
+            if (!this.changes.includes(this.additions[i]) && !unaccounted.includes(this.additions[i])) {
                 if (this.additions[i] === undefined || this.additions[i].trim() == '') {
                     this.additions[i] = "BLANK";
                     if (!addedBlank) {
@@ -67,24 +101,25 @@ class FlaggedColumn {
                     unaccounted.push(this.additions[i]);
                 }
             }
-
-            this.additions[i] = this.additions[i].replace(/ReplacementString/g, '');
+            if (this.additions[i] !== undefined) {
+                this.additions[i] = this.additions[i].replace(/ReplacementString/g, '');
+            }
             let val = this.additions[i];
             SAMPLE.records[i].splice(this.index, 0, this.additions[i]);
-            if (i > 0) {
-                if (this.breakdown.has(val)) {
-                    this.breakdown.set(val, this.breakdown.get(val) + 1);
-                } else {
-                    this.breakdown.set(val, 1);
-                }
+            if (this.breakdown.has(val)) {
+                this.breakdown.set(val, this.breakdown.get(val) + 1);
+            } else {
+                this.breakdown.set(val, 1);
             }
         }
+        console.log("Done parsing", this.name);
     }
 
 
     FindAndReplace(find, replace) {
         let replaced = false;
         this.changes.push("ReplacementString" + replace);
+        console.log("normal str find, ", find, replace);
         for (let i = 0; i < this.additions.length; i++) {
             if (this.additions[i] !== undefined && this.additions[i].split(" ").join("") == find) {
                 this.additions[i] = "ReplacementString" + replace;
@@ -101,13 +136,13 @@ class FlaggedColumn {
     OtherReplace(replacementCode) {
         let replaced = false;
         let undefined_replacement = false;
+        let cIndex = CalcIndexColumn(this.name);
+        if (cIndex > SAMPLE.records.length) {
+            undefined_replacement = true;
+        }
         this.changes.push("ReplacementString" + replacementCode);
         for (let i = 1; i < this.additions.length; i++) {
-            if (this.additions[i] === undefined) {
-                this.additions[i] = "ReplacementString" + replacementCode;
-                replaced = true;
-                undefined_replacement = true;
-            } else if (!this.additions[i].includes("ReplacementString")) {
+            if (this.additions[i] === undefined || !this.additions[i].includes("ReplacementString")) {
                 this.additions[i] = "ReplacementString" + replacementCode;
                 replaced = true;
             }
@@ -126,6 +161,7 @@ class FlaggedColumn {
     FindAndReplaceRange(min, max, replace) {
         let replaced = false;
         this.changes.push("ReplacementString" + replace);
+        console.log("ranged replace of:", replace, min, max);
         for (let i = 0; i < this.additions.length; i++) {
             if (parseInt(this.additions[i]) <= max && parseInt(this.additions[i]) >= min) {
                 this.additions[i] = "ReplacementString" + replace;
@@ -154,8 +190,11 @@ class Sample {
 		sampleWorker.onmessage = function(event) {
             SAMPLE.records = event.data.slice();
             sampleWorker.terminate();
+            $("div#loadingStatusMsg").remove();
+            $("div#sampleuploadtimer").remove();
 		};
 		sampleWorker.postMessage(data);
+        document.getElementById("loadingStatusMsg").innerText = "Working on converting Sample";
         // for (let i = 0; i < data.length; i++) {
         //     this.records[i] = $.csv.toArray(data[i]);
         //     if (this.records[i] === undefined)
@@ -163,6 +202,18 @@ class Sample {
         // }
         this.replacements = [];
     }
+
+
+    VisualizationQueueCol(cname, name=undefined) {
+        // create a flag for the column
+        const visualFlag = new FlaggedColumn(cname, 0);
+        visualFlag.createCol = false;
+        if (name !== undefined)
+            visualFlag.name = name;
+        this.flagged_additions.push(visualFlag);
+        // Mark the flag as DO NOT ADD
+    }
+
 
     GenerateTokens(cname) {
         const tokenFlag = new FlaggedColumn(cname, this.flagged_start);
@@ -182,6 +233,44 @@ class Sample {
         if (!email || email.length > 256) return false;
         var tester = /^[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~](\.?[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
         return tester.test(email);
+    }
+
+
+    MergePhone(cols) {
+        // make a flag object
+        console.log("merging phones");
+        let phoneFlag = new FlaggedColumn("PHONE_NUMBERS", this.flagged_start);
+        phoneFlag.isCopied = true;
+        // read in priority col
+        let colID_prio = CalcIndexColumn(cols[0]) - 1;
+        let colID_secd = CalcIndexColumn(cols[1]) - 1;
+        let invalids = [];
+        for (let i = 1; i < SAMPLE.records.length; i++) {
+            let prio = SAMPLE.records[i][colID_prio];
+            let secnd = SAMPLE.records[i][colID_secd];
+            if (prio != undefined && prio.trim() !== '' && prio.length > 1) {
+                phoneFlag.additions[i] = "ReplacementString" + prio;
+                phoneFlag.changes.push(phoneFlag.additions[i]);
+            } else if (secnd != undefined && secnd.trim() !== '' && secnd.length > 1) {
+                // anything that priority col has empty, check second col
+                phoneFlag.additions[i] = "ReplacementString" + secnd;
+                phoneFlag.changes.push(phoneFlag.additions[i]);
+            } else {
+                // if data is invalid in second col, do warning, otherwise set as blank
+                if (prio === undefined && secnd == undefined)
+                    continue;
+                phoneFlag.additions[i] = "invalid";
+                invalids.push(i + 1);
+
+            }
+        }
+        for (let i = 0; i < invalids.length; i++) {
+            WARNINGS.push("<b>WARNINGS:</b> In lines '" + invalids[i] + " no valid phone number was found");
+            TEXTWARNINGS.push("WARNINGS: In lines '" + invalids[i] + " no valid phone number was found");
+        }
+        console.log("Done merging phones", invalids);
+        this.flagged_start++;
+        this.flagged_additions.push(phoneFlag);
     }
 
 
@@ -261,16 +350,15 @@ class Sample {
         value = value.toString();
         let min = parseInt(rangedArr[0]);
         let max = parseInt(rangedArr[1]);
-        let flaggedCol = this.FlagExists(col);
-        if (flaggedCol == -1) {
+        let flag = this.FlagExists(col).flag;
+        if (flag === undefined) {
             // Flagged column doesn't exist
             // loop through records and do the replacements
-            let flag = new FlaggedColumn(col, this.flagged_start);
+            flag = new FlaggedColumn(col, this.flagged_start);
             this.flagged_start++;
             this.flagged_additions.push(flag);
-            flaggedCol = this.flagged_additions.length - 1;
         }
-        this.flagged_additions[flaggedCol].FindAndReplaceRange(min, max, value);
+        flag.FindAndReplaceRange(min, max, value);
     }
 
 
@@ -278,18 +366,17 @@ class Sample {
         // in column X replace Item with Value for all records
         item = item.toString();
         value = value.toString();
-        let flaggedCol = this.FlagExists(col);
-        if (flaggedCol == -1) {
+        let flag = this.FlagExists(col).flag;
+        if (flag === undefined) {
             // Flagged column doesn't exist, create one
-            let flag = new FlaggedColumn(col, this.flagged_start);
+            flag = new FlaggedColumn(col, this.flagged_start);
             this.flagged_start++;
             this.flagged_additions.push(flag);
-            flaggedCol = this.flagged_additions.length - 1;
         }
         if (item.toUpperCase() == "OTHER") {
-            this.flagged_additions[flaggedCol].OtherReplace(value);
+            flag.OtherReplace(value);
         } else {
-            this.flagged_additions[flaggedCol].FindAndReplace(item, value);
+            flag.FindAndReplace(item, value);
         }
     }
 
@@ -297,24 +384,24 @@ class Sample {
     FlagExists(colName) {
         for (let i = 0; i < this.flagged_additions.length; i++) {
             if (this.flagged_additions[i].name == colName)
-                return i;
+                return {index : i, flag : this.flagged_additions[i]};
         }
-        return -1;
+        return {index : -1, flag: undefined};
     }
 
 
     VLookUp(conds, currentCol, replacement) {
-        let flaggedCol = SAMPLE.FlagExists(currentCol);
+        let flag = SAMPLE.FlagExists(currentCol).flag;
         let col = CalcIndexColumn(currentCol) - 1;
         console.log("vlookup data: ",conds, currentCol, replacement);
-        if (flaggedCol == -1) {
+        if (flag === undefined) {
             // column is empty, create it
             console.log("No flagged column exists for this vlookup!");
-            SAMPLE.flagged_additions.push(new FlaggedColumn(currentCol, SAMPLE.flagged_start));
+            flag = new FlaggedColumn(currentCol, SAMPLE.flagged_start);
             SAMPLE.flagged_start++;
-            flaggedCol = SAMPLE.flagged_additions.length - 1;
+            SAMPLE.flagged_additions.push(flag);
         }
-        SAMPLE.flagged_additions[flaggedCol].changes.push("ReplacementString" + replacement);
+        flag.changes.push("ReplacementString" + replacement);
         let replaced = false;
         for (let k = 0; k < SAMPLE.records.length; k++) {
             let setRecord = true;
@@ -337,7 +424,7 @@ class Sample {
             }
             if (setRecord) {
                 replaced = true;
-                SAMPLE.flagged_additions[flaggedCol].additions[k] = ("ReplacementString" + replacement);
+                flag.additions[k] = ("ReplacementString" + replacement);
             }
         }
         if (replaced == false) {
@@ -387,7 +474,6 @@ class Sample {
         let fBlob;
         AltLoadBar("LoadingMessages");
         if (INITIAL_FILETYPE == "csv") {
-            console.log(csvVar);
             fBlob = new Blob(csvVar, {type:"text/csv"});
             let downloadLink = document.createElement("a");
             downloadLink.download = "RENAME_ME." + INITIAL_FILETYPE;

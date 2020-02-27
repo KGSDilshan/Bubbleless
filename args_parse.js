@@ -19,8 +19,6 @@ function OpenFile(event) {
 			SAMPLE = e.target.result;
 			PreviewSample(SAMPLE);
 			ProcessEntireSample(SAMPLE);
-			$("div#loadingStatusMsg").remove();
-			$("div#sampleuploadtimer").remove();
 		};
 	} else {
 		INITIAL_FILETYPE = files[0].name.split(".");
@@ -40,8 +38,6 @@ function OpenFile(event) {
 					PreviewSample(SAMPLE);
 					ProcessEntireSample(SAMPLE, "sample_uploader");
 					FileWorker.terminate();
-					$("div#loadingStatusMsg").remove();
-					$("div#sampleuploadtimer").remove();
 					break;
 			};
 		};
@@ -129,6 +125,9 @@ function ProcessInput() {
 		alert("Upload a sample first.");
 		return;
 	}
+	if (document.getElementById("bubblelessScrubNamesInput").value == "") {
+		alert("Please insert data for scrubbing.");
+	}
 	let flagstart = document.getElementById("bubbless-flagstart-input").value;
 	if (parseInt(flagstart) < 0) {
 		alert("Invalid input for flag start field.");
@@ -142,7 +141,10 @@ function ProcessInput() {
 	$("button#continue3").remove();
 	// reparse all arguments
 	let contents = document.getElementById("bubblelessInput").value;
-	contents = contents.split("\n");
+	let scrubs = document.getElementById("bubblelessScrubNamesInput").value;
+	let temp = scrubs.split("\n");
+	scrubs = contents.split("\n");
+	contents = temp.concat(scrubs);
 	for (let i = 0; i < contents.length; i++) {
 		i = RunCommand(contents, i);
 	}
