@@ -80,9 +80,10 @@ class DataVisual {
 
 
         // sort data by labels
+        console.log(this.percentages);
         this.percentages.sort(
             function(a, b) {
-                return a.label > b.label;
+                return a.label.toString() > b.label.toString();
             }
         );
         // repopulate arrays
