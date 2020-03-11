@@ -128,7 +128,7 @@ function GraphCmdCallback(contents, index) {
 
 function CopyColumnCallback(contents, index) {
     // COPYCOLUMN/tcol
-    let line = contents[index].split("\t");
+    let line = contents[index].toUpperCase().split("\t");
     SAMPLE.CopyCol(line[1].trim().toString());
     return index;
 }
