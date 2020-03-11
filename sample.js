@@ -5,7 +5,7 @@ ERRORS TO CHECK
 
 
 */
-var HEADER = "";
+var SAMPLE_HEADER = "";
 
 class FlaggedColumn {
     constructor(columnName, index) {
@@ -192,7 +192,7 @@ class Sample {
             sampleWorker.terminate();
             $("div#loadingStatusMsg").remove();
             $("div#sampleuploadtimer").remove();
-            HEADER = SAMPLE.records[0].slice();
+            SAMPLE_HEADER = SAMPLE.records[0].slice();
 		};
 		sampleWorker.postMessage(data);
         document.getElementById("loadingStatusMsg").innerText = "Working on converting Sample";
@@ -458,7 +458,7 @@ class Sample {
     	for (const [key, value] of SAMPLE.deletedRecords.entries()) {
     		fullData.push("Deleted from filter in column: "  + key.toString() + "\n");
             console.log("k, v", key, value);
-            fullData.push(HEADER.join(",") + "\n");
+            fullData.push(SAMPLE_HEADER.join(",") + "\n");
             for (let i = 0; i < SAMPLE.deletedRecords.get(key).length; i++) {
                 fullData.push(value[i].join(",") + "\n");
             }
