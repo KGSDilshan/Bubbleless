@@ -5,11 +5,11 @@ ERRORS TO CHECK
 
 
 */
-
+var HEADER = "";
 
 class FlaggedColumn {
     constructor(columnName, index) {
-        this.name = columnName;
+        this.name = columnName.toUpperCase();
         this.additions = [];
         this.index = index;
         this.changes = []; // what should be in the flagged column
@@ -121,7 +121,7 @@ class FlaggedColumn {
         this.changes.push("ReplacementString" + replace);
         console.log("normal str find, ", find, replace);
         for (let i = 0; i < this.additions.length; i++) {
-            if (this.additions[i] !== undefined && this.additions[i].split(" ").join("") == find) {
+            if (this.additions[i] !== undefined && this.additions[i].split(" ").join("").toUpperCase() == find) {
                 this.additions[i] = "ReplacementString" + replace;
                 replaced = true;
             }
@@ -192,6 +192,7 @@ class Sample {
             sampleWorker.terminate();
             $("div#loadingStatusMsg").remove();
             $("div#sampleuploadtimer").remove();
+            HEADER = SAMPLE.records[0].slice();
 		};
 		sampleWorker.postMessage(data);
         document.getElementById("loadingStatusMsg").innerText = "Working on converting Sample";
@@ -248,10 +249,10 @@ class Sample {
         for (let i = 1; i < SAMPLE.records.length; i++) {
             let prio = SAMPLE.records[i][colID_prio];
             let secnd = SAMPLE.records[i][colID_secd];
-            if (prio != undefined && prio.trim() !== '' && prio.length > 1) {
+            if (prio != undefined && prio.trim() !== '' && parseInt(prio) != 0 && prio.length > 1) {
                 phoneFlag.additions[i] = "ReplacementString" + prio;
                 phoneFlag.changes.push(phoneFlag.additions[i]);
-            } else if (secnd != undefined && secnd.trim() !== '' && secnd.length > 1) {
+            } else if (secnd != undefined && secnd.trim() !== '' && parseInt(secnd) != 0 && secnd.length > 1) {
                 // anything that priority col has empty, check second col
                 phoneFlag.additions[i] = "ReplacementString" + secnd;
                 phoneFlag.changes.push(phoneFlag.additions[i]);
@@ -457,26 +458,29 @@ class Sample {
         let fullData = [];
     	for (const [key, value] of SAMPLE.deletedRecords.entries()) {
     		fullData.push("Deleted from filter in column: "  + key.toString() + "\n");
-            fullData.push(this.records[0]);
-            for (let i = 0; i < value.length; i++) {
-                fullData.push(value[i].join(","));
+            console.log("k, v", key, value);
+            fullData.push(HEADER);
+            for (let i = 0; i < SAMPLE.deletedRecords.get(key).length; i++) {
+                fullData.push(value[i].join(",") + "\n");
             }
     	}
+        console.log("fdata", fullData);
         this.DownloadCSV(fullData, "deletedRecords.csv");
     }
 
 
-    DownloadCSV(csvVar) {
+    DownloadCSV(csvVar, fname="") {
     	if (window.Blob == undefined || window.URL == undefined || window.URL.createObjectURL == undefined) {
     		alert("Your browser doesn't support Blobs");
     		return;
     	}
         let fBlob;
         AltLoadBar("LoadingMessages");
-        if (INITIAL_FILETYPE == "csv") {
+        if (INITIAL_FILETYPE == "csv" || fname.includes(".csv")) {
+            console.log("dl as csv:", csvVar);
             fBlob = new Blob(csvVar, {type:"text/csv"});
             let downloadLink = document.createElement("a");
-            downloadLink.download = "RENAME_ME." + INITIAL_FILETYPE;
+            downloadLink.download = "RENAME_ME" + (fname.includes(".csv") ? "_deletes.csv" : "." + INITIAL_FILETYPE);
             downloadLink.href = window.URL.createObjectURL(fBlob);
             downloadLink.style.display = "none";
             document.body.appendChild(downloadLink);

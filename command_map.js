@@ -212,12 +212,13 @@ function DefaultCallback(contents, index) {
                     return i;
                 }
             } else {
-                currentCol = line[0];
+                currentCol = line[0].toUpperCase();
             }
         } else {
             // find and replacement
             let original = line[0].toUpperCase().split(",");
             let replacement = line[1];
+            console.log(original, replacement);
             for (let j = 0; j < original.length; j++) {
                 if (original[j].includes("-")) {
                     // this is a range
