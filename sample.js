@@ -457,8 +457,10 @@ class Sample {
         let fullData = [];
     	for (const [key, value] of SAMPLE.deletedRecords.entries()) {
     		fullData.push("Deleted from filter in column: "  + key.toString() + "\n");
-            console.log("k, v", key, value);
+            fullData.push("\n");
+            fullData.push("\n");
             fullData.push(SAMPLE_HEADER.join(",") + "\n");
+            fullData.push("\n");
             for (let i = 0; i < SAMPLE.deletedRecords.get(key).length; i++) {
                 fullData.push(value[i].join(",") + "\n");
             }
