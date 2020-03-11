@@ -269,7 +269,6 @@ class Sample {
             WARNINGS.push("<b>WARNINGS:</b> In lines '" + invalids[i] + " no valid phone number was found");
             TEXTWARNINGS.push("WARNINGS: In lines '" + invalids[i] + " no valid phone number was found");
         }
-        console.log("Done merging phones", invalids);
         this.flagged_start++;
         this.flagged_additions.push(phoneFlag);
     }
