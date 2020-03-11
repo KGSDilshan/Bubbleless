@@ -113,8 +113,9 @@ function CalcColumnID(num) {
 
 function CalcIndexColumn(s) {
 	let n = 0;
-	for(let p = 0; p < s.length; p++){
-		n = s[p].charCodeAt() - 64 + n * 26;
+	let rs = s.toUpperCase();
+	for(let p = 0; p < rs.length; p++){
+		n = rs[p].charCodeAt() - 64 + n * 26;
 	}
 	return n;
 }
