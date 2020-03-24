@@ -147,6 +147,7 @@ function ProcessInput() {
 	scrubs = contents.split("\n");
 	contents = temp.concat(scrubs);
 	for (let i = 0; i < contents.length; i++) {
+		console.log(contents[i]);
 		i = RunCommand(contents, i);
 	}
 
@@ -166,13 +167,48 @@ function ProcessInput() {
 	DisplayWarnings(good);
 	ViewRawData();
 	document.getElementById("dataChartArea").innerHTML = "";
+	const qBuff = document.getElementById("QuotasBuffer");
+	qBuff.innerHTML = "";
 	for (let i = 0; i < SAMPLE.flagged_additions.length; i++) {
 		if (!SAMPLE.flagged_additions[i].isCopied) {
-			let x = new DataVisual(SAMPLE.flagged_additions[i].breakdown, SAMPLE.flagged_additions[i].breakdownNames, SAMPLE.flagged_additions[i].parentName);
-			x.RenderGraph();
+			let grph = new DataVisual(SAMPLE.flagged_additions[i].breakdown,
+				SAMPLE.flagged_additions[i].breakdownNames, SAMPLE.flagged_additions[i].parentName,
+				 SAMPLE.flagged_additions[i].originalValue);
+			grph.RenderGraph();
+			//let quotaGrp = new QuotaGroup(SAMPLE.flagged_additions[i].parentName);
+			if (grph.percentages && grph.name != "EMAIL_Flagged from EMAIL") {
+				console.log(grph.name);
+				//console.log(grph.)
+				let data_table = '<table class="table table-bordered">';
+				data_table += '<thead>';
+				data_table += '<tr>';
+		        data_table += '<th scope="col" colspan="5" contenteditable="true">' + SAMPLE.flagged_additions[i].parentName + '</th>';
+		        data_table += '</tr>';
+				let quotaName = SAMPLE.flagged_additions[i].parentName;
+				quotaName = "p" + quotaName[0].toUpperCase() + quotaName.slice(1, quotaName.length).toLowerCase();
+				for (let j = 0; j < grph.percentages.length; j++) {
+					data_table += '<tr>';
+					data_table += '<td contenteditable="true">' + (grph.percentages[j].transformation ? grph.percentages[j].transformation : "QUOTA_NAME") + '</td>';
+					data_table += '<td contenteditable="true">' + grph.percentages[j].rounded + '%</td>';
+					data_table += '<td contenteditable="true">' + quotaName + '</td>';
+					data_table += '<td contenteditable="true">' + grph.percentages[j].label + '</td>';
+					data_table += '</tr>';
+				}
+				data_table += '</thead>';
+		        data_table += '<tbody>';
+		        data_table += '</tbody>';
+		        data_table += '</table>';
+				qBuff.innerHTML += data_table + "<br><br>";
+				// for (let j = 0; j < grph.percentages.length; j++) {
+				// 	// in quota buffer, create a quota
+				// }
+			}
 		}
 	}
+
+
 }
+
 
 function ViewRawData() {
 	if (SAMPLE.deletedRecords.size > 0) {

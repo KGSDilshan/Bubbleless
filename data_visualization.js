@@ -21,7 +21,7 @@ var PALETTE = [
 
 
 class DataVisual {
-    constructor(datamap, dataName, parentName) {
+    constructor(datamap, dataName, parentName, dataTransformation) {
         this.name = (dataName == parentName || parentName === undefined) ? dataName : dataName + " from " + parentName;
         this.percentages = [];
         this.data = [];
@@ -29,6 +29,7 @@ class DataVisual {
         this.colors = [];
         this.borderColors = [];
         this.total = 0;
+        this.dataTransformation = dataTransformation;
 
         for (const [key, value] of datamap.entries()) {
             this.data.push(value);
@@ -56,11 +57,19 @@ class DataVisual {
         for (let i = 0; i < this.data.length; i++) {
             let t = (this.data[i] / this.total) * 100;
             let r = parseInt(t);
+            let transf = undefined;
+            for (let j = 0; j < this.dataTransformation.length; j++) {
+                if (this.dataTransformation[j].r == this.labels[i]) {
+                    transf = this.dataTransformation[j].f;
+                    break;
+                }
+            }
             this.percentages.push({
                 rounded : r,
                 remainder : t - r,
                 label: this.labels[i],
                 data: this.data[i],
+                transformation: transf,
             });
             sum += r;
         }
@@ -125,6 +134,10 @@ class DataVisual {
         data_table += '</tbody>';
         data_table += '</table><br><br>';
 		$("div#dataChartArea").append(data_table);
+    }
+
+    GetDataPoints() {
+        return this.percentages;
     }
 
     RandColor() {

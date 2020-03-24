@@ -13,6 +13,7 @@ class FlaggedColumn {
         this.additions = [];
         this.index = index;
         this.changes = []; // what should be in the flagged column
+        this.originalValue = []; // what should values are being mapped from
         this.breakdown = new Map();
         this.breakdownNames = "";
         this.isCopied = false;
@@ -120,6 +121,7 @@ class FlaggedColumn {
     FindAndReplace(find, replace) {
         let replaced = false;
         this.changes.push("ReplacementString" + replace);
+        this.originalValue.push({f: find, r: replace});
         console.log("normal str find, ", find, replace);
         for (let i = 0; i < this.additions.length; i++) {
             if (this.additions[i] !== undefined && this.additions[i].split(" ").join("").toUpperCase() == find) {
@@ -142,6 +144,7 @@ class FlaggedColumn {
             undefined_replacement = true;
         }
         this.changes.push("ReplacementString" + replacementCode);
+        this.originalValue.push({f:"Other", r:replacementCode});
         for (let i = 1; i < this.additions.length; i++) {
             if (this.additions[i] === undefined || !this.additions[i].includes("ReplacementString")) {
                 this.additions[i] = "ReplacementString" + replacementCode;
@@ -162,6 +165,7 @@ class FlaggedColumn {
     FindAndReplaceRange(min, max, replace) {
         let replaced = false;
         this.changes.push("ReplacementString" + replace);
+        this.originalValue.push({f : min.toString() + "-" + max.toString(), r: replace});
         console.log("ranged replace of:", replace, min, max);
         for (let i = 0; i < this.additions.length; i++) {
             if (parseInt(this.additions[i]) <= max && parseInt(this.additions[i]) >= min) {
@@ -426,6 +430,30 @@ class Sample {
             if (setRecord) {
                 replaced = true;
                 flag.additions[k] = ("ReplacementString" + replacement);
+                if (min == max) {
+                    let fset = false;
+                    for (let k = 0; k < flag.originalValue.length; k++) {
+                        if (flag.originaValue[k].f == min) {
+                            fset = true;
+                            break;
+                        }
+                    }
+                    if (fset) {
+                        flag.originalValue.push({f: min, r: replacement});
+                    }
+                } else {
+                    let nme = min.toString() + "-" + max.toString();
+                    let fset = false;
+                    for (let k = 0; k < flag.originalValue.length; k++) {
+                        if (flag.originaValue[k].f == nme) {
+                            fset = true;
+                            break;
+                        }
+                    }
+                    if (fset) {
+                        flag.originalValue.push({f: nme, r: replacement});
+                    }
+                }
             }
         }
         if (replaced == false) {

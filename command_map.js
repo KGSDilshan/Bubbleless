@@ -173,7 +173,7 @@ function EvalEmailsCallback(contents, index) {
     for (let i = 0; i < emailCols.length; i++) {
         emailCols[i] = CalcIndexColumn(emailCols[i].toString()) - 1;
     }
-    console.log("email cols: ", emailCols);
+    //console.log("email cols: ", emailCols);
     SAMPLE.CreateEmails("EMAIL", emailCols);
     return index;
 }
@@ -183,7 +183,7 @@ function MergeCallback(contents, index) {
     // MERGEPHONENUM\ColA, ColB
     let line = contents[index].split("\t");
     let cols = line[1].split(" ").join("").split(",");
-    console.log(line, cols);
+    //console.log(line, cols);
     SAMPLE.MergePhone(cols);
     return index;
 }
@@ -191,7 +191,7 @@ function MergeCallback(contents, index) {
 
 function MakeTokensCallback(contents, index) {
     // CREATETOKENS
-    console.log("run make tokens CB");
+    //console.log("run make tokens CB");
     SAMPLE.GenerateTokens("TOKEN");
     return index;
 }
@@ -218,7 +218,7 @@ function DefaultCallback(contents, index) {
             // find and replacement
             let original = line[0].toUpperCase().split(",");
             let replacement = line[1];
-            console.log(original, replacement);
+            //console.log(original, replacement);
             for (let j = 0; j < original.length; j++) {
                 if (original[j].includes("-")) {
                     // this is a range
