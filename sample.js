@@ -17,7 +17,6 @@ class FlaggedColumn {
         this.breakdownNames = "";
         this.isCopied = false;
         this.createCol = true;
-
         // from column name, populate additions column
         let colID = CalcIndexColumn(columnName) - 1;
         for (let i = 0; i < SAMPLE.records.length; i++) {
@@ -40,8 +39,10 @@ class FlaggedColumn {
         let cIndex = CalcIndexColumn(this.name);
         if (cIndex- 1 < UNCHANGED_ROWS) {
             parentColName = this.name;
+            this.parentName = this.name;
         } else if (cIndex > SAMPLE.records.length) {
             parentColName = this.name;
+            this.parentName = this.name;
         } else {
             parentColName = CalcColumnID(cIndex + (SAMPLE.flagged_start - UNCHANGED_ROWS));
         }
@@ -61,10 +62,10 @@ class FlaggedColumn {
         }
 
         if (this.additions[0] === undefined) {
-            this.additions[0] = this.name + "_Flagged";
-            this.breakdownNames = this.name + "_Flagged";
+            this.additions[0] = this.parentName + "_Flagged";
+            this.breakdownNames = this.parentName + "_Flagged";
         } else {
-            this.additions[0] = this.name + "_Flagged_(" + parentColName + ")";
+            this.additions[0] = this.parentName + "_Flagged_(" + parentColName + ")";
             this.breakdownNames = this.additions[0];
         }
 
@@ -478,7 +479,6 @@ class Sample {
         let fBlob;
         AltLoadBar("LoadingMessages");
         if (INITIAL_FILETYPE == "csv" || fname.includes(".csv")) {
-            console.log("dl as csv:", csvVar);
             fBlob = new Blob(csvVar, {type:"text/csv"});
             let downloadLink = document.createElement("a");
             downloadLink.download = "RENAME_ME" + (fname.includes(".csv") ? "_deletes.csv" : "." + INITIAL_FILETYPE);
