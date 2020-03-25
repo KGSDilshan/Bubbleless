@@ -1,14 +1,3 @@
-// round up function
-function rd(x) {
-    let val = x.toString().split(".")
-    if (val.length == 1)
-        return val;
-    else if (parseInt(val[1][0]) >= 5)
-        return parseInt(x) + 1
-    else
-        return parseInt(x)
-}
-
 function CreateNewQuota_DOM(len) {
 	const qBuff = document.getElementById("QuotasBuffer");
     let data_table = '<table class="table table-bordered">';
@@ -43,30 +32,4 @@ function ReadQuotaTables() {
     data = data.split("\n");
     console.log(data);
     return data;
-}
-
-
-/*
-    quotaConfig = {
-        limit: null,
-        client: null,
-        nSize: null,
-        isActive: true,
-        isRaw : false,
-        isCounter: false,
-        isCounted: false,
-        Mode: "phone",
-    }
-
-*/
-
-
-class Quota {
-    constructor(quotaGroup, quotaName, questionName, quotaPercentage, quotaCodes, quotaConfig) {
-        this.config = quotaConfig;
-        this.name = quotaGroup.name + " - " + quotaName;
-        this.limit = quotaPercentage;
-        this.qCodes = quotaCodes; // arr of codes ????
-        this.qName = questionName; // arr of questions ????
-    }
 }

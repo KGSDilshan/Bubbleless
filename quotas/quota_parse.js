@@ -127,4 +127,20 @@ function ReadQuotaArr() {
         }
         i++;
     }
+
+    // when quotas have been generated, run validation
+    let counter = 0;
+    let alertMsg = "";
+    for (let i = 0; i < QUOTA_GROUPS.length; i++) {
+        if (!QUOTA_GROUPS[i].validateQuotas()) {
+            alertMsg += QUOTA_GROUPS[i].displayWarnings();
+            counter++;
+        }
+    }
+    if (counter == 0) {
+        // no errors
+        console.log("no errors");
+    } else {
+        alert(alertMsg);
+    }
 }
