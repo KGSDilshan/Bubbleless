@@ -40,7 +40,7 @@ function ReadQuotaTables() {
             data += qBuff.childNodes[i].childNodes[0].innerText + "\n";
         }
     }
-    //data = data.split("\n");
+    data = data.split("\n");
 
     return data;
 }
@@ -110,8 +110,7 @@ function ExportQuotas() {
     let data = [];
     let today = new Date();
 
-    data[0] = ReadQuotaTables();
-    data[0] = data[0].trim();
+    data[0] = ReadQuotaTables().join("\n").trim();
 
     let fBlob;
     fBlob = new Blob(data, {type:"text/csv"});
