@@ -21,6 +21,7 @@
     <script src="data_visualization.js"></script>
     <script src="tokens.js"></script>
     <script src="quotas/quotus.js"></script>
+    <script src="quotas/quota_parse.js"></script>
     <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
     <script src="worker.js"></script>
@@ -43,10 +44,10 @@
         $( document ).ready(function() {
             document.getElementById("bubblelessInput").innerHTML = "";
             document.getElementById("bubblelessScrubNamesInput").innerHTML = "";
-            let placeholderText = ["COPYCOLUMN	XX_FN","COPYCOLUMN	XX_LN", "", "EMAIL","other	rf@rf.com",
-                                    "","EVALEMAILS	XX_Col1, XX_Col2", "", "CREATETOKENS", "",
-                                    "MERGEPHONENUM	XX_Cell, XX_LL", "", "XX_Cell","1-999999999999999	2","other	1"];
-            document.getElementById("bubblelessInput").value = placeholderText.join("\n");
+            // let placeholderText = ["COPYCOLUMN	XX_FN","COPYCOLUMN	XX_LN", "", "EMAIL","other	rf@rf.com",
+            //                         "","EVALEMAILS	XX_Col1, XX_Col2", "", "CREATETOKENS", "",
+            //                         "MERGEPHONENUM	XX_Cell, XX_LL", "", "XX_Cell","1-999999999999999	2","other	1"];
+            // document.getElementById("bubblelessInput").value = placeholderText.join("\n");
             document.getElementById("bubbless-flagstart-input").value = 1;
         });
     </script>
@@ -219,7 +220,7 @@
             <br>
             <br>
         </form>
-    	<button type="submit" class="btn btn-primary mb-2" id="makeNewQ" onClick=CreateNewQuota_DOM(document.getElementById("QuotaRows").value) >Create New Quota</button>
+    	<button type="submit" class="btn btn-primary mb-2" id="makeNewQ" onClick=CreateNewQuota_DOM(document.getElementById("QuotaRows").value) >Append New Quota</button>
 
         <br>
         <br>

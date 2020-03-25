@@ -42,6 +42,7 @@ function ReadQuotaTables() {
     }
     data = data.split("\n");
     console.log(data);
+    return data;
 }
 
 
