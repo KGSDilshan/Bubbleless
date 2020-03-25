@@ -31,6 +31,19 @@ function CreateNewQuota_DOM(len) {
     qBuff.innerHTML += data_table + "<br><br>";
 }
 
+function ReadQuotaTables() {
+    const qBuff = document.getElementById("QuotasBuffer");
+    let data = "";
+    for (let i = 0; i < qBuff.childNodes.length; i++) {
+        if (qBuff.childNodes[i].tagName == "TABLE") {
+            // get the table's head
+            data += qBuff.childNodes[i].childNodes[0].innerText + "\n";
+        }
+    }
+    data = data.split("\n");
+    console.log(data);
+}
+
 
 /*
     quotaConfig = {

@@ -199,9 +199,6 @@ function ProcessInput() {
 		        data_table += '</tbody>';
 		        data_table += '</table>';
 				qBuff.innerHTML += data_table + "<br><br>";
-				// for (let j = 0; j < grph.percentages.length; j++) {
-				// 	// in quota buffer, create a quota
-				// }
 			}
 		}
 	}
