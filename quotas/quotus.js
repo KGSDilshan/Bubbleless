@@ -112,15 +112,19 @@ function ExportQuotas() {
 
     data[0] = ReadQuotaTables().join("\n").trim();
 
-    let fBlob;
-    fBlob = new Blob(data, {type:"text/csv"});
-    let downloadLink = document.createElement("a");
-    downloadLink.download = "ExportedQuotas_" + (today.getMonth() + 1).toString().padStart(2,"0") + today.getDate().toString() + ".dat";
-    console.log("File Name:",downloadLink.download);
-    downloadLink.href = window.URL.createObjectURL(fBlob);
-    downloadLink.style.display = "none";
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
+    if (data[0].length > 0) {
+        let fBlob;
+        fBlob = new Blob(data, {type:"text/csv"});
+        let downloadLink = document.createElement("a");
+        downloadLink.download = "ExportedQuotas_" + (today.getMonth() + 1).toString().padStart(2,"0") + today.getDate().toString() + ".dat";
+        console.log("File Name:",downloadLink.download);
+        downloadLink.href = window.URL.createObjectURL(fBlob);
+        downloadLink.style.display = "none";
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+    } else {
+        alert("There is nothing to export.");
+    }
 
     console.log("ExportQuotas: Complete");
 }
