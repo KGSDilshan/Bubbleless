@@ -69,13 +69,10 @@ function ImportQuotas(event) {
             reader.addEventListener("loadend", function (event) {
                 const qBuff = document.getElementById("QuotasBuffer");
                 let data = event.target.result.split("\n");
-
-                data = data.map(r => r.split("\t"));
-                console.log(data);
-
                 let data_table = "";
-                
+                data = data.map(r => r.split("\t"));                
 				for (let a = 0; a < data.length; a++) {
+                    // If the length of the current row is 1, it's a header; End the current table and start a new one
                     if (data[a].length == 1) {
                         if (a > 0) {
                             data_table += '</thead>';
@@ -90,10 +87,9 @@ function ImportQuotas(event) {
                         data_table += '</tr>';
                     } else {
                         data_table += '<tr>';
-                        data_table += '<td contenteditable="true">' + data[a][0] + '</td>';
-                        data_table += '<td contenteditable="true">' + data[a][1] + '</td>';
-                        data_table += '<td contenteditable="true">' + data[a][2] + '</td>';
-                        data_table += '<td contenteditable="true">' + data[a][3] + '</td>';
+                        data[a].forEach(td => {
+                            data_table += '<td contenteditable="true">' + td + '</td>';
+                        });
                         data_table += '</tr>';
                     }
 				}
@@ -102,13 +98,11 @@ function ImportQuotas(event) {
 		        data_table += '</tbody>';
 		        data_table += '</table>';
                 qBuff.innerHTML += data_table + "<br><br>";
-                console.log(data_table);
-                console.log("ImportQuotas: Loaded");
             });
             reader.readAsText(qFile);
-
-            console.log("ImportQuotas: Complete");
         }
+        
+        console.log("ImportQuotas: Complete");
     }
 }
 
