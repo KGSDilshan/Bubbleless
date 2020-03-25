@@ -57,14 +57,58 @@ function ClearQuotaTables() {
 
 function ImportQuotas(event) {
     ClearQuotaTables();
+    let qFileInput = document.getElementById("quotaImportFile");
+    qFileInput.click();
 
-    let qFile = document.getElementById("quotaImportFile").files;
-    if (qFile.length===0) {
-        alert("This action requires a valid csv file to be uploaded.");
-    } else {
-        console.log(qFile);
+    qFileInput.onchange = function () {
+        let qFile = qFileInput.files[0];
+        let reader = new FileReader();
+        if (qFile.length===0) {
+            alert("This action requires a valid .dat file to be uploaded.");
+        } else {
+            reader.addEventListener("loadend", function (event) {
+                const qBuff = document.getElementById("QuotasBuffer");
+                let data = event.target.result.split("\n");
 
-        console.log("ImportQuotas: Complete");
+                data = data.map(r => r.split("\t"));
+                console.log(data);
+
+                let data_table = "";
+                
+				for (let a = 0; a < data.length; a++) {
+                    if (data[a].length == 1) {
+                        if (a > 0) {
+                            data_table += '</thead>';
+                            data_table += '<tbody>';
+                            data_table += '</tbody>';
+                            data_table += '</table>';
+                        }
+                        data_table += '<table class="table table-bordered">';
+                        data_table += '<thead>';
+                        data_table += '<tr>';
+                        data_table += '<th scope="col" colspan="5" contenteditable="true">' + data[a][0] + '</th>';
+                        data_table += '</tr>';
+                    } else {
+                        data_table += '<tr>';
+                        data_table += '<td contenteditable="true">' + data[a][0] + '</td>';
+                        data_table += '<td contenteditable="true">' + data[a][1] + '</td>';
+                        data_table += '<td contenteditable="true">' + data[a][2] + '</td>';
+                        data_table += '<td contenteditable="true">' + data[a][3] + '</td>';
+                        data_table += '</tr>';
+                    }
+				}
+				data_table += '</thead>';
+		        data_table += '<tbody>';
+		        data_table += '</tbody>';
+		        data_table += '</table>';
+                qBuff.innerHTML += data_table + "<br><br>";
+                console.log(data_table);
+                console.log("ImportQuotas: Loaded");
+            });
+            reader.readAsText(qFile);
+
+            console.log("ImportQuotas: Complete");
+        }
     }
 }
 
@@ -77,7 +121,7 @@ function ExportQuotas() {
     let fBlob;
     fBlob = new Blob(data, {type:"text/csv"});
     let downloadLink = document.createElement("a");
-    downloadLink.download = "ExportedCSVQuotas_" + (today.getMonth() + 1).toString().padStart(2,"0") + today.getDate().toString() + ".csv";
+    downloadLink.download = "ExportedQuotas_" + (today.getMonth() + 1).toString().padStart(2,"0") + today.getDate().toString() + ".dat";
     console.log("File Name:",downloadLink.download);
     downloadLink.href = window.URL.createObjectURL(fBlob);
     downloadLink.style.display = "none";
