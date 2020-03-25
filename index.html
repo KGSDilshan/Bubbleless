@@ -221,8 +221,10 @@
             <br>
             <br>
         </form>
-    	<button type="submit" class="btn btn-primary mb-2" id="makeNewQ" onClick=CreateNewQuota_DOM(document.getElementById("QuotaRows").value) >Append New Quota</button>
-
+        <button type="submit" class="btn btn-primary mb-2" id="makeNewQ" onClick=CreateNewQuota_DOM(document.getElementById("QuotaRows").value) >Create New Quota</button>
+        <button type="submit" class="btn btn-primary mb-2" id="exportQuotas" onClick=ExportQuotas() >Export Quotas</button>
+        <button type="submit" class="btn btn-primary mb-2" id="importQuotas" onClick=ImportQuotas() >Import Quotas</button>
+        <input type="file" class="btn btn-primary mb-2" id="quotaImportFile" accept="*.dat" required style="display:none;" />
         <br>
         <br>
     </div>
