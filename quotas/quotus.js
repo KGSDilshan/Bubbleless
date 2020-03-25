@@ -40,10 +40,54 @@ function ReadQuotaTables() {
             data += qBuff.childNodes[i].childNodes[0].innerText + "\n";
         }
     }
-    data = data.split("\n");
-    console.log(data);
+    //data = data.split("\n");
+
+    return data;
 }
 
+function ClearQuotaTables() {
+    const qBuff = document.getElementById("QuotasBuffer");
+
+    while (qBuff.firstChild) {
+        qBuff.removeChild(qBuff.firstChild);
+    }
+
+    console.log("ClearQuotaTables: Quota tables cleared.");
+}
+
+function ImportQuotas(event) {
+    ClearQuotaTables();
+
+    let qFile = document.getElementById("quotaImportFile").files;
+    if (qFile.length===0) {
+        alert("This action requires a valid csv file to be uploaded.");
+    } else {
+        console.log(qFile);
+
+        console.log("ImportQuotas: Complete");
+    }
+}
+
+function ExportQuotas() {
+    let data = [];
+    let today = new Date();
+
+    data[0] = ReadQuotaTables();
+    //data[0] = data[0].map(e => e.replace(/\t/g,","));
+    //data[0] = data[0].join("\n");
+
+    let fBlob;
+    fBlob = new Blob(data, {type:"text/csv"});
+    let downloadLink = document.createElement("a");
+    downloadLink.download = "ExportedCSVQuotas_" + (today.getMonth() + 1).toString().padStart(2,"0") + today.getDate().toString() + ".csv";
+    console.log("File Name:",downloadLink.download);
+    downloadLink.href = window.URL.createObjectURL(fBlob);
+    downloadLink.style.display = "none";
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+
+    console.log("ExportQuotas: Complete");
+}
 
 /*
     quotaConfig = {
