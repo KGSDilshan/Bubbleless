@@ -74,11 +74,13 @@ function NameGroupValidation(OriginalName, template) {
 
 
 
-function CreateQuotaGroup(QGname, quotaObj) {
+function CreateQuotaGroup(QGname, quotaObj, rawSizes) {
     if (QGname == "" || QGname == undefined) {
         return;
     }
+
     let configTemplate = {
+        nSizes: rawSizes.slice(),
         isTri: false,
         isDual: false,
         isFlex: false,
@@ -95,6 +97,15 @@ function CreateQuotaGroup(QGname, quotaObj) {
 
 
 function ReadQuotaArr() {
+    let rawSizes = document.getElementById("QNSize").value;
+    if (rawSizes == "" || !rawSizes) {
+        alert("Missing N-sizes. Please specify this manditory field to continue");
+        return;
+    }
+    rawSizes = rawSizes.split("-");
+    for (let i = 0; i < rawSizes.length; i++) {
+        rawSizes[i] = parseInt(rawSizes[i]);
+    }
     let content = ReadQuotaTables();
     let i = 0;
     let qGName = "";
@@ -105,7 +116,7 @@ function ReadQuotaArr() {
             continue;
         } else if (line.length == 1 && line[0] != undefined) {
             // line should contain a new quota group. Attempt to serialize previous data
-            CreateQuotaGroup(qGName, qGQuotas);
+            CreateQuotaGroup(qGName, qGQuotas, rawSizes);
             qGName = line[0];
             qGQuotas = [];
         } else if (line.length > 1) {

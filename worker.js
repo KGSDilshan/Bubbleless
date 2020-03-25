@@ -1,7 +1,6 @@
 onmessage = function(file) {
     self.importScripts('https://unpkg.com/xlsx/dist/xlsx.full.min.js');
     let reader = new FileReader();
-    console.log(file.data[0]);
     postMessage("(1/6) starting up");
     reader.readAsArrayBuffer(file.data[0]);
     postMessage("(2/6) reading file as compressed binary.");
