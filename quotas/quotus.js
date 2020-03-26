@@ -27,7 +27,13 @@ function ReadQuotaTables() {
     for (let i = 0; i < qBuff.childNodes.length; i++) {
         if (qBuff.childNodes[i].tagName == "TABLE") {
             // get the table's head
-            data += qBuff.childNodes[i].childNodes[0].innerText + "\n";
+            let grpData = qBuff.childNodes[i].childNodes[0].innerText.split("\n");
+            for (let j = grpData.length; j >= 0; j--) {
+                if (grpData[j] == "") {
+                    grpData.splice(j, 1);
+                }
+            }
+            data += grpData.join("\n") + "\n";
         }
     }
     data = data.split("\n");

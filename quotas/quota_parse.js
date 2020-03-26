@@ -165,6 +165,7 @@ function ReadQuotaArr() {
     while (i < content.length) {
         let line = content[i].trim().split("\t");
         if (line == undefined) {
+            i++;
             continue;
         } else if (line.length == 1 && line[0] != undefined) {
             // line should contain a new quota group. Attempt to serialize previous data
