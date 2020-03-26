@@ -1,5 +1,7 @@
 var QUOTA_GROUPS = [];
 
+var QUOTA_HEADERS = [];
+
 var QUOTA_PROPERTIES = [
     {
         name: "(tri)",
@@ -23,7 +25,6 @@ var QUOTA_PROPERTIES = [
     },
 ];
 
-
 function IncludesNameTri(name) {
     return name.toLowerCase().includes("(tri)");
 }
@@ -41,8 +42,8 @@ function IncludesNameSplit(name) {
     let cleanName = name.toLowerCase().replace(/\s+/g, '');   // Remove spaces from the name so parsing is easier
     cleanName = cleanName.split("(");
 
-    QUOTA_GROUPS.forEach(qg => {
-        if (cleanName.includes(qg.group_name.toLowerCase() + ")")) {
+    QUOTA_HEADERS.forEach(qh => {
+        if (cleanName.includes(qh.group_name.toLowerCase() + ")")) {
             hasSplits = true;
         }
     });
@@ -82,10 +83,10 @@ function RemoveNameSplits(name, tObj) {
 
     cleanName = cleanName.split("(");
 
-    QUOTA_GROUPS.forEach(qg => {
-        if (cleanName.includes(qg.group_name.toLowerCase() + ")")) {
-            splits.push(qg.group_name.toLowerCase());
-            title = title.replace("(" + qg.group_name.toLowerCase() + ")",'');
+    QUOTA_HEADERS.forEach(qh => {
+        if (cleanName.includes(qh.group_name.toLowerCase() + ")")) {
+            splits.push(qh.group_name.toLowerCase());
+            title = title.replace("(" + qh.group_name.toLowerCase() + ")",'');
         }
     });
 
@@ -111,14 +112,13 @@ function NameGroupValidation(OriginalName, template) {
     };
 }
 
-
-
 function CreateQuotaGroup(QGname, quotaObj, rawSizes) {
     if (QGname == "" || QGname == undefined) {
         return;
     }
 
     let configTemplate = {
+        id: generateId(),
         nSizes: rawSizes.slice(),
         isTri: false,
         isDual: false,
@@ -136,7 +136,6 @@ function CreateQuotaGroup(QGname, quotaObj, rawSizes) {
     QUOTA_GROUPS.push(new QuotaGroup(name, config, quotaObj));
 }
 
-
 function ReadQuotaArr() {
     let rawSizes = document.getElementById("QNSize").value;
     if (rawSizes == "" || !rawSizes) {
@@ -151,6 +150,18 @@ function ReadQuotaArr() {
     let i = 0;
     let qGName = "";
     let qGQuotas = [];
+
+    // Initialize quota groups/headers
+    QUOTA_GROUPS = [];
+    QUOTA_HEADERS = [];
+
+    // Grab all the headers
+    content.forEach(row => {
+        if (!row.includes("\t") && row.length > 0) {
+            QUOTA_HEADERS.push(row.toLowerCase().replace(/\s+/g, '').split("(")[0].trim());
+        }
+    });
+
     while (i < content.length) {
         let line = content[i].trim().split("\t");
         if (line == undefined) {
@@ -186,7 +197,6 @@ function ReadQuotaArr() {
     }
 }
 
-
 function downloadQuotas() {
     let full_data = "";
     for (let i = 0; i < QUOTA_GROUPS.length; i++) {
@@ -205,4 +215,13 @@ function downloadQuotas() {
     downloadLink.style.display = "none";
     document.body.appendChild(downloadLink);
     downloadLink.click();
+}
+
+function generateId() {
+    let newId = QUOTA_GROUPS.length;
+
+    while (QUOTA_GROUPS.find(x => x.id === newId)) {
+        newId++;
+    }
+    return newId;
 }

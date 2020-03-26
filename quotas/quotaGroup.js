@@ -16,6 +16,7 @@ class QuotaGroup {
         this.textWarnings = [];
         this.hasSplits = config.hasSplits;
         this.splits = config.splits;
+        this.id = config.id;
 
         // figure out mode and nsizes of this quota
         this.mode = 0;
