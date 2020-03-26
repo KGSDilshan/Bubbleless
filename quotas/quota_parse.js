@@ -98,6 +98,12 @@ function CreateQuotaGroup(QGname, quotaObj, rawSizes) {
 
 
 function ReadQuotaArr() {
+    // clear warning area
+    const warningBuffer = document.getElementById("QuotaWarningsBuffer");
+    while (warningBuffer.firstChild) {
+        warningBuffer.removeChild(warningBuffer.firstChild);
+    }
+
     let rawSizes = document.getElementById("QNSize").value;
     if (rawSizes == "" || !rawSizes) {
         alert("Missing N-sizes. Please specify this manditory field to continue");
@@ -108,6 +114,10 @@ function ReadQuotaArr() {
         rawSizes[i] = parseInt(rawSizes[i]);
     }
     let content = ReadQuotaTables();
+    if (content.length <= 1 && content[0] =="") {
+        alert("Nothing to process...");
+        return;
+    }
     let i = 0;
     let qGName = "";
     let qGQuotas = [];
@@ -142,8 +152,11 @@ function ReadQuotaArr() {
     if (counter == 0) {
         // no errors
         console.log("no errors");
+        document.getElementById("QuotaWarningsBuffer").innerHTML += '<button type="submit" class="btn btn-success mb-2" onClick=downloadQuotas() >Download Quotas</button>';
+
     } else {
         alert(alertMsg);
+        document.getElementById("QuotaWarningsBuffer").innerHTML += '<button type="submit" class="btn btn-danger mb-2" onClick=downloadQuotas() >Awknowledge Warnings and Download Quotas</button>';
     }
 }
 

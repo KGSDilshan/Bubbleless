@@ -1,6 +1,14 @@
+var TABLE_COUNTER = 0;
+
+function DeleteTable(id) {
+    var removeDiv = document.getElementById(id);
+    var parentEl = removeDiv.parentElement;
+    parentEl.removeChild(removeDiv);
+}
+
 function CreateNewQuota_DOM(len) {
 	const qBuff = document.getElementById("QuotasBuffer");
-    let data_table = '<table class="table table-bordered">';
+    let data_table = '<table class="table table-bordered" id="quotaTable">';
     data_table += '<thead>';
     data_table += '<tr>';
     data_table += '<th scope="col" colspan="5" contenteditable="true">QUOTA_GROUP_NAME</th>';
@@ -17,24 +25,23 @@ function CreateNewQuota_DOM(len) {
     data_table += '<tbody>';
     data_table += '</tbody>';
     data_table += '</table>';
-    qBuff.innerHTML += data_table + "<br><br>";
+    qBuff.innerHTML += '<div id="tableIndex' + TABLE_COUNTER +'"><button type="button" class="btn btn-danger" onClick=DeleteTable("tableIndex' + TABLE_COUNTER + '")>Delete QUOTA_GROUP_NAME<span class="glyphicon glyphicon-trash aria-hidden="true"></span></button>' + "<br>" + data_table + "<br><br></div>";
+    TABLE_COUNTER++;
 }
 
 
 function ReadQuotaTables() {
-    const qBuff = document.getElementById("QuotasBuffer");
+    const qBuff = document.querySelectorAll("table#quotaTable");
+
     let data = "";
-    for (let i = 0; i < qBuff.childNodes.length; i++) {
-        if (qBuff.childNodes[i].tagName == "TABLE") {
-            // get the table's head
-            let grpData = qBuff.childNodes[i].childNodes[0].innerText.split("\n");
-            for (let j = grpData.length; j >= 0; j--) {
-                if (grpData[j] == "") {
-                    grpData.splice(j, 1);
-                }
+    for (let i = 0; i < qBuff.length; i++) {
+        let grpData = qBuff[i].innerText.split("\n");
+        for (let j = grpData.length; j >= 0; j--) {
+            if (grpData[j] == "") {
+                grpData.splice(j, 1);
             }
-            data += grpData.join("\n") + "\n";
         }
+        data += grpData.join("\n") + "\n";
     }
     data = data.split("\n");
     return data;
@@ -56,7 +63,6 @@ function ImportQuotas(event) {
     ClearQuotaTables();
     let qFileInput = document.getElementById("quotaImportFile");
     qFileInput.click();
-
     qFileInput.onchange = function () {
         let qFile = qFileInput.files[0];
         let reader = new FileReader();
@@ -75,9 +81,12 @@ function ImportQuotas(event) {
                             data_table += '</thead>';
                             data_table += '<tbody>';
                             data_table += '</tbody>';
-                            data_table += '</table>';
+                            data_table += '</table><br><br></div>';
+                            TABLE_COUNTER++;
                         }
-                        data_table += '<table class="table table-bordered">';
+                        let unbracketed_name = data[a][0].replace(/\([a-zA-Z0-9 %]*\)/gi,"");
+                        data_table += '<div id="tableIndex' + TABLE_COUNTER +'"><button type="button" class="btn btn-danger" onClick=DeleteTable("tableIndex' + TABLE_COUNTER + '")>Delete ' +  unbracketed_name + '<span class="glyphicon glyphicon-trash aria-hidden="true"></span></button>' + "<br>" +
+                                     '<table class="table table-bordered" id="quotaTable">';
                         data_table += '<thead>';
                         data_table += '<tr>';
                         data_table += '<th scope="col" colspan="5" contenteditable="true">' + data[a][0] + '</th>';
@@ -95,6 +104,7 @@ function ImportQuotas(event) {
 		        data_table += '</tbody>';
 		        data_table += '</table>';
                 qBuff.innerHTML += data_table + "<br><br>";
+                TABLE_COUNTER++;
             });
             reader.readAsText(qFile);
         }
