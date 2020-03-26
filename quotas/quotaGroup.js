@@ -18,6 +18,8 @@ class QuotaGroup {
 
         // figure out mode and nsizes of this quota
         this.mode = 0;
+        this.hasSplits = config.hasSplits;
+        this.splits = config.splits;
         if (this.isTri) {
             this.mode = 3;
         } else if (this.isDual) {
