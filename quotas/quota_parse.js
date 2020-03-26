@@ -144,3 +144,24 @@ function ReadQuotaArr() {
         alert(alertMsg);
     }
 }
+
+
+function downloadQuotas() {
+    let full_data = "";
+    for (let i = 0; i < QUOTA_GROUPS.length; i++) {
+        full_data += QUOTA_GROUPS[i].displayQuotas();
+    }
+    // download
+    if (window.Blob == undefined || window.URL == undefined || window.URL.createObjectURL == undefined) {
+        alert("Your browser doesn't support Blobs");
+        return;
+    }
+
+    let csvFile = new Blob([full_data], {type:"text/csv"});
+    let downloadLink = document.createElement("a");
+    downloadLink.download = "quotas.csv";
+    downloadLink.href = window.URL.createObjectURL(csvFile);
+    downloadLink.style.display = "none";
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+}

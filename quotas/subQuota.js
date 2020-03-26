@@ -63,25 +63,25 @@ class Quota {
             switch (this.group.mode) {
                 case 1:
                     // phone only
-                    this.limits.phone = round05Ciel(this.group.nSizes[0] * lim);
+                    this.limits.phone = round05Ciel((this.group.nSizes[0] * lim)/100);
                     break;
                 case 2:
                     // figure out which two modes they are
                     if (this.group.nSizes.length > 0 && this.group.nSizes[0] != 0 && this.group.nSizes[0]) {
-                        this.limits.phone = round05Ciel(this.group.nSizes[0] * lim);
+                        this.limits.phone = round05Ciel((this.group.nSizes[0] * lim)/100);
                     }
                     if (this.group.nSizes.length > 1 && this.group.nSizes[1] != 0 && this.group.nSizes[1]) {
-                        this.limits.email = round05Ciel(this.group.nSizes[1] * lim);
+                        this.limits.email = round05Ciel((this.group.nSizes[1] * lim)/100);
                     }
                     if (this.group.nSizes.length > 2 && this.group.nSizes[2] != 0 && this.group.nSizes[2]) {
-                        this.limits.text = round05Ciel(this.group.nSizes[2] * lim);
+                        this.limits.text = round05Ciel((this.group.nSizes[2] * lim)/100);
                     }
                     break;
                 case 3:
                     // tri mode is every mode
-                    this.limits.phone = round05Ciel(this.group.nSizes[0] * lim);
-                    this.limits.email = round05Ciel(this.group.nSizes[1] * lim);
-                    this.limits.text = round05Ciel(this.group.nSizes[2] * lim);
+                    this.limits.phone = round05Ciel((this.group.nSizes[0] * lim)/100);
+                    this.limits.email = round05Ciel((this.group.nSizes[1] * lim)/100);
+                    this.limits.text = round05Ciel((this.group.nSizes[2] * lim)/100);
                     break;
             }
         }
@@ -100,25 +100,26 @@ class Quota {
                 if (this.limits[property] == 0)
                     continue;
                 if (this.group.mode > 1) {
-                    data += this.name + "," + this.csvMode + "," + this.questionName + "," + this.qCodes[i] + "," + this.limits[property] + "," + suffix + "\n";
                     switch (property) {
                         case "phone":
-                            data += this.name + " - Phone," + this.csvMode + "," + this.questionName + "," + this.qCodes[i] + "," + this.limits[property] + "," + suffix + "\n";
+                            data += this.name + " - Phone," + this.csvMode + "," + this.qName + "," + this.qCodes[i] + "," + this.limits[property] + "," + suffix + "\n";
                             data += this.name + " - Phone," + this.csvMode + "," + "pMode" + "," + 1 + "," + this.limits[property] + "," + suffix + "\n";
                             break;
                         case "email":
-                            data += this.name + " - Email," + this.csvMode + "," + this.questionName + "," + this.qCodes[i] + "," + this.limits[property] + "," + suffix + "\n";
+                            data += this.name + " - Email," + this.csvMode + "," + this.qName + "," + this.qCodes[i] + "," + this.limits[property] + "," + suffix + "\n";
                             data += this.name + " - Email," + this.csvMode + "," + "pMode" + "," + 2 + "," + this.limits[property] + "," + suffix + "\n";
                             break;
                         case "text":
-                            data += this.name + " - Text," + this.csvMode + "," + this.questionName + "," + this.qCodes[i] + "," + this.limits[property] + "," + suffix + "\n";
+                            data += this.name + " - Text," + this.csvMode + "," + this.qName + "," + this.qCodes[i] + "," + this.limits[property] + "," + suffix + "\n";
                             data += this.name + " - Text," + this.csvMode + "," + "pMode" + "," + 3 + "," + this.limits[property] + "," + suffix + "\n";
                             break;
                     };
+                } else {
+                    data += this.name + "," + this.csvMode + "," + this.qName + "," + this.qCodes[i] + "," + this.limits[property] + "," + suffix + "\n";
                 }
             }
         }
-        return data + "\n";
+        return data;
     }
 
 }

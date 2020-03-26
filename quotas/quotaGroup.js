@@ -44,9 +44,11 @@ class QuotaGroup {
         }
     }
 
+
     getName() {
         return this.group_name;
     }
+
 
     validateQuotas() {
         let limitTotal = 0;
@@ -94,6 +96,7 @@ class QuotaGroup {
         return this.warnings.length == 0;
     }
 
+
     displayWarnings() {
         let message = "";
         alertMsg = "";
@@ -112,6 +115,13 @@ class QuotaGroup {
         }
 
 
+    displayQuotas() {
+        let grpData = "";
+        for (let i = 0; i < this.subQuotas.length; i++) {
+            grpData += this.subQuotas[i].display();
+        }
+        return grpData;
+    }
 
 
 
