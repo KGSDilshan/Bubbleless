@@ -66,7 +66,7 @@ function ImportQuotas(event) {
     qFileInput.onchange = function () {
         let qFile = qFileInput.files[0];
         let reader = new FileReader();
-        if (qFile.length===0) {
+        if (qFile.length === 0) {
             alert("This action requires a valid .dat file to be uploaded.");
         } else {
             reader.addEventListener("loadend", function (event) {
@@ -118,14 +118,14 @@ function ExportQuotas() {
     let data = [];
     let today = new Date();
 
-    data[0] = ReadQuotaTables().join("\n").trim();
+    data[0] = ReadQuotaTables().join("\n").replace(/\n\n+/, "\n").trim();
 
     if (data[0].length > 0) {
         let fBlob;
         fBlob = new Blob(data, {type:"text/csv"});
         let downloadLink = document.createElement("a");
         downloadLink.download = "ExportedQuotas_" + (today.getMonth() + 1).toString().padStart(2,"0") + today.getDate().toString() + ".dat";
-        console.log("File Name:",downloadLink.download);
+        console.log("File Name:", downloadLink.download);
         downloadLink.href = window.URL.createObjectURL(fBlob);
         downloadLink.style.display = "none";
         document.body.appendChild(downloadLink);

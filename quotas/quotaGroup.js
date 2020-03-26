@@ -14,7 +14,9 @@ class QuotaGroup {
         this.isStandard = true; // placeholder property for client specific and tabled quotas
         this.warnings = [];
         this.textWarnings = [];
-
+        this.hasSplits = config.hasSplits;
+        this.splits = config.splits;
+        this.id = config.id;
 
         // figure out mode and nsizes of this quota
         this.mode = 0;

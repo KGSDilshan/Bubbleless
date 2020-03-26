@@ -1,5 +1,7 @@
 var QUOTA_GROUPS = [];
 
+var QUOTA_HEADERS = [];
+
 var QUOTA_PROPERTIES = [
     {
         name: "(tri)",
@@ -16,8 +18,12 @@ var QUOTA_PROPERTIES = [
         validation: IncludesNameFlex,
         callback: RemoveNameFlex,
     },
+    {
+        name: "(split)",
+        validation: IncludesNameSplit,
+        callback: RemoveNameSplits,
+    },
 ];
-
 
 function IncludesNameTri(name) {
     return name.toLowerCase().includes("(tri)");
@@ -29,6 +35,20 @@ function IncludesNameDual(name) {
 
 function IncludesNameFlex(name) {
     return name.toLowerCase().includes("(flex");
+}
+
+function IncludesNameSplit(name) {
+    let hasSplits = false;
+    let cleanName = name.toLowerCase().replace(/\s+/g, '');   // Remove spaces from the name so parsing is easier
+    cleanName = cleanName.split("(");
+
+    QUOTA_HEADERS.forEach(qh => {
+        if (cleanName.includes(qh.toLowerCase() + ")")) {
+            hasSplits = true;
+        }
+    });
+
+    return hasSplits;
 }
 
 function RemoveNameTri(name, tObj) {
@@ -55,7 +75,26 @@ function RemoveNameFlex(name, tObj) {
     return {template: obj, name: title};
 }
 
+function RemoveNameSplits(name, tObj) {
+    let title = name;
+    let obj = JSON.parse(JSON.stringify(tObj));
+    let splits = [];
+    let cleanName = name.toLowerCase().replace(/\s+/g, '');   // Remove spaces from the name so parsing is easier
 
+    cleanName = cleanName.split("(");
+
+    QUOTA_HEADERS.forEach(qh => {
+        if (cleanName.includes(qh.toLowerCase() + ")")) {
+            splits.push(qh.toLowerCase());
+            title = title.replace("(" + qh.toLowerCase() + ")",'');
+        }
+    });
+
+    obj.splits = splits;
+    obj.hasSplits = true;
+
+    return {template: obj, name: title};
+}
 
 function NameGroupValidation(OriginalName, template) {
     let name = OriginalName.slice();
@@ -73,29 +112,29 @@ function NameGroupValidation(OriginalName, template) {
     };
 }
 
-
-
 function CreateQuotaGroup(QGname, quotaObj, rawSizes) {
     if (QGname == "" || QGname == undefined) {
         return;
     }
 
     let configTemplate = {
+        id: generateId(),
         nSizes: rawSizes.slice(),
         isTri: false,
         isDual: false,
         isFlex: false,
         isRawFlex: false,
         flexAmount: false,
+        hasSplits: false,
+        splits: []
     };
-    // from the name, derrive group properties
+    // from the name, derive group properties
     let retObj = NameGroupValidation(QGname, configTemplate);
     let config = retObj.template;
     let name = retObj.name;
     console.log("group details", name, config);
     QUOTA_GROUPS.push(new QuotaGroup(name, config, quotaObj));
 }
-
 
 function ReadQuotaArr() {
     // clear warning area
@@ -121,6 +160,18 @@ function ReadQuotaArr() {
     let i = 0;
     let qGName = "";
     let qGQuotas = [];
+
+    // Initialize quota groups/headers
+    QUOTA_GROUPS = [];
+    QUOTA_HEADERS = [];
+
+    // Grab all the headers
+    content.forEach(row => {
+        if (!row.includes("\t") && row.length > 0) {
+            QUOTA_HEADERS.push(row.toLowerCase().replace(/\s+/g, '').split("(")[0].trim());
+        }
+    });
+
     while (i < content.length) {
         let line = content[i].trim().split("\t");
         if (line == undefined) {
@@ -160,7 +211,6 @@ function ReadQuotaArr() {
     }
 }
 
-
 function downloadQuotas() {
     let full_data = "";
     for (let i = 0; i < QUOTA_GROUPS.length; i++) {
@@ -179,4 +229,13 @@ function downloadQuotas() {
     downloadLink.style.display = "none";
     document.body.appendChild(downloadLink);
     downloadLink.click();
+}
+
+function generateId() {
+    let newId = QUOTA_GROUPS.length;
+
+    while (QUOTA_GROUPS.find(x => x.id === newId)) {
+        newId++;
+    }
+    return newId;
 }
