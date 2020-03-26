@@ -113,15 +113,19 @@ function ReadQuotaArr() {
     let qGQuotas = [];
     while (i < content.length) {
         let line = content[i].trim().split("\t");
+        console.log(line);
         if (line == undefined) {
+            i++;
             continue;
         } else if (line.length == 1 && line[0] != undefined) {
             // line should contain a new quota group. Attempt to serialize previous data
+            console.log("make quota grp");
             CreateQuotaGroup(qGName, qGQuotas, rawSizes);
             qGName = line[0];
             qGQuotas = [];
         } else if (line.length > 1) {
             // must be a sub quota
+            console.log("add to sub quota");
             qGQuotas.push(line);
         } else {
             console.log(line, "doesn't fall into categories");

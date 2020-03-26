@@ -5,7 +5,7 @@ class QuotaGroup {
         this.isDual = config.isDual;
         this.isFlex = config.isFlex;
         this.isRawFlex = config.isRawFlex;
-        this.flexAmount = config.flexAmount;
+        this.flexAmount = parseFloat(config.flexAmount);
         this.nSizes = config.nSizes.slice();
         // total N is all nsizes totaled together
         this.totalN = this.nSizes.reduce((a, b) => a + b, 0);
@@ -55,6 +55,7 @@ class QuotaGroup {
         let limitTotal = 0;
         let dupeQs = [];
         let zeroLimits = [];
+        console.log("group: ", this.getName(), this.subQuotas);
         let raw = this.subQuotas[0].isRaw;
         for (let i = 0; i < this.subQuotas.length; i++) {
             limitTotal += this.subQuotas[i].valLimit;

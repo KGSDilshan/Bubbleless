@@ -2,7 +2,7 @@
 function round05Ciel(x) {
     let val = x.toString().split(".")
     if (val.length == 1)
-        return val;
+        return parseInt(val);
     else if (parseInt(val[1][0]) >= 5)
         return parseInt(x) + 1
     else
@@ -36,6 +36,7 @@ class Quota {
         // for each code, we need a new quota
         let data = "";
         let suffix;
+        let name = "";
         for (let i = 0; i < this.qCodes.length; i++) {
             for (const property in this.limits) {
                 if (this.limits[property] == undefined)
@@ -49,26 +50,31 @@ class Quota {
                     }
                     this.limits[property] = parseInt(counterLim);
                     suffix = this.client.getSuffix(this);
-                    data += this.name + "," + this.csvMode + "," + this.qName + "," + this.qCodes[i] + "," + this.limits[property] + "," + suffix + "\n";
+                    name = this.client.finalName(this, this.name);
+                    data += name + "," + this.csvMode + "," + this.qName + "," + this.qCodes[i] + "," + this.limits[property] + "," + suffix + "\n";
                     continue;
                 }
                 suffix = this.client.getSuffix(this);
                 if (this.group.mode > 1) {
                     switch (property) {
                         case "phone":
-                            data += this.name + " - Phone," + this.csvMode + "," + this.qName + "," + this.qCodes[i] + "," + this.limits[property] + "," + suffix + "\n";
-                            data += this.name + " - Phone," + this.csvMode + "," + "pMode" + "," + 1 + "," + this.limits[property] + "," + suffix + "\n";
+                            name = this.client.finalName(this, this.name + " - Phone");
+                            data += name + "," + this.csvMode + "," + this.qName + "," + this.qCodes[i] + "," + this.limits[property] + "," + suffix + "\n";
+                            data += name + "," + this.csvMode + "," + "pMode" + "," + 1 + "," + this.limits[property] + "," + suffix + "\n";
                             break;
                         case "email":
-                            data += this.name + " - Email," + this.csvMode + "," + this.qName + "," + this.qCodes[i] + "," + this.limits[property] + "," + suffix + "\n";
-                            data += this.name + " - Email," + this.csvMode + "," + "pMode" + "," + 2 + "," + this.limits[property] + "," + suffix + "\n";
+                            name = this.client.finalName(this, this.name + " - Email");
+                            data += name + "," + this.csvMode + "," + this.qName + "," + this.qCodes[i] + "," + this.limits[property] + "," + suffix + "\n";
+                            data += name + "," + this.csvMode + "," + "pMode" + "," + 2 + "," + this.limits[property] + "," + suffix + "\n";
                             break;
                         case "text":
-                            data += this.name + " - Text," + this.csvMode + "," + this.qName + "," + this.qCodes[i] + "," + this.limits[property] + "," + suffix + "\n";
-                            data += this.name + " - Text," + this.csvMode + "," + "pMode" + "," + 3 + "," + this.limits[property] + "," + suffix + "\n";
+                            name = this.client.finalName(this, this.name + " - Text");
+                            data += name + "," + this.csvMode + "," + this.qName + "," + this.qCodes[i] + "," + this.limits[property] + "," + suffix + "\n";
+                            data += name + "," + this.csvMode + "," + "pMode" + "," + 3 + "," + this.limits[property] + "," + suffix + "\n";
                             break;
                     };
                 } else {
+                    name = this.client.finalName(this, this.name);
                     data += this.name + "," + this.csvMode + "," + this.qName + "," + this.qCodes[i] + "," + this.limits[property] + "," + suffix + "\n";
                 }
             }
