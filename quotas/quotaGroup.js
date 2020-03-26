@@ -32,13 +32,14 @@ class QuotaGroup {
 
         // populate sub quotas array
         console.log("raw subquotas:", this.rawSubQuotas);
+        this.clientId = parseInt(document.getElementById("clientSelect").value);
         if (this.isStandard) {
             for (let i = 0; i < this.rawSubQuotas.length; i++) {
                 let name = this.rawSubQuotas[i][0];
                 let percent = this.rawSubQuotas[i][1];
                 let question = this.rawSubQuotas[i][2];
                 let codes = this.rawSubQuotas[i][3].split(" ").join("").split(",");
-                this.subQuotas.push(new Quota(this, name, percent, question, codes));
+                this.subQuotas.push(new Quota(this, name, percent, question, codes, this.clientId));
                 console.log(this.rawSubQuotas[i]);
             }
         }
@@ -99,7 +100,7 @@ class QuotaGroup {
 
     displayWarnings() {
         let message = "";
-        alertMsg = "";
+        let alertMsg = "";
         for (let i = 0; i < this.warnings.length; i++) {
             let htmlAlert;
             htmlAlert = '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
@@ -112,7 +113,7 @@ class QuotaGroup {
         // write
         document.getElementById("QuotaWarningsBuffer").innerHTML = message + "<br><br>";
         return alertMsg;
-        }
+    }
 
 
     displayQuotas() {
