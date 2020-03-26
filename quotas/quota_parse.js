@@ -43,7 +43,7 @@ function IncludesNameSplit(name) {
     cleanName = cleanName.split("(");
 
     QUOTA_HEADERS.forEach(qh => {
-        if (cleanName.includes(qh.group_name.toLowerCase() + ")")) {
+        if (cleanName.includes(qh.toLowerCase() + ")")) {
             hasSplits = true;
         }
     });
@@ -84,9 +84,9 @@ function RemoveNameSplits(name, tObj) {
     cleanName = cleanName.split("(");
 
     QUOTA_HEADERS.forEach(qh => {
-        if (cleanName.includes(qh.group_name.toLowerCase() + ")")) {
-            splits.push(qh.group_name.toLowerCase());
-            title = title.replace("(" + qh.group_name.toLowerCase() + ")",'');
+        if (cleanName.includes(qh.toLowerCase() + ")")) {
+            splits.push(qh.toLowerCase());
+            title = title.replace("(" + qh.toLowerCase() + ")",'');
         }
     });
 
