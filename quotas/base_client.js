@@ -20,14 +20,53 @@ class BaseClient {
         return suffix;
     }
 
-    finalName(quota, qname) {
+    finalName(quota, qname, limit) {
         // flex name modification
         let name = qname;
         if (quota.group.isFlex) {
-            name += " (Flex " + (quota.group.isRawFlex ? "" : "%") + quota.group.flexAmount + " added)";
+            name += " (" + (quota.group.isRawFlex ? "" : "Flex ") + quota.group.flexAmount + (quota.group.isRawFlex ? "" : "%") + " added)";
         }
         // counter name modification
-        // TODO
+        if (quota.counter == true) {
+            name += " (Min : " + limit + ")";
+        }
+        return name;
+    }
+
+    counterQuota(quota) {
+        if (!quota.counter)
+            return;
+        let counterLim = "";
+        for (let k = 0; k < (quota.group.totalN.toString().length); k++) {
+            counterLim += "9";
+        }
+        quota.active = false;
+        // get min value
+        let minVal = quota.valLimit;
+        switch (quota.group.mode) {
+            case 1:
+                // phone only
+                quota.limits.phone = counterLim;
+                break;
+            case 2:
+                // figure out which two modes they are
+                if (quota.group.nSizes.length > 0 && quota.group.nSizes[0] != 0 && quota.group.nSizes[0]) {
+                    quota.limits.phone = counterLim;
+                }
+                if (quota.group.nSizes.length > 1 && quota.group.nSizes[1] != 0 && quota.group.nSizes[1]) {
+                    quota.limits.email = counterLim;
+                }
+                if (quota.group.nSizes.length > 2 && quota.group.nSizes[2] != 0 && quota.group.nSizes[2]) {
+                    quota.limits.text = counterLim;
+                }
+                break;
+            case 3:
+                // tri mode is every mode
+                quota.limits.phone = counterLim;
+                quota.limits.email = counterLim;
+                quota.limits.text = counterLim;
+                break;
+        }
     }
 
     calcLimit(quota) {
