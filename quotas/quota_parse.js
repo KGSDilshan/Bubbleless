@@ -18,6 +18,7 @@ var QUOTA_PROPERTIES = [
     },
 ];
 
+
 function IncludesNameTri(name) {
     return name.toLowerCase().includes("(tri)");
 }
