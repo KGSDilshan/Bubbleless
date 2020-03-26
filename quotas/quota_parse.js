@@ -42,8 +42,7 @@ function IncludesNameSplit(name) {
     cleanName = cleanName.split("(");
 
     QUOTA_GROUPS.forEach(qg => {
-        console.log("QG CHECK: ", qg, cleanName);
-        if (cleanName.includes(qg.group_name.toLowerCase())) {
+        if (cleanName.includes(qg.group_name.toLowerCase() + ")")) {
             hasSplits = true;
         }
     });
@@ -81,19 +80,17 @@ function RemoveNameSplits(name, tObj) {
     let splits = [];
     let cleanName = name.toLowerCase().replace(/\s+/g, '');   // Remove spaces from the name so parsing is easier
 
-    cleanName = cleanName.split(")(");
+    cleanName = cleanName.split("(");
 
     QUOTA_GROUPS.forEach(qg => {
-        if (cleanName.includes(qg.group_name.toLowerCase())) {
+        if (cleanName.includes(qg.group_name.toLowerCase() + ")")) {
             splits.push(qg.group_name.toLowerCase());
+            title = title.replace("(" + qg.group_name.toLowerCase() + ")",'');
         }
     });
 
-    splits.forEach(name => {
-        title.replace("(" + name + ")", '');
-    });
-
     obj.splits = splits;
+    obj.hasSplits = true;
 
     return {template: obj, name: title};
 }

@@ -14,12 +14,11 @@ class QuotaGroup {
         this.isStandard = true; // placeholder property for client specific and tabled quotas
         this.warnings = [];
         this.textWarnings = [];
-
+        this.hasSplits = config.hasSplits;
+        this.splits = config.splits;
 
         // figure out mode and nsizes of this quota
         this.mode = 0;
-        this.hasSplits = config.hasSplits;
-        this.splits = config.splits;
         if (this.isTri) {
             this.mode = 3;
         } else if (this.isDual) {
