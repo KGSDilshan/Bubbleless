@@ -16,6 +16,11 @@ var QUOTA_PROPERTIES = [
         validation: IncludesNameFlex,
         callback: RemoveNameFlex,
     },
+    {
+        name: "(split)",
+        validation: IncludesNameSplit,
+        callback: RemoveNameSplits,
+    },
 ];
 
 
@@ -29,6 +34,21 @@ function IncludesNameDual(name) {
 
 function IncludesNameFlex(name) {
     return name.toLowerCase().includes("(flex");
+}
+
+function IncludesNameSplit(name) {
+    let hasSplits = false;
+    let cleanName = name.toLowerCase().replace(/\s+/g, '');   // Remove spaces from the name so parsing is easier
+    cleanName = cleanName.split("(");
+
+    QUOTA_GROUPS.forEach(qg => {
+        console.log("QG CHECK: ", qg, cleanName);
+        if (cleanName.includes(qg.group_name.toLowerCase())) {
+            hasSplits = true;
+        }
+    });
+
+    return hasSplits;
 }
 
 function RemoveNameTri(name, tObj) {
@@ -55,7 +75,28 @@ function RemoveNameFlex(name, tObj) {
     return {template: obj, name: title};
 }
 
+function RemoveNameSplits(name, tObj) {
+    let title = name;
+    let obj = JSON.parse(JSON.stringify(tObj));
+    let splits = [];
+    let cleanName = name.toLowerCase().replace(/\s+/g, '');   // Remove spaces from the name so parsing is easier
 
+    cleanName = cleanName.split(")(");
+
+    QUOTA_GROUPS.forEach(qg => {
+        if (cleanName.includes(qg.group_name.toLowerCase())) {
+            splits.push(qg.group_name.toLowerCase());
+        }
+    });
+
+    splits.forEach(name => {
+        title.replace("(" + name + ")", '');
+    });
+
+    obj.splits = splits;
+
+    return {template: obj, name: title};
+}
 
 function NameGroupValidation(OriginalName, template) {
     let name = OriginalName.slice();
@@ -87,8 +128,10 @@ function CreateQuotaGroup(QGname, quotaObj, rawSizes) {
         isFlex: false,
         isRawFlex: false,
         flexAmount: false,
+        hasSplits: false,
+        splits: []
     };
-    // from the name, derrive group properties
+    // from the name, derive group properties
     let retObj = NameGroupValidation(QGname, configTemplate);
     let config = retObj.template;
     let name = retObj.name;
