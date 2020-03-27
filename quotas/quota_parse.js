@@ -19,12 +19,22 @@ var QUOTA_PROPERTIES = [
         callback: RemoveNameFlex,
     },
     {
+        name: "Custom N size",
+        validation: IncludesCustomN,
+        callback: SetCustomNSize,
+    },
+    {
         // Always should be last in array, happens at lowest priority
         name: "(split)",
         validation: IncludesNameSplit,
         callback: RemoveNameSplits,
     },
 ];
+
+function IncludesCustomN(name) {
+    let customN = document.getElementById("customN" + QUOTA_GROUPS.length).value;
+    return (customN.trim() != "" && Number.isInteger(parseInt(customN)));
+}
 
 function IncludesNameTri(name) {
     return name.toLowerCase().includes("(tri)");
@@ -41,8 +51,14 @@ function IncludesNameFlex(name) {
 function IncludesNameSplit(name) {
     let hasSplits = false;
     let bracketedContent = name.match(/\(.*?\)/g);
-    console.log(name, bracketedContent)
     return (bracketedContent != null && bracketedContent.length > 0);
+}
+
+function SetCustomNSize(name, tObj) {
+    let obj = JSON.parse(JSON.stringify(tObj));
+    obj.nOverride = true;
+    obj.nOverrideVal = parseInt(document.getElementById("customN" + QUOTA_GROUPS.length).value);
+    return {template: obj, name: name};
 }
 
 function RemoveNameTri(name, tObj) {
@@ -119,6 +135,8 @@ function CreateQuotaGroup(QGname, quotaObj, rawSizes) {
         isRawFlex: false,
         flexAmount: false,
         hasSplits: false,
+        nOverride: false,
+        nOverrideVal: undefined,
         splits: []
     };
     // from the name, derive group properties

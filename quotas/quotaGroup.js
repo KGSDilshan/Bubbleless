@@ -5,10 +5,16 @@ class QuotaGroup {
         this.isDual = config.isDual;
         this.isFlex = config.isFlex;
         this.isRawFlex = config.isRawFlex;
-        this.flexAmount = parseFloat(config.flexAmount);
         this.nSizes = config.nSizes.slice();
         // total N is all nsizes totaled together
         this.totalN = this.nSizes.reduce((a, b) => a + b, 0);
+        this.flexAmount = parseFloat(config.flexAmount);
+        if (config.nOverride == true) {
+            for (let i = 0; i < this.nSizes.length; i++) {
+                this.nSizes[i] = config.nOverrideVal;
+            }
+            this.totalN = config.nOverrideVal;
+        }
         this.subQuotas = [];
         this.rawSubQuotas = subQuotas.slice();
         this.isStandard = true; // placeholder property for client specific and tabled quotas
@@ -34,7 +40,6 @@ class QuotaGroup {
         }
 
         // populate sub quotas array
-        console.log("raw subquotas:", this.rawSubQuotas);
         this.clientId = parseInt(document.getElementById("clientSelect").value);
         if (this.isStandard) {
             for (let i = 0; i < this.rawSubQuotas.length; i++) {
@@ -43,7 +48,6 @@ class QuotaGroup {
                 let question = this.rawSubQuotas[i][2];
                 let codes = this.rawSubQuotas[i][3].split(" ").join("").split(",");
                 this.subQuotas.push(new Quota(this, name, percent, question, codes, this.clientId));
-                console.log(this.rawSubQuotas[i]);
             }
         }
     }
@@ -58,7 +62,6 @@ class QuotaGroup {
         let limitTotal = 0;
         let dupeQs = [];
         let zeroLimits = [];
-        console.log("group: ", this.getName(), this.subQuotas);
         let raw = this.subQuotas[0].isRaw;
         for (let i = 0; i < this.subQuotas.length; i++) {
             limitTotal += this.subQuotas[i].valLimit;

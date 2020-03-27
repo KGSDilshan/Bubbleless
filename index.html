@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>Bubbleless</title>
     <meta name="description" content="webport">
-    <meta name ="author" content="Dilshan Gunasekera">
+    <meta name="author" content="Dilshan Gunasekera">
     <link rel="icon" href="favicon.ico">
     <link rel="stylesheet" type="text/css" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="main.css">
@@ -31,20 +32,20 @@
     <script src="export_worker.js"></script>
     <!-- <script src="sampleProcess_worker.js"></script> -->
     <link href="https://fonts.googleapis.com/css?family=Roboto+Mono|Harmattan" rel="stylesheet">
-    <link href='font-awesome-4.7.0/css/font-awesome.min.css' rel='stylesheet'/>
+    <link href='font-awesome-4.7.0/css/font-awesome.min.css' rel='stylesheet' />
 
     <style type="text/css">
-      html, body {
-        margin: 0px;
-        top: 0px;
-        background-color: #FFFFFF;
-        overflow-x: hidden;
-        width: 100%;
-      }
-
+        html,
+        body {
+            margin: 0px;
+            top: 0px;
+            background-color: #FFFFFF;
+            overflow-x: hidden;
+            width: 100%;
+        }
     </style>
     <script>
-        $( document ).ready(function() {
+        $(document).ready(function() {
             document.getElementById("bubblelessInput").innerHTML = "";
             document.getElementById("bubblelessScrubNamesInput").innerHTML = "";
             // let placeholderText = ["COPYCOLUMN	XX_FN","COPYCOLUMN	XX_LN", "", "EMAIL","other	rf@rf.com",
@@ -54,235 +55,246 @@
             document.getElementById("bubbless-flagstart-input").value = 1;
         });
     </script>
-  </head>
+</head>
 
-  <body>
+<body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="#">Menu</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <ul class="navbar-nav">
-        <li class="nav-item active">
-          <a class="nav-item nav-link active" href="index.html"><i class="fa fa-home" aria-hidden="true"> Home</i></a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-item nav-link active" href="docs.html"><i class="fa fa-book" aria-hidden="true"> Documentation</i></a>
-        </li>
-      <li class="nav-item">
-          <a class="nav-item nav-link active" href="https://github.com/KGSDilshan/Bubbleless"><i class="fa fa-github" aria-hidden="true"> Source</i></a>
-      </li>
-        </ul>
-      </div>
+        <a class="navbar-brand" href="#">Menu</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <ul class="navbar-nav">
+                <li class="nav-item active">
+                    <a class="nav-item nav-link active" href="index.html"><i class="fa fa-home" aria-hidden="true"> Home</i></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-item nav-link active" href="docs.html"><i class="fa fa-book" aria-hidden="true"> Documentation</i></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-item nav-link active" href="https://github.com/KGSDilshan/Bubbleless"><i class="fa fa-github" aria-hidden="true"> Source</i></a>
+                </li>
+            </ul>
+        </div>
     </nav>
 
 
-  <!-- Header -->
-  <div class="jumbotron text-center jumbotron-fluid" id="webpage-title" style="padding-bottom: 10px">
-      <font style="color: white"><h1><strong>Bubbleless</strong> <br>
-      <small style="color: #FFFFFF;" size="1">Scrubbing without the bubbles</small>
-      </h1></font>
-      <div style="text-align: right">
-        <font size="4vh" style="color: white">v1.0.0</font>
-      </div>
-    </div>
-<div style="background-color: #EEEEEE;">
-<br>
-<br>
-  <div class="container section-block" align="center">
-    <br>
-    <br>
-    <font class="section-heading">Upload and Paste Materials</font>
-    <hr class="subtle_section">
-    <br>
-    <br>
-    <form>
-        <div class="form-group" align=center>
-            <div class="custom-file">
-                <input type="file" class="custom-file-input" accept='*csv' onchange='OpenFile(event)' id="sampleFile" required>
-                <label class="custom-file-label" for="sampleFile">Choose file...</label>
-                <div class="invalid-feedback">A Sample is Required</div>
-            </div>
+    <!-- Header -->
+    <div class="jumbotron text-center jumbotron-fluid" id="webpage-title" style="padding-bottom: 10px">
+        <font style="color: white">
+            <h1><strong>Bubbleless</strong> <br>
+                <small style="color: #FFFFFF;" size="1">Scrubbing without the bubbles</small>
+            </h1>
+        </font>
+        <div style="text-align: right">
+            <font size="4vh" style="color: white">v1.0.0</font>
         </div>
-        <div class="form-group">
-            <div id="sample_uploader"><label for="displayRecords">Sample Preview</label><br></div>
-            <div class="scrollhorizontal" id="samplePreview" align="center" width="100%">
-                <b>Requires sample.</b>
-            </div>
-        </div>
-        <br>
-        <div class="form-group row">
-            <label for="bubbless-flagstart-input" class="col-2 col-form-label">Flags start:</label>
-            <div class="col-10">
-                <input class="form-control" type="number" value="1" id="bubbless-flagstart-input">
-            </div>
-        </div>
-        <br>
-        <div class="form-group">
-            <label for="bubblelessScrubNamesInput">Paste Scrubbing data here</label>
-            <textarea class="form-control" id="bubblelessScrubNamesInput" rows="6" placeholder="Names of people, deletes, scrubs in here">
-            </textarea>
-        </div>
-        <br>
-        <div class="form-group">
-            <label for="bubblelessInput">Paste your conversions here</label>
-            <textarea class="form-control" id="bubblelessInput" rows="10" placeholder="Paste your conversions here.">
-            </textarea>
-        </div>
-        <br>
-    </form>
-    <div id="processSection">
-    <button class="btn btn-primary" onClick=ProcessInput()>Process</button>
     </div>
-    <br>
-    <br>
-  </div>
-    <div style="height: 30px"></div>
-    <div class="container section-block">
+    <div style="background-color: #EEEEEE;">
         <br>
         <br>
-        <font class="section-heading">Report</font>
-        <hr class="subtle_section">
-        <br>
-        <div id="WarningBuffer" title="WARNINGS" align="left">Requires Processing.</div>
-        <div id="LoadingMessages"></div>
-        <div id="ButtonBuffer" align="left"></div>
-        <br>
-        <br>
-    </div>
-    <br>
-    <br>
-    <div class="container section-block"><br>
-    <br>
-    <font class="section-heading">Data Visualization</font>
-    <hr class="subtle_section">
-    <div id="dataChartArea">
-    </div>
-    </div>
-    <br>
-    <br>
-    <div class="container section-block">
-        <br>
-        <br>
-        <font class="section-heading">Survey Level Quota Properties</font>
-        <hr class="subtle_section">
-        <br>
-        <form>
-            <div class="form-check" align = "left">
-                <input class="form-check-input" type="checkbox" value="" id="NOL">
-                <label class="form-check-label" for="NOL">
-                    Name On List
-                </label>
-            </div>
+        <div class="container section-block" align="center">
             <br>
-            <div class="form-group row">
-                <label for="EndSize" class="col-sm-2 col-form-label">N Sizes*</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" id="QNSize" placeholder="Phone-Email-Text">
+            <br>
+            <font class="section-heading">Upload and Paste Materials</font>
+            <hr class="subtle_section">
+            <br>
+            <br>
+            <form>
+                <div class="form-group" align=center>
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" accept='*csv' onchange='OpenFile(event)' id="sampleFile" required>
+                        <label class="custom-file-label" for="sampleFile">Choose file...</label>
+                        <div class="invalid-feedback">A Sample is Required</div>
+                    </div>
                 </div>
-            </div>
-            <br>
-            <div class="form-group" align="left">
-                <label for="clientSelect">Client</label>
-                <select class="form-control" id="clientSelect">
-                    <option value="0">General Specifications</option>
-                    <option value="1">McLaughlin</option>
-                    <option value="2">ALG</option>
-                    <option value="3">Binder</option>
-                    <option value="4">FM3</option>
-                    <option value="5">Ragnar</option>
-                    <option value="6">EMC</option>
-                    <option value="7">Probolsky</option>
-                    <option value="8">Wallin</option>
-                    <option value="9">Keating</option>
-                    <option value="10">Lake Research</option>
-                    <option value="11">Lincoln Park</option>
-                    <option value="12">NRCC</option>
-                    <option value="13">Fabrizio</option>
-                    <option value="14">National Research</option>
-                    <option value="15">Sextant</option>
-                    <option value="16">Global Strategy Group</option>
-                </select>
-            </div>
-        </form>
-        <br>
-        <br>
-        <font class="section-heading">Quotas Properties</font>
-        <hr class="subtle_section">
-        <br>
-        <div id="QuotasBuffer" title="QuotasBuffer" align="left"></div>
-        <form>
-        	<div class="form-group row">
-            	<label for="QuotaRows" class="col-sm-2 col-form-label">Rows in new Quota</label>
-            	<div class="col-sm-10">
-            	       <input type="text" class="form-control" id="QuotaRows" placeholder="4" value="5">
-            	</div>
+                <div class="form-group">
+                    <div id="sample_uploader"><label for="displayRecords">Sample Preview</label><br></div>
+                    <div class="scrollhorizontal" id="samplePreview" align="center" width="100%">
+                        <b>Requires sample.</b>
+                    </div>
+                </div>
+                <br>
+                <div class="form-group row">
+                    <label for="bubbless-flagstart-input" class="col-2 col-form-label">Flags start:</label>
+                    <div class="col-10">
+                        <input class="form-control" type="number" value="1" id="bubbless-flagstart-input">
+                    </div>
+                </div>
+                <br>
+                <div class="form-group">
+                    <label for="bubblelessScrubNamesInput">Paste Scrubbing data here</label>
+                    <textarea class="form-control" id="bubblelessScrubNamesInput" rows="6" placeholder="Names of people, deletes, scrubs in here">
+            </textarea>
+                </div>
+                <br>
+                <div class="form-group">
+                    <label for="bubblelessInput">Paste your conversions here</label>
+                    <textarea class="form-control" id="bubblelessInput" rows="10" placeholder="Paste your conversions here.">
+            </textarea>
+                </div>
+                <br>
+            </form>
+            <div id="processSection">
+                <button class="btn btn-primary" onClick=ProcessInput()>Process</button>
             </div>
             <br>
             <br>
-        </form>
-        <button type="submit" class="btn btn-primary mb-2" id="importQuotas" onClick=ImportQuotas() >Import Quotas</button>
-        <button type="submit" class="btn btn-primary mb-2" id="exportQuotas" onClick=ExportQuotas() >Export Quotas</button>
-        <button type="submit" class="btn btn-primary mb-2" id="makeNewQ" onClick=CreateNewQuota_DOM(document.getElementById("QuotaRows").value) >Create New Quota</button>
-        <input type="file" class="btn btn-primary mb-2" id="quotaImportFile" accept="*.dat" required style="display:none;" />
-        <div>
-        <br>
-        <button type="submit" class="btn btn-primary mb-2" onClick=ReadQuotaArr() >Process Quotas</button>
+        </div>
+        <div style="height: 30px"></div>
+        <div class="container section-block">
+            <br>
+            <br>
+            <font class="section-heading">Report</font>
+            <hr class="subtle_section">
+            <br>
+            <div id="WarningBuffer" title="WARNINGS" align="left">Requires Processing.</div>
+            <div id="LoadingMessages"></div>
+            <div id="ButtonBuffer" align="left"></div>
+            <br>
+            <br>
         </div>
         <br>
         <br>
-        <br>
-    </div>
-    <div style="height: 30px"></div>
-    <div class="container section-block">
-        <br>
-        <br>
-        <font class="section-heading">Quota Report</font>
-        <hr class="subtle_section">
-        <br>
-        <div id="QuotaWarningsBuffer"></div>
-    </div>
-    <div style="height: 30px"></div>
-    <div class="container section-block">
+        <div class="container section-block"><br>
+            <br>
+            <font class="section-heading">Data Visualization</font>
+            <hr class="subtle_section">
+            <div id="dataChartArea">
+            </div>
+        </div>
         <br>
         <br>
-        <font class="section-heading">Latest Update</font>
-        <hr class="subtle_section">
-        <p>
-        <br>
-        <script>
-        var dataObj;
-        $.getJSON('https://api.github.com/repos/KGSDilshan/Bubbleless/branches/master', function(data) {
-            dataObj = data;
-            let person = dataObj.commit.commit.author.name;
-            let date = dataObj.commit.commit.author.date;
-            let message = dataObj.commit.commit.message;
-            let output = "By: " + person + "<br>&nbsp;&nbsp;&nbsp;&nbsp;" + date + "<br>&nbsp;&nbsp;&nbsp;&nbsp;" + message;
-            $("div#LatestCommit").replaceWith(output);
-        });
-        </script>
-        <div id="LatestCommit"></div>
-        <br>
-        <br>
-        <center>
-    <br>
-    <br>
-    </div>
-    </body>
+        <div class="container section-block">
+            <br>
+            <br>
+            <font class="section-heading">Survey Level Quota Properties</font>
+            <hr class="subtle_section">
+            <br>
+            <form>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group row" align="left">
+                            <label for="EndSize" class="col-sm-2 col-form-label">N Sizes*</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="QNSize" placeholder="Phone-Email-Text">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group" align="left">
+                            <select class="form-control" id="clientSelect">
+                                <option value="0">Default Client</option>
+                                <option value="1">McLaughlin</option>
+                                <option value="2">ALG</option>
+                                <option value="3">Binder</option>
+                                <option value="4">FM3</option>
+                                <option value="5">Ragnar</option>
+                                <option value="6">EMC</option>
+                                <option value="7">Probolsky</option>
+                                <option value="8">Wallin</option>
+                                <option value="9">Keating</option>
+                                <option value="10">Lake Research</option>
+                                <option value="11">Lincoln Park</option>
+                                <option value="12">NRCC</option>
+                                <option value="13">Fabrizio</option>
+                                <option value="14">National Research</option>
+                                <option value="15">Sextant</option>
+                                <option value="16">Global Strategy Group</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-check" align="left">
+                            <input class="form-check-input" type="checkbox" value="" id="NOL">
+                            <label class="form-check-label" for="NOL">
+                                Name On List
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <br>
+            <br>
+            <font class="section-heading">Quotas Properties</font>
+            <hr class="subtle_section">
+            <br>
+            <div id="QuotasBuffer" title="QuotasBuffer" align="left"></div>
+            <form>
+                <div class="form-group row">
+                    <label for="QuotaRows" class="col-sm-2 col-form-label">Rows in new Quota</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="QuotaRows" placeholder="4" value="5">
+                    </div>
+                </div>
+                <br>
+                <br>
+            </form>
+            <button type="submit" class="btn btn-primary mb-2" id="importQuotas" onClick=ImportQuotas()>Import Quotas</button>
+            <button type="submit" class="btn btn-primary mb-2" id="exportQuotas" onClick=ExportQuotas()>Export Quotas</button>
+            <button type="submit" class="btn btn-primary mb-2" id="makeNewQ" onClick=CreateNewQuota_DOM(document.getElementById("QuotaRows").value)>Create New Quota</button>
+            <input type="file" class="btn btn-primary mb-2" id="quotaImportFile" accept="*.dat" required style="display:none;" />
+            <div>
+                <br>
+                <button type="submit" class="btn btn-primary mb-2" onClick=ReadQuotaArr()>Process Quotas</button>
+            </div>
+            <br>
+            <br>
+            <br>
+        </div>
+        <div style="height: 30px"></div>
+        <div class="container section-block">
+            <br>
+            <br>
+            <font class="section-heading">Quota Report</font>
+            <hr class="subtle_section">
+            <br>
+            <div id="QuotaWarningsBuffer"></div>
+        </div>
+        <div style="height: 30px"></div>
+        <div class="container section-block">
+            <br>
+            <br>
+            <font class="section-heading">Latest Update</font>
+            <hr class="subtle_section">
+            <p>
+                <br>
+                <script>
+                    var dataObj;
+                    $.getJSON('https://api.github.com/repos/KGSDilshan/Bubbleless/branches/master', function(data) {
+                        dataObj = data;
+                        let person = dataObj.commit.commit.author.name;
+                        let date = dataObj.commit.commit.author.date;
+                        let message = dataObj.commit.commit.message;
+                        let output = "By: " + person + "<br>&nbsp;&nbsp;&nbsp;&nbsp;" + date + "<br>&nbsp;&nbsp;&nbsp;&nbsp;" + message;
+                        $("div#LatestCommit").replaceWith(output);
+                    });
+                </script>
+                <div id="LatestCommit"></div>
+                <br>
+                <br>
+                <center>
+                    <br>
+                    <br>
+        </div>
+</body>
 <div style="height: 30px"></div>
 </div>
-  <footer>
+<footer>
     <div id="CR_text">
-    <br>
-    <br>
-    <br>
-    Is not a replacement for a shower.
-    <br>
-    <br>
-    <br>
+        <br>
+        <br>
+        <br>
+        Is not a replacement for a shower.
+        <br>
+        <br>
+        <br>
     </div>
-  </footer>
+</footer>
 
 </html>

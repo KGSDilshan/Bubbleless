@@ -6,13 +6,31 @@ function DeleteTable(id) {
     parentEl.removeChild(removeDiv);
 }
 
+function UITableHTML(unbracketed_name) {
+    let tableHeader = '<div id="tableIndex' + TABLE_COUNTER +'">';
+    tableHeader += '<form"><div class="row">'
+
+    tableHeader += '<div class="col">';
+    tableHeader += '<button type="button" class="btn btn-danger btn-sm" onClick=DeleteTable("tableIndex' + TABLE_COUNTER + '")>Delete ' +  unbracketed_name + '</button>';
+    tableHeader += '</div>';
+    tableHeader += '<div class="col"><div class="form-group">';
+    tableHeader += '<input type="text" class="form-control form-control-sm"" id="customN' + TABLE_COUNTER +'" placeholder="Custom N-size">';
+    tableHeader += '</div></div>';
+    tableHeader += '</div>';
+    tableHeader += '</form>';
+    tableHeader += '<table class="table table-light table-bordered table-hover" id="quotaTable">'
+    return tableHeader;
+}
+
 function CreateNewQuota_DOM(len) {
 	const qBuff = document.getElementById("QuotasBuffer");
-    let data_table = '<table class="table table-bordered" id="quotaTable">';
+    let data_table = '';
     data_table += '<thead>';
     data_table += '<tr>';
     data_table += '<th scope="col" colspan="5" contenteditable="true">QUOTA_GROUP_NAME</th>';
     data_table += '</tr>';
+    data_table += '</thead>';
+    data_table += '<tbody>';
     for (let i = 0; i < len; i++) {
         data_table += '<tr>';
         data_table += '<td contenteditable="true">QUOTA_NAME</td>';
@@ -21,11 +39,10 @@ function CreateNewQuota_DOM(len) {
         data_table += '<td contenteditable="true">' + (i + 1) + '</td>';
         data_table += '</tr>';
     }
-    data_table += '</thead>';
-    data_table += '<tbody>';
     data_table += '</tbody>';
     data_table += '</table>';
-    qBuff.innerHTML += '<div id="tableIndex' + TABLE_COUNTER +'"><button type="button" class="btn btn-danger" onClick=DeleteTable("tableIndex' + TABLE_COUNTER + '")>Delete QUOTA_GROUP_NAME</button>' + "<br>" + data_table + "<br><br></div>";
+    let unbracketed_name = "QUOTA_GROUP_NAME";
+    qBuff.innerHTML += UITableHTML(unbracketed_name) + data_table + "<br><br></div>";
     TABLE_COUNTER++;
 }
 
@@ -78,19 +95,18 @@ function ImportQuotas(event) {
                     // If the length of the current row is 1, it's a header; End the current table and start a new one
                     if (data[a].length == 1) {
                         if (a > 0) {
-                            data_table += '</thead>';
-                            data_table += '<tbody>';
                             data_table += '</tbody>';
                             data_table += '</table><br><br></div>';
                             TABLE_COUNTER++;
                         }
                         let unbracketed_name = data[a][0].replace(/\([a-zA-Z0-9 %]*\)/gi,"");
-                        data_table += '<div id="tableIndex' + TABLE_COUNTER +'"><button type="button" class="btn btn-danger" onClick=DeleteTable("tableIndex' + TABLE_COUNTER + '")>Delete ' +  unbracketed_name + '</button>' + "<br>" +
-                                     '<table class="table table-bordered" id="quotaTable">';
+                        data_table += UITableHTML(unbracketed_name);
                         data_table += '<thead>';
                         data_table += '<tr>';
                         data_table += '<th scope="col" colspan="5" contenteditable="true">' + data[a][0] + '</th>';
                         data_table += '</tr>';
+                        data_table += '</thead>';
+                        data_table += '<tbody>';
                     } else {
                         data_table += '<tr>';
                         data[a].forEach(td => {
@@ -99,8 +115,6 @@ function ImportQuotas(event) {
                         data_table += '</tr>';
                     }
 				}
-				data_table += '</thead>';
-		        data_table += '<tbody>';
 		        data_table += '</tbody>';
 		        data_table += '</table>';
                 qBuff.innerHTML += data_table + "<br><br>";
