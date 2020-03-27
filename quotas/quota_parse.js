@@ -226,3 +226,19 @@ function generateId() {
     }
     return newId;
 }
+
+function generateSplits() {
+    
+}
+
+function generateCSVLine(qName, qType, qCode, aCode, limit, active) {
+    let rowStr = "";
+    let suffix = '"{""action"":""1"",""autoload_url"":""1"",""active"":""' + (active ? "1" : "0") +
+                    '"",""qls"":[{""quotals_language"":""en"",""quotals_name"":""x"",""quotals_url"":"""",' +
+                    '""quotals_urldescrip"":"""",""quotals_message"":""Sorry your responses have exceeded' +
+                    ' a quota on this survey.""}]}"';
+
+    rowStr += qName + "," + qType + "," + qCode + "," + aCode + "," + limit + "," + suffix + "\n";
+
+    return rowStr;
+}
