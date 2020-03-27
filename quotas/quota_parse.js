@@ -216,6 +216,7 @@ function downloadQuotas() {
     for (let i = 0; i < QUOTA_GROUPS.length; i++) {
         full_data += QUOTA_GROUPS[i].displayQuotas();
     }
+    full_data += generateCSVSplits();
     // download
     if (window.Blob == undefined || window.URL == undefined || window.URL.createObjectURL == undefined) {
         alert("Your browser doesn't support Blobs");
@@ -238,4 +239,57 @@ function generateId() {
         newId++;
     }
     return newId;
+}
+
+function generateCSVSplits() {
+    let splitRows = "";
+    QUOTA_GROUPS.forEach(group => { // Search for quota groups with splits
+        if (group.hasSplits) {
+            group.splits.forEach(splitName => { // For each split, match it with another group in QUOTA_GROUPS
+                QUOTA_GROUPS.forEach(otherGroup => {
+                    if(otherGroup.group_name === splitName) { // When we find a match, start creating temporary quotas to add
+                        let fullN = group.totalN;
+                        group.subQuotas.forEach(mainQuota => {
+                            otherGroup.subQuotas.forEach(splitQuota => {
+                                mainQuota.qCodes.forEach(mainQuestionCode => {
+                                    splitQuota.qCodes.forEach(splitQuestionCode => {
+                                        splitRows += generateCSVLine(
+                                            mainQuota.name + " / " + splitQuota.name,
+                                            "Simple",
+                                            mainQuota.qName,
+                                            mainQuestionCode,
+                                            Math.ceil((mainQuota.isRaw ? mainQuota.valLimit / fullN : mainQuota.valLimit) * (splitQuota.isRaw ? splitQuota.valLimit / fullN : splitQuota.valLimit) * fullN).toString(),
+                                            false
+                                        );
+                                        splitRows += generateCSVLine(
+                                            mainQuota.name + " / " + splitQuota.name,
+                                            "Simple",
+                                            splitQuota.qName,
+                                            splitQuestionCode,
+                                            Math.ceil((mainQuota.isRaw ? mainQuota.valLimit / fullN : mainQuota.valLimit) * (splitQuota.isRaw ? splitQuota.valLimit / fullN : splitQuota.valLimit) * fullN).toString(),
+                                            false
+                                        );
+                                    });                                    
+                                });
+                            });
+                        });
+                    }
+                });
+            });
+        }
+    });
+
+    return splitRows;
+}
+
+function generateCSVLine(qName, qType, qCode, aCode, limit, active) {
+    let rowStr = "";
+    let suffix = '"{""action"":""1"",""autoload_url"":""1"",""active"":""' + (active ? "1" : "0") +
+                    '"",""qls"":[{""quotals_language"":""en"",""quotals_name"":""x"",""quotals_url"":"""",' +
+                    '""quotals_urldescrip"":"""",""quotals_message"":""Sorry your responses have exceeded' +
+                    ' a quota on this survey.""}]}"';
+
+    rowStr = qName + "," + qType + "," + qCode + "," + aCode + "," + limit + "," + suffix + "\n";
+
+    return rowStr;
 }

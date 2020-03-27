@@ -118,7 +118,6 @@ class QuotaGroup {
         return alertMsg;
     }
 
-
     displayQuotas() {
         let grpData = "";
         for (let i = 0; i < this.subQuotas.length; i++) {
@@ -126,7 +125,5 @@ class QuotaGroup {
         }
         return grpData;
     }
-
-
 
 }
