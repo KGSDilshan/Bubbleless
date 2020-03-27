@@ -25,7 +25,7 @@ function CreateNewQuota_DOM(len) {
     data_table += '<tbody>';
     data_table += '</tbody>';
     data_table += '</table>';
-    qBuff.innerHTML += '<div id="tableIndex' + TABLE_COUNTER +'"><button type="button" class="btn btn-danger" onClick=DeleteTable("tableIndex' + TABLE_COUNTER + '")>Delete QUOTA_GROUP_NAME<span class="glyphicon glyphicon-trash aria-hidden="true"></span></button>' + "<br>" + data_table + "<br><br></div>";
+    qBuff.innerHTML += '<div id="tableIndex' + TABLE_COUNTER +'"><button type="button" class="btn btn-danger" onClick=DeleteTable("tableIndex' + TABLE_COUNTER + '")>Delete QUOTA_GROUP_NAME</button>' + "<br>" + data_table + "<br><br></div>";
     TABLE_COUNTER++;
 }
 
@@ -85,7 +85,7 @@ function ImportQuotas(event) {
                             TABLE_COUNTER++;
                         }
                         let unbracketed_name = data[a][0].replace(/\([a-zA-Z0-9 %]*\)/gi,"");
-                        data_table += '<div id="tableIndex' + TABLE_COUNTER +'"><button type="button" class="btn btn-danger" onClick=DeleteTable("tableIndex' + TABLE_COUNTER + '")>Delete ' +  unbracketed_name + '<span class="glyphicon glyphicon-trash aria-hidden="true"></span></button>' + "<br>" +
+                        data_table += '<div id="tableIndex' + TABLE_COUNTER +'"><button type="button" class="btn btn-danger" onClick=DeleteTable("tableIndex' + TABLE_COUNTER + '")>Delete ' +  unbracketed_name + '</button>' + "<br>" +
                                      '<table class="table table-bordered" id="quotaTable">';
                         data_table += '<thead>';
                         data_table += '<tr>';
