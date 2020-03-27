@@ -118,15 +118,60 @@ class QuotaGroup {
         return alertMsg;
     }
 
-
     displayQuotas() {
         let grpData = "";
         for (let i = 0; i < this.subQuotas.length; i++) {
             grpData += this.subQuotas[i].display();
         }
+
+        let dummyGroup = new QuotaGroup ("", {
+            id: generateId(),
+            nSizes: [33,33,33],
+            isTri: false,
+            isDual: false,
+            isFlex: false,
+            isRawFlex: false,
+            flexAmount: false,
+            hasSplits: false,
+            splits: []
+        }, []);
+        QUOTA_GROUPS.forEach(group => { // Search for quota groups with splits
+            if (group.hasSplits) {
+                group.splits.forEach(splitName => { // For each split, match it with another group in QUOTA_GROUPS
+                    QUOTA_GROUPS.forEach(otherGroup => {
+                        if(otherGroup.group_name === splitName) { // When we find a match, start creating temporary quotas to add
+                            let fullN = group.totalN;
+                            let splitPercentages = [];
+                            otherGroup.nSizes.forEach(n => {
+                                splitPercentages.push(n/fullN);
+                            });
+                            group.subQuotas.forEach(mainQuota => {
+                                otherGroup.subQuotas.forEach(splitQuota => {
+                                    grpData += new Quota(
+                                        dummyGroup,
+                                        mainQuota.name + " / " + splitQuota.name,
+                                        ((mainQuota.isRaw ? mainQuota.valLimit / fullN : mainQuota.valLimit) * (splitQuota.isRaw ? splitQuota.valLimit / fullN : splitQuota.valLimit) * fullN).toString(),
+                                        mainQuota.qName,
+                                        mainQuota.qCodes,
+                                        mainQuota.client
+                                    ).display();
+                                    grpData += new Quota(
+                                        dummyGroup,
+                                        mainQuota.name + " / " + splitQuota.name,
+                                        ((mainQuota.isRaw ? mainQuota.valLimit / fullN : mainQuota.valLimit) * (splitQuota.isRaw ? splitQuota.valLimit / fullN : splitQuota.valLimit) * fullN).toString(),
+                                        splitQuota.qName,
+                                        splitQuota.qCodes,
+                                        splitQuota.client
+                                    ).display();
+                                });
+                            });
+                        }
+                    });
+                });
+            }
+        });
+
         return grpData;
     }
-
-
 
 }
