@@ -32,7 +32,11 @@ var QUOTA_PROPERTIES = [
 ];
 
 function IncludesCustomN(name) {
-    let customN = document.getElementById("customN" + QUOTA_GROUPS.length).value;
+    let customN = document.getElementById("customN" + QUOTA_GROUPS.length);
+    if (customN)
+        customN = customN.value;
+    else
+        return false;
     return (customN.trim() != "" && Number.isInteger(parseInt(customN)));
 }
 

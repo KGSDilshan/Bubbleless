@@ -12,6 +12,10 @@ class BaseClient {
         this.name = "BasicClient";
     }
 
+    clientSpecificWarnings() {
+        return;
+    }
+
     getSuffix(quota) {
         let suffix = '"{""action"":""1"",""autoload_url"":""1"",""active"":""' + (quota.active ? 1 : 0) +
                     '"",""qls"":[{""quotals_language"":""en"",""quotals_name"":""x"",""quotals_url"":"""",' +

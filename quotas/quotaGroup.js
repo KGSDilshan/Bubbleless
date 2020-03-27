@@ -124,17 +124,21 @@ class QuotaGroup {
             let foreignGroup;
             // get corresponding group for a split - if it exists
             for (let g = 0; g < QUOTA_GROUPS.length; g++) {
-                if (QUOTA_GROUPS[g].group_name.toLowerCase() == validSplits) {
+                if (QUOTA_GROUPS[g].group_name.toLowerCase() == validSplits[f]) {
                     foreignGroup = QUOTA_GROUPS[g];
                     break;
                 }
+            }
+            if (!foreignGroup) {
+                console.log(validSplits);
+                return;
             }
             // generate a split quota for each combination of foreign subquota and subquota
             for (let i = 0; i < foreignGroup.subQuotas.length; i++) {
                 for (let j = 0; j < this.subQuotas.length; j++) {
                     // multiply percentage from foriegn quota with the subquota's percentage
                     let newPercent = ((foreignGroup.subQuotas[i].valLimit * this.subQuotas[j].valLimit)/100) + "%";
-                    let newName = this.subQuotas[j].name + " - " + foreignGroup.subQuotas[i].rawName;
+                    let newName = this.subQuotas[j].rawName + " - " + foreignGroup.subQuotas[i].rawName;
                     // then create a new quota with a merged name, percentage, question names, and codes
                     let splitQuota = new Quota(this, newName, newPercent, this.subQuotas[j].qName, this.subQuotas[j].qCodes, this.clientId);
                     // inactive subsplits by default
