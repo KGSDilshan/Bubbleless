@@ -42,7 +42,7 @@ class QuotaGroup {
                 let percent = this.rawSubQuotas[i][1];
                 let question = this.rawSubQuotas[i][2];
                 let codes = this.rawSubQuotas[i][3].split(" ").join("").split(",");
-                this.subQuotas.push(new Quota(this, name, percent, [question], codes, this.clientId));
+                this.subQuotas.push(new Quota(this, name, percent, question, codes, this.clientId));
                 console.log(this.rawSubQuotas[i]);
             }
         }

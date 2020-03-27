@@ -215,7 +215,6 @@ function downloadQuotas() {
     for (let i = 0; i < QUOTA_GROUPS.length; i++) {
         full_data += QUOTA_GROUPS[i].displayQuotas();
     }
-    full_data += generateCSVSplits();
     // download
     if (window.Blob == undefined || window.URL == undefined || window.URL.createObjectURL == undefined) {
         alert("Your browser doesn't support Blobs");
