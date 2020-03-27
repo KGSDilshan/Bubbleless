@@ -17,6 +17,7 @@ class Quota {
         this.client = CreateClient(clientId);
 
         this.name = quotaName;
+        this.rawName = quotaName;
         // Quota name-level configurations
         this.counter = false;
         if (quotaName.includes("(counter)")) {

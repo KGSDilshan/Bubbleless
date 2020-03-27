@@ -19,6 +19,7 @@ var QUOTA_PROPERTIES = [
         callback: RemoveNameFlex,
     },
     {
+        // Always should be last in array, happens at lowest priority
         name: "(split)",
         validation: IncludesNameSplit,
         callback: RemoveNameSplits,
@@ -39,16 +40,9 @@ function IncludesNameFlex(name) {
 
 function IncludesNameSplit(name) {
     let hasSplits = false;
-    let cleanName = name.toLowerCase().replace(/\s+/g, '');   // Remove spaces from the name so parsing is easier
-    cleanName = cleanName.split("(");
-
-    QUOTA_HEADERS.forEach(qh => {
-        if (cleanName.includes(qh.toLowerCase() + ")")) {
-            hasSplits = true;
-        }
-    });
-
-    return hasSplits;
+    let bracketedContent = name.match(/\(.*?\)/g);
+    console.log(name, bracketedContent)
+    return (bracketedContent != null && bracketedContent.length > 0);
 }
 
 function RemoveNameTri(name, tObj) {
@@ -78,20 +72,19 @@ function RemoveNameFlex(name, tObj) {
 function RemoveNameSplits(name, tObj) {
     let title = name;
     let obj = JSON.parse(JSON.stringify(tObj));
-    let splits = [];
-    let cleanName = name.toLowerCase().replace(/\s+/g, '');   // Remove spaces from the name so parsing is easier
+    let splits = name.toLowerCase().match(/\(.*?\)/g);
 
-    cleanName = cleanName.split("(");
-
-    QUOTA_HEADERS.forEach(qh => {
-        if (cleanName.includes(qh.toLowerCase() + ")")) {
-            splits.push(qh.toLowerCase());
-            title = title.replace("(" + qh.toLowerCase() + ")",'');
+    if (splits.length > 0) {
+        for (let i = 0; i < splits.length; i++) {
+            title = title.replace(/\(.*?\)/gi, "");
+            splits[i] = splits[i].toLowerCase();
         }
-    });
-
-    obj.splits = splits;
-    obj.hasSplits = true;
+        obj.hasSplits = true;
+        obj.splits = splits;
+    } else {
+        obj.hasSplits = false;
+        obj.splits = undefined;
+    }
 
     return {template: obj, name: title};
 }
@@ -167,7 +160,7 @@ function ReadQuotaArr() {
 
     // Grab all the headers
     content.forEach(row => {
-        if (!row.includes("\t") && row.length > 0) {
+        if (!row.includes("\t") && row.length > 0 && row[0].trim() != "") {
             QUOTA_HEADERS.push(row.toLowerCase().replace(/\s+/g, '').split("(")[0].trim());
         }
     });
@@ -209,6 +202,12 @@ function ReadQuotaArr() {
         alert(alertMsg);
         document.getElementById("QuotaWarningsBuffer").innerHTML += '<button type="submit" class="btn btn-danger mb-2" onClick=downloadQuotas() >Awknowledge Warnings and Download Quotas</button>';
     }
+
+    // create split quotas after validation
+    for (let i = 0; i < QUOTA_GROUPS.length; i++) {
+        QUOTA_GROUPS[i].createSplitQuotas();
+    }
+
 }
 
 function downloadQuotas() {
@@ -239,57 +238,4 @@ function generateId() {
         newId++;
     }
     return newId;
-}
-
-function generateCSVSplits() {
-    let splitRows = "";
-    QUOTA_GROUPS.forEach(group => { // Search for quota groups with splits
-        if (group.hasSplits) {
-            group.splits.forEach(splitName => { // For each split, match it with another group in QUOTA_GROUPS
-                QUOTA_GROUPS.forEach(otherGroup => {
-                    if(otherGroup.group_name === splitName) { // When we find a match, start creating temporary quotas to add
-                        let fullN = group.totalN;
-                        group.subQuotas.forEach(mainQuota => {
-                            otherGroup.subQuotas.forEach(splitQuota => {
-                                mainQuota.qCodes.forEach(mainQuestionCode => {
-                                    splitQuota.qCodes.forEach(splitQuestionCode => {
-                                        splitRows += generateCSVLine(
-                                            mainQuota.name + " / " + splitQuota.name,
-                                            "Simple",
-                                            mainQuota.qName,
-                                            mainQuestionCode,
-                                            Math.ceil((mainQuota.isRaw ? mainQuota.valLimit / fullN : mainQuota.valLimit) * (splitQuota.isRaw ? splitQuota.valLimit / fullN : splitQuota.valLimit) * fullN).toString(),
-                                            false
-                                        );
-                                        splitRows += generateCSVLine(
-                                            mainQuota.name + " / " + splitQuota.name,
-                                            "Simple",
-                                            splitQuota.qName,
-                                            splitQuestionCode,
-                                            Math.ceil((mainQuota.isRaw ? mainQuota.valLimit / fullN : mainQuota.valLimit) * (splitQuota.isRaw ? splitQuota.valLimit / fullN : splitQuota.valLimit) * fullN).toString(),
-                                            false
-                                        );
-                                    });                                    
-                                });
-                            });
-                        });
-                    }
-                });
-            });
-        }
-    });
-
-    return splitRows;
-}
-
-function generateCSVLine(qName, qType, qCode, aCode, limit, active) {
-    let rowStr = "";
-    let suffix = '"{""action"":""1"",""autoload_url"":""1"",""active"":""' + (active ? "1" : "0") +
-                    '"",""qls"":[{""quotals_language"":""en"",""quotals_name"":""x"",""quotals_url"":"""",' +
-                    '""quotals_urldescrip"":"""",""quotals_message"":""Sorry your responses have exceeded' +
-                    ' a quota on this survey.""}]}"';
-
-    rowStr = qName + "," + qType + "," + qCode + "," + aCode + "," + limit + "," + suffix + "\n";
-
-    return rowStr;
 }
