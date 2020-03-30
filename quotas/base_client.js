@@ -7,17 +7,29 @@ function CreateClient(id) {
         case 4: // FM
             return new FMClient();
         case 5: // RN
+            return new RNClient();
         case 6: // EM
+            return new EMClient();
         case 7: // PB
+            return new PBClient();
         case 8: // WL
+            return new WLClient();
         case 9: // KT
+            return new KTClient();
         case 10: // LR
+            return new LRClient();
         case 11: // LP
+            return new LPClient();
         case 12: // NRC
+            return new NRCClient();
         case 13: // FB
+            return new FBClient();
         case 14: // NR
+            return new NRClient();
         case 15: // SX
+            return new SXClient();
         case 16: // GSG
+            return new GSGClient();
         // fall through
         case 1: // McL
         default:
@@ -199,5 +211,4 @@ class BaseClient {
             }
         }
     }
-
 }
