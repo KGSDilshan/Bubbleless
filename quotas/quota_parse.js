@@ -211,14 +211,14 @@ function ReadQuotaArr() {
     let counter = 0;
     let alertMsg = "";
     document.getElementById("QuotaWarningsBuffer").innerHTML = "";
+    // Check client specific warnings
+    CLIENT.clientSpecificWarnings();
     for (let i = 0; i < QUOTA_GROUPS.length; i++) {
         if (!QUOTA_GROUPS[i].validateQuotas()) {
             alertMsg += QUOTA_GROUPS[i].displayWarnings();
             counter++;
         }
     }
-    // Check client specific warnings
-    CLIENT.clientSpecificWarnings();
 
     if (counter == 0) {
         // no errors
