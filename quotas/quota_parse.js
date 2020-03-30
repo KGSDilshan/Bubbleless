@@ -1,5 +1,4 @@
 var QUOTA_GROUPS = [];
-
 var QUOTA_HEADERS = [];
 
 var QUOTA_PROPERTIES = [
@@ -180,8 +179,8 @@ function ReadQuotaArr() {
     QUOTA_GROUPS = [];
     QUOTA_HEADERS = [];
     RAN_CSWARNINGS = false;
+    CLIENT = CreateClient(parseInt(document.getElementById("clientSelect").value));
     document.getElementById("QuotaWarningsBuffer").innerHTML = "";
-
     // Grab all the headers
     content.forEach(row => {
         if (!row.includes("\t") && row.length > 0 && row[0].trim() != "") {
@@ -218,6 +217,9 @@ function ReadQuotaArr() {
             counter++;
         }
     }
+    // Check client specific warnings
+    CLIENT.clientSpecificWarnings();
+
     if (counter == 0) {
         // no errors
         console.log("no errors");

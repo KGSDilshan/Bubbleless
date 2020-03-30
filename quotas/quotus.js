@@ -1,5 +1,7 @@
 var TABLE_COUNTER = 0;
 var RAN_CSWARNINGS = 0;
+var CLIENT = undefined;
+
 
 function DeleteTable(id) {
     var removeDiv = document.getElementById(id);

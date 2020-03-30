@@ -40,14 +40,13 @@ class QuotaGroup {
         }
 
         // populate sub quotas array
-        this.clientId = parseInt(document.getElementById("clientSelect").value);
         if (this.isStandard) {
             for (let i = 0; i < this.rawSubQuotas.length; i++) {
                 let name = this.rawSubQuotas[i][0];
                 let percent = this.rawSubQuotas[i][1];
                 let question = this.rawSubQuotas[i][2];
                 let codes = this.rawSubQuotas[i][3].split(" ").join("").split(",");
-                this.subQuotas.push(new Quota(this, name, percent, question, codes, this.clientId));
+                this.subQuotas.push(new Quota(this, name, percent, question, codes));
             }
         }
     }
@@ -102,11 +101,6 @@ class QuotaGroup {
         // Error with limit 0 for quota
         for (let i = 0; i < zeroLimits.length; i++) {
             this.warnings.push("WARNING: Quota " + this.subQuotas[zeroLimits[i]].name + " limit is set to 0 and inactive.");
-        }
-
-        // Check client specific warnings
-        for (let i = 0; i < this.subQuotas.length; i++) {
-            this.subQuotas[i].client.clientSpecificWarnings();
         }
 
         // true if no errors
