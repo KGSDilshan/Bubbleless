@@ -56,14 +56,14 @@ class DBClient extends BaseClient {
             return;
         RAN_CSWARNINGS = true;
 
-        for (let i = 0; i < QUOTA_GROUPS.length; i++) {
-            let curGroup = QUOTA_GROUPS[i];
-            let curGroupName = QUOTA_GROUPS[i].getName().toLowerCase();
+        for (let j = 0; j < QUOTA_GROUPS.length; j++) {
+            let curGroup = QUOTA_GROUPS[j];
+            let curGroupName = QUOTA_GROUPS[j].getName().toLowerCase();
 
             // Balance all quotas by splits except Geo, Lang, Phonetype
-            if (!(curGroupName.includes("geo")
+            if ((!(curGroupName.includes("geo")
             || curGroupName.includes("lang")
-            || curGroupName.includes("phone"))) {
+            || curGroupName.includes("phone"))) && !this.check.splitQuotasChecked) {
                 this.check.splitQuotasChecked = true;
                 if (!curGroup.hasSplits) {
                     console.log(curGroup, "missing split quotas");
@@ -76,16 +76,16 @@ class DBClient extends BaseClient {
             - If gender starts with an "m", it's male
             - If gender starts with an "f", it's female
             */
-            if (curGroupName.includes("gender")
-            || curGroupName.includes("sex")) {
+            if ((curGroupName.includes("gender")
+            || curGroupName.includes("sex")) && !this.check.genderCodesChecked) {
                 this.check.genderCodesChecked = true;
                 for (let i = 0; i < curGroup.subQuotas.length; i++) {
                     let quota = curGroup.subQuotas[i];
-                    if(quota.name.toLowerCase().startsWith("m") && quota.qCodes[0] == 1) {
+                    if(quota.rawName.toLowerCase().startsWith("m") && quota.qCodes[0] == 1) {
                         console.log(curGroup, "Gender - Male is coded as 1 instead of 2. Recoded as 2");
                         curGroup.warnings.push("WARNING: " + quota.name + " Quota coded as 1, recoded to 2 (Checklist)");
                         quota.qCodes[0] = 2;
-                    } else if (quota.name.toLowerCase().startsWith("f")) {
+                    } else if (quota.rawName.toLowerCase().startsWith("f") && quota.qCodes[0] == 2) {
                         console.log(curGroup, "Gender - Female is coded as 2 instead of 1. Recoded as 1");
                         curGroup.warnings.push("WARNING: " + quota.name + " Quota coded as 2, recoded to 1 (Checklist)");
                         quota.qCodes[0] = 1;
@@ -94,18 +94,18 @@ class DBClient extends BaseClient {
             }
 
             // Phone Type 50% LL, 50% Cell
-            if (curGroupName.includes("phone")) {
+            if (curGroupName.includes("phone") && !this.check.phoneTypeQuotasChecked) {
                 this.check.phoneTypeQuotasChecked = true;
                 for (let i = 0; i < curGroup.subQuotas.length; i++) {
                     let quota = curGroup.subQuotas[i];
-                    let n = quota.valLimit * curGroup.totalN;
+                    let n = quota.getRawNSize();
                     if(n !== curGroup.totalN / 2) {
                         console.log(curGroup, "Phone Type - " + quota.name + " limit is not half of total N size");
                         curGroup.warnings.push("WARNING: " + quota.name + " Quota not 50% of total N size. Changed to 50% of total N size (Checklist)");
-                        quota.valLimit = 0.5;
+                        quota.valLimit = 50;
                         quota.strLimit = "50%";
                         for (const property in quota.limits) {
-                            if (property) {
+                            if (quota.limits[property]) {
                                 quota.limits[property] = curGroup.totalN / 2;
                             }
                         }
@@ -114,43 +114,51 @@ class DBClient extends BaseClient {
             }
 
             // Add other offsetter for ethnicity quota
-            if (curGroupName.includes("ethnicity") || curGroupName.includes("race")) {
+            if ((curGroupName.includes("ethnicity") || curGroupName.includes("race")) && !this.check.ethnicityOtherOffsetterChecked) {
                 this.check.ethnicityOtherOffsetterChecked = true;
 
+                let offsetterNSize = 0;
                 let otherExists = false;
-                let offsetN = curGroup.totalN;
-                // Update the offsetN if the quota doesn't include 'other'
+
+                // Check for other option existing in current quotas
                 for (let i = 0; i < curGroup.subQuotas.length; i++) {
-                    if(curGroup.subQuotas[i].name.includes("other")) {
+                    let quota = curGroup.subQuotas[i];
+                    if(curGroup.subQuotas[i].rawName.toLowerCase().includes("other")) {
                         otherExists = true;
                     } else {
-                        for (const property in quota.limits) {
-                            if (property) {
-                                offsetN -= quota.limits[property];
-                            }
-                        }
+                        offsetterNSize += quota.valLimit;
                     }
                 }
-                
+
+                // Check for n-size discrepencies and create n-size variable
+                // If the first subquota is raw, they all are
+                if (curGroup.subQuotas[0].isRaw && curGroup.totalN != offsetterNSize) {
+                    offsetterNSize = String.toString(parseInt(curGroup.totalN) - parseInt(offsetterNSize));
+                } else if (!curGroup.subQuotas[0].isRaw && offsetterNSize != 100) {
+                    offsetterNSize = (100 - offsetterNSize) + "%";
+                } else {
+                    offsetterNSize = curGroup.subQuotas[0].isRaw ? "0" : "0%";
+                }
+
                 // Create an other-offsetter quota if the other quota does not exist
                 if (!otherExists) {
                     console.log(curGroup, "Ethnicity - Other quota does not exist");
                     curGroup.warnings.push("WARNING: Ethnicity - Other quota does not exist. Created Ethnicity - Other offsetter quota (Checklist)");
-                    curGroup.subQuotas.push(new Quota(
+                    let newQuota = new Quota(
                         curGroup,
-                        curGroupName + " - Other OFFSETTER" + (curGroup.isFlex ? " (flex=" + curGroup.getRawFlex() + ")" : ""),
-                        offsetN.toString(),
+                        "Other OFFSETTER",
+                        offsetterNSize,
                         curGroup.subQuotas[0].qName,
-                        [curGroup.subQuotas.length],
+                        [curGroup.subQuotas.length + 1],
                         this.clientId
-                        )
-                    );
-                    
+                        );
+                    newQuota.active = false;
+                    curGroup.subQuotas.push(newQuota);                    
                 }
             }
 
             // Presidential vote quota is inactive (??? - perhaps have the programmer add this in?)
-            if (curGroupName.includes("pres") || curGroupName.includes("vote 20")) {
+            if ((curGroupName.includes("pres") || curGroupName.includes("vote 20")) && !this.check.presVoteInactiveChecked) {
                 this.check.presVoteInactiveChecked = true;
 
                 let warningDisplayed = false;
