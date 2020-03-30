@@ -12,9 +12,9 @@ function round05Ciel(x) {
 
 
 class Quota {
-    constructor(quotaGroup, quotaName, quotaPercentage, questionName, quotaCodes, clientId) {
+    constructor(quotaGroup, quotaName, quotaPercentage, questionName, quotaCodes, client) {
         this.group = quotaGroup;
-        this.client = CreateClient(clientId);
+        this.client = client;
 
         this.name = quotaName;
         this.rawName = quotaName;
