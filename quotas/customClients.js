@@ -169,23 +169,3 @@ class DBClient extends BaseClient {
         }
     }
 }
-
-
-class FMClient extends BaseClient {
-    constructor() {
-        super("DB");
-    }
-
-    clientSpecificWarnings() {
-        if (RAN_CSWARNINGS)
-            return;
-        RAN_CSWARNINGS = true;
-
-        // if dual mode, n sizes should be equal
-        // if mode is phone, add 5% flex to all quotas that aren't counters
-        // phone type quotas should be inactive
-        // LL Min 30%
-        // Splits should be +5 added
-
-    }
-}

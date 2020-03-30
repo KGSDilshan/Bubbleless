@@ -150,6 +150,7 @@ function ProcessInput() {
 		console.log(contents[i]);
 		i = RunCommand(contents, i);
 	}
+	SAMPLE.CheckClusters();
 
 	SAMPLE.PrepareExport();
 	console.log("filetype: ", INITIAL_FILETYPE);
@@ -176,14 +177,15 @@ function ProcessInput() {
 				 SAMPLE.flagged_additions[i].originalValue);
 			grph.RenderGraph();
 			//let quotaGrp = new QuotaGroup(SAMPLE.flagged_additions[i].parentName);
-			if (grph.percentages && grph.name != "EMAIL_Flagged from EMAIL") {
+			if (grph.percentages && grph.name != "EMAIL_Flagged from EMAIL" && !grph.name.includes("Clusters in sample")) {
 				console.log(grph.name);
-				//console.log(grph.)
-				let data_table = '<table class="table table-bordered">';
-				data_table += '<thead>';
+				const qBuff = document.getElementById("QuotasBuffer");
+				let data_table = '<thead>';
 				data_table += '<tr>';
-		        data_table += '<th scope="col" colspan="5" contenteditable="true">' + SAMPLE.flagged_additions[i].parentName + '</th>';
-		        data_table += '</tr>';
+				data_table += '<th scope="col" colspan="5" contenteditable="true">' + SAMPLE.flagged_additions[i].parentName + '</th>';
+				data_table += '</tr>';
+				data_table += '</thead>';
+				data_table += '<tbody>';
 				let quotaName = SAMPLE.flagged_additions[i].parentName;
 				quotaName = "p" + quotaName[0].toUpperCase() + quotaName.slice(1, quotaName.length).toLowerCase();
 				for (let j = 0; j < grph.percentages.length; j++) {
@@ -194,11 +196,10 @@ function ProcessInput() {
 					data_table += '<td contenteditable="true">' + grph.percentages[j].label + '</td>';
 					data_table += '</tr>';
 				}
-				data_table += '</thead>';
-		        data_table += '<tbody>';
-		        data_table += '</tbody>';
-		        data_table += '</table>';
-				qBuff.innerHTML += data_table + "<br><br>";
+				data_table += '</tbody>';
+				data_table += '</table>';
+				let unbracketed_name = SAMPLE.flagged_additions[i].parentName;
+				qBuff.innerHTML += UITableHTML(unbracketed_name) + data_table + "<br><br></div>";
 			}
 		}
 	}

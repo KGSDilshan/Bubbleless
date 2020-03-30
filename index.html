@@ -27,6 +27,7 @@
     <script src="quotas/subQuota.js"></script>
     <script src="quotas/base_client.js"></script>
     <script src="quotas/customClients.js"></script>
+    <script src="quotas/customClientTemp.js"></script>
     <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
     <script src="worker.js"></script>
@@ -121,6 +122,13 @@
                     <label for="bubbless-flagstart-input" class="col-2 col-form-label">Flags start:</label>
                     <div class="col-10">
                         <input class="form-control" type="number" value="1" id="bubbless-flagstart-input">
+                    </div>
+                </div>
+                <br>
+                <div class="form-group row">
+                    <label for="bubbless-cluster-col" class="col-2 col-form-label">Cluster column:</label>
+                    <div class="col-10">
+                        <input class="form-control"  value="" placeholder="leave empty if non-clustered" id="bubbless-cluster-col">
                     </div>
                 </div>
                 <br>
