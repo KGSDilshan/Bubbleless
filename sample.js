@@ -6,6 +6,7 @@ ERRORS TO CHECK
 
 */
 var SAMPLE_HEADER = "";
+const invalidDomains = [".gov"];
 
 class FlaggedColumn {
     constructor(columnName, index) {
@@ -94,12 +95,12 @@ class FlaggedColumn {
                     if (!addedBlank) {
                         addedBlank = true;
                         unaccounted.push(this.additions[i]);
-                        WARNINGS.push("<b>WARNINGS:</b> In column '" + this.name + "' found unaccounted value '" + this.additions[i] + "'");
-                        TEXTWARNINGS.push("WARNINGS: In column '" + this.name + "' found unaccounted value '" + this.additions[i] + "'");
+                        WARNINGS.push("<b>WARNING:</b> In column '" + this.name + "' found unaccounted value '" + this.additions[i] + "'");
+                        TEXTWARNINGS.push("WARNING: In column '" + this.name + "' found unaccounted value '" + this.additions[i] + "'");
                     }
                 } else {
-                    WARNINGS.push("<b>WARNINGS:</b> In column '" + this.name + "' found unaccounted value '" + this.additions[i] + "'");
-                    TEXTWARNINGS.push("WARNINGS: In column '" + this.name + "' found unaccounted value '" + this.additions[i] + "'");
+                    WARNINGS.push("<b>WARNING:</b> In column '" + this.name + "' found unaccounted value '" + this.additions[i] + "'");
+                    TEXTWARNINGS.push("WARNING: In column '" + this.name + "' found unaccounted value '" + this.additions[i] + "'");
                     unaccounted.push(this.additions[i]);
                 }
             }
@@ -130,8 +131,8 @@ class FlaggedColumn {
             }
         }
         if (replaced == false) {
-            WARNINGS.push("<b>WARNINGS:</b> In column '" + this.name + "' could not find value '" + find + "'");
-            TEXTWARNINGS.push("WARNINGS: In column '" + this.name + "' could not find value '" + find + "'");
+            WARNINGS.push("<b>WARNING:</b> In column '" + this.name + "' could not find value '" + find + "'");
+            TEXTWARNINGS.push("WARNING: In column '" + this.name + "' could not find value '" + find + "'");
         }
     }
 
@@ -152,12 +153,12 @@ class FlaggedColumn {
             }
         }
         if (replaced == false) {
-            WARNINGS.push("<b>WARNINGS:</b> In column '" + this.name + "' no values categorized into 'OTHER'");
-            TEXTWARNINGS.push("WARNINGS: In column '" + this.name + "' no values categorized into 'OTHER'");
+            WARNINGS.push("<b>WARNING:</b> In column '" + this.name + "' no values categorized into 'OTHER'");
+            TEXTWARNINGS.push("WARNING: In column '" + this.name + "' no values categorized into 'OTHER'");
         }
         if (undefined_replacement == true) {
-            WARNINGS.push("<b>WARNINGS:</b> Column '" + this.name + "' does not exist. Blank slate used.");
-            TEXTWARNINGS.push("WARNINGS: Column '" + this.name + "' does not exist. Blank slate used.");
+            WARNINGS.push("<b>WARNING:</b> Column '" + this.name + "' does not exist. Blank slate used.");
+            TEXTWARNINGS.push("WARNING: Column '" + this.name + "' does not exist. Blank slate used.");
         }
     }
 
@@ -174,8 +175,8 @@ class FlaggedColumn {
             }
         }
         if (replaced == false) {
-            WARNINGS.push("<b>WARNINGS:</b> In column '" + this.name + "' could not find value between'" + min + "' and '" + max + "'");
-            TEXTWARNINGS.push("WARNINGS: In column '" + this.name + "' could not find value between'" + min + "' and '" + max + "'");
+            WARNINGS.push("<b>WARNING:</b> In column '" + this.name + "' could not find value between'" + min + "' and '" + max + "'");
+            TEXTWARNINGS.push("WARNING: In column '" + this.name + "' could not find value between'" + min + "' and '" + max + "'");
         }
     }
 
@@ -209,6 +210,16 @@ class Sample {
         this.replacements = [];
     }
 
+    CheckClusters() {
+        let clusterCol = document.getElementById("bubbless-cluster-col");
+        if (clusterCol == undefined || clusterCol.value == "") {
+            WARNINGS.push("<b>WARNING:</b> Cluster column not defined or invalid'");
+            TEXTWARNINGS.push("WARNING: Cluster column not defined or invalid'");
+            return;
+        }
+
+        this.VisualizationQueueCol(clusterCol.value, "Clusters in sample");
+    }
 
     VisualizationQueueCol(cname, name=undefined) {
         // create a flag for the column
@@ -235,10 +246,18 @@ class Sample {
 
     ValidateEmail(email) {
         //return (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email));
-
         if (!email || email.length > 256) return false;
         var tester = /^[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~](\.?[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
-        return tester.test(email);
+        if (tester.test(email)) {
+            for (var em = 0; em < invalidDomains.length; em++) {
+                if (email.toLowerCase().endsWith(invalidDomains[em])) {
+                    return 1;
+                }
+            }
+            return 0;
+        } else {
+            return 2;
+        }
     }
 
 
@@ -271,8 +290,8 @@ class Sample {
             }
         }
         for (let i = 0; i < invalids.length; i++) {
-            WARNINGS.push("<b>WARNINGS:</b> In lines '" + invalids[i] + " no valid phone number was found");
-            TEXTWARNINGS.push("WARNINGS: In lines '" + invalids[i] + " no valid phone number was found");
+            WARNINGS.push("<b>WARNING:</b> In lines '" + invalids[i] + " no valid phone number was found");
+            TEXTWARNINGS.push("WARNING: In lines '" + invalids[i] + " no valid phone number was found");
         }
         this.flagged_start++;
         this.flagged_additions.push(phoneFlag);
@@ -283,15 +302,29 @@ class Sample {
         let emailFlag = new FlaggedColumn(cname, this.flagged_start);
         emailFlag.changes.push("ReplacementStringrf@rf.com");
         console.log("start emails", SAMPLE.records.length, cols.length);
-        for (let j = 1; j < SAMPLE.records.length; j++) {
+        for (let j = SAMPLE.records.length-1; j >= 1; j--) {
             // check each record at specified column
             for (let i = 0; i < cols.length; i++) {
                 let recordEmail = SAMPLE.records[j][cols[i]];
                 if (recordEmail)
-                    recordEmail = recordEmail.trim();
-                if (this.ValidateEmail(recordEmail)) {
-                    emailFlag.additions[j] = "ReplacementString" + recordEmail;
-                    emailFlag.changes.push(emailFlag.additions[j]);
+                    recordEmail = recordEmail.trim().toLowerCase();
+                var emStatus = false;
+                switch (this.ValidateEmail(recordEmail)) {
+                    case 0:
+                        // valid email, don't delete
+                        emailFlag.additions[j] = "ReplacementString" + recordEmail;
+                        emailFlag.changes.push(emailFlag.additions[j]);
+                        emStatus = true;
+                        break;
+                    case 1:
+                        // filtered email. Record ought to be deleted
+                        this.DeleteRecordByIndex(cname, j);
+                        emStatus = true;
+                    default:
+                        // invalid email
+                        break;
+                }
+                if (emStatus) {
                     break;
                 }
             }
@@ -331,8 +364,8 @@ class Sample {
             }
         }
         if (colDeleted == false) {
-            WARNINGS.push("<b>WARNINGS:</b> In column '" + col + "' didn't contain deletes of value '" + name + "'");
-            TEXTWARNINGS.push("WARNINGS: In column '" + col + "' didn't contain deletes of value '" + name + "'");
+            WARNINGS.push("<b>WARNING:</b> In column '" + col + "' didn't contain deletes of value '" + name + "'");
+            TEXTWARNINGS.push("WARNING: In column '" + col + "' didn't contain deletes of value '" + name + "'");
         }
     }
 
@@ -457,8 +490,8 @@ class Sample {
             }
         }
         if (replaced == false) {
-            WARNINGS.push("<b>WARNINGS:</b> Found nothing which matched combine condition for: '" + currentCol + "'.");
-            TEXTWARNINGS.push("WARNINGS: Found nothing which matched combine condition for: '" + currentCol + "'.");
+            WARNINGS.push("<b>WARNING:</b> Found nothing which matched combine condition for: '" + currentCol + "'.");
+            TEXTWARNINGS.push("WARNING: Found nothing which matched combine condition for: '" + currentCol + "'.");
         }
     }
 
