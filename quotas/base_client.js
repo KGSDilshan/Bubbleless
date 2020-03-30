@@ -3,7 +3,9 @@ function CreateClient(id) {
         case 2: // AL
             return new ALClient();
         case 3: // DB
+            return new DBClient();
         case 4: // FM
+            return new FMClient();
         case 5: // RN
         case 6: // EM
         case 7: // PB
