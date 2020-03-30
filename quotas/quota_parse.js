@@ -179,6 +179,8 @@ function ReadQuotaArr() {
     // Initialize quota groups/headers
     QUOTA_GROUPS = [];
     QUOTA_HEADERS = [];
+    RAN_CSWARNINGS = false;
+    document.getElementById("QuotaWarningsBuffer").innerHTML = "";
 
     // Grab all the headers
     content.forEach(row => {
@@ -209,6 +211,7 @@ function ReadQuotaArr() {
     // when quotas have been generated, run validation
     let counter = 0;
     let alertMsg = "";
+    document.getElementById("QuotaWarningsBuffer").innerHTML = "";
     for (let i = 0; i < QUOTA_GROUPS.length; i++) {
         if (!QUOTA_GROUPS[i].validateQuotas()) {
             alertMsg += QUOTA_GROUPS[i].displayWarnings();

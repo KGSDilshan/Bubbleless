@@ -32,6 +32,9 @@ class Quota {
         this.qCodes = quotaCodes; // arr of codes
         this.isRaw = false;
         this.active = this.valLimit != 0;
+        if (this.group.mode > 1 && !document.getElementById("OnlineQActivity").checked) {
+            this.active = false;
+        }
         this.action = 1; // term without warning
         this.csvMode = "Simple";
         this.calculateLimit();
@@ -83,6 +86,12 @@ class Quota {
                             suffix = this.client.getSuffix(this);
                             data += name + "," + this.csvMode + "," + this.qName + "," + this.qCodes[i] + "," + this.limits[property] + "," + suffix + "\n";
                             data += name + "," + this.csvMode + "," + "pMode" + "," + 3 + "," + this.limits[property] + "," + suffix + "\n";
+                            break;
+                        default:
+                            name = this.client.finalName(this, this.name, this.limits[property]);
+                            this.client.counterQuota(this);
+                            suffix = this.client.getSuffix(this);
+                            data += name + "," + this.csvMode + "," + this.qName + "," + this.qCodes[i] + "," + this.limits[property] + "," + suffix + "\n";
                             break;
                     };
                 } else {

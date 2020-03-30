@@ -1,5 +1,23 @@
 function CreateClient(id) {
     switch (id) {
+        case 2: // AL
+            return new ALClient();
+        case 3: // DB
+        case 4: // FM
+        case 5: // RN
+        case 6: // EM
+        case 7: // PB
+        case 8: // WL
+        case 9: // KT
+        case 10: // LR
+        case 11: // LP
+        case 12: // NRC
+        case 13: // FB
+        case 14: // NR
+        case 15: // SX
+        case 16: // GSG
+        // fall through
+        case 1: // McL
         default:
             return new BaseClient();
     };
@@ -8,11 +26,18 @@ function CreateClient(id) {
 
 
 class BaseClient {
-    constructor() {
-        this.name = "BasicClient";
+    constructor(name="BasicClient") {
+        this.name = name;
+        RAN_CSWARNINGS = false;
     }
 
-    clientSpecificWarnings() {
+    clientSpecificWarnings(quota) {
+        if (this.randCSWarns)
+            return;
+        this.ranCSWarns = true;
+    }
+
+    clientSpecificQuotaTransformations() {
         return;
     }
 
@@ -54,21 +79,29 @@ class BaseClient {
                 break;
             case 2:
                 // figure out which two modes they are
-                if (quota.group.nSizes.length > 0 && quota.group.nSizes[0] != 0 && quota.group.nSizes[0]) {
-                    quota.limits.phone = counterLim;
-                }
-                if (quota.group.nSizes.length > 1 && quota.group.nSizes[1] != 0 && quota.group.nSizes[1]) {
-                    quota.limits.email = counterLim;
-                }
-                if (quota.group.nSizes.length > 2 && quota.group.nSizes[2] != 0 && quota.group.nSizes[2]) {
-                    quota.limits.text = counterLim;
+                if (quota.group.isDual) {
+                    if (quota.group.nSizes.length > 0 && quota.group.nSizes[0] != 0 && quota.group.nSizes[0]) {
+                        quota.limits.phone = counterLim;
+                    }
+                    if (quota.group.nSizes.length > 1 && quota.group.nSizes[1] != 0 && quota.group.nSizes[1]) {
+                        quota.limits.email = counterLim;
+                    }
+                    if (quota.group.nSizes.length > 2 && quota.group.nSizes[2] != 0 && quota.group.nSizes[2]) {
+                        quota.limits.text = counterLim;
+                    }
+                } else {
+                    quota.limits.normLim = counterLim;
                 }
                 break;
             case 3:
                 // tri mode is every mode
-                quota.limits.phone = counterLim;
-                quota.limits.email = counterLim;
-                quota.limits.text = counterLim;
+                if (quota.group.isTri) {
+                    quota.limits.phone = counterLim;
+                    quota.limits.email = counterLim;
+                    quota.limits.text = counterLim;
+                } else {
+                    quota.limits.normLim = counterLim;
+                }
                 break;
         }
     }
@@ -94,22 +127,30 @@ class BaseClient {
                     quota.limits.phone = lim;
                     break;
                 case 2:
-                    // figure out which two modes they are
-                    if (quota.group.nSizes.length > 0 && quota.group.nSizes[0] != 0 && quota.group.nSizes[0]) {
-                        quota.limits.phone = lim;
-                    }
-                    if (quota.group.nSizes.length > 1 && quota.group.nSizes[1] != 0 && quota.group.nSizes[1]) {
-                        quota.limits.email = lim;
-                    }
-                    if (quota.group.nSizes.length > 2 && quota.group.nSizes[2] != 0 && quota.group.nSizes[2]) {
-                        quota.limits.text = lim;
+                    if (quota.group.isDual) {
+                        // figure out which two modes they are
+                        if (quota.group.nSizes.length > 0 && quota.group.nSizes[0] != 0 && quota.group.nSizes[0]) {
+                            quota.limits.phone = lim;
+                        }
+                        if (quota.group.nSizes.length > 1 && quota.group.nSizes[1] != 0 && quota.group.nSizes[1]) {
+                            quota.limits.email = lim;
+                        }
+                        if (quota.group.nSizes.length > 2 && quota.group.nSizes[2] != 0 && quota.group.nSizes[2]) {
+                            quota.limits.text = lim;
+                        }
+                    } else {
+                        quota.limits.normLim = lim;
                     }
                     break;
                 case 3:
-                    // tri mode is every mode
-                    quota.limits.phone = lim;
-                    quota.limits.email = lim;
-                    quota.limits.text = lim;
+                    if (quota.group.isTri) {
+                        // tri mode is every mode
+                        quota.limits.phone = lim;
+                        quota.limits.email = lim;
+                        quota.limits.text = lim;
+                    } else {
+                        quota.limits.normLim = lim;
+                    }
                     break;
             }
         } else {
@@ -128,22 +169,30 @@ class BaseClient {
                     quota.limits.phone = round05Ciel((quota.group.nSizes[0] * lim)/100) + flexAddition;
                     break;
                 case 2:
-                    // figure out which two modes they are
-                    if (quota.group.nSizes.length > 0 && quota.group.nSizes[0] != 0 && quota.group.nSizes[0]) {
-                        quota.limits.phone = round05Ciel((quota.group.nSizes[0] * lim)/100) + flexAddition;
-                    }
-                    if (quota.group.nSizes.length > 1 && quota.group.nSizes[1] != 0 && quota.group.nSizes[1]) {
-                        quota.limits.email = round05Ciel((quota.group.nSizes[1] * lim)/100) + flexAddition;
-                    }
-                    if (quota.group.nSizes.length > 2 && quota.group.nSizes[2] != 0 && quota.group.nSizes[2]) {
-                        quota.limits.text = round05Ciel((quota.group.nSizes[2] * lim)/100) + flexAddition;
+                    if (quota.group.isDual) {
+                        // figure out which two modes they are
+                        if (quota.group.nSizes.length > 0 && quota.group.nSizes[0] != 0 && quota.group.nSizes[0]) {
+                            quota.limits.phone = round05Ciel((quota.group.nSizes[0] * lim)/100) + flexAddition;
+                        }
+                        if (quota.group.nSizes.length > 1 && quota.group.nSizes[1] != 0 && quota.group.nSizes[1]) {
+                            quota.limits.email = round05Ciel((quota.group.nSizes[1] * lim)/100) + flexAddition;
+                        }
+                        if (quota.group.nSizes.length > 2 && quota.group.nSizes[2] != 0 && quota.group.nSizes[2]) {
+                            quota.limits.text = round05Ciel((quota.group.nSizes[2] * lim)/100) + flexAddition;
+                        }
+                    } else {
+                        quota.limits.normLim = round05Ciel((quota.group.nSizes[0] * lim)/100) + flexAddition;
                     }
                     break;
                 case 3:
-                    // tri mode is every mode
-                    quota.limits.phone = round05Ciel((quota.group.nSizes[0] * lim)/100) + flexAddition;
-                    quota.limits.email = round05Ciel((quota.group.nSizes[1] * lim)/100) + flexAddition;
-                    quota.limits.text = round05Ciel((quota.group.nSizes[2] * lim)/100) + flexAddition;
+                    if (quota.group.isTri) {
+                        // tri mode is every mode
+                        quota.limits.phone = round05Ciel((quota.group.nSizes[0] * lim)/100) + flexAddition;
+                        quota.limits.email = round05Ciel((quota.group.nSizes[1] * lim)/100) + flexAddition;
+                        quota.limits.text = round05Ciel((quota.group.nSizes[2] * lim)/100) + flexAddition;
+                    } else {
+                        quota.limits.normLim = round05Ciel((quota.group.nSizes[0] * lim)/100) + flexAddition;;
+                    }
                     break;
             }
         }

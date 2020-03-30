@@ -27,9 +27,9 @@ class QuotaGroup {
 
         // figure out mode and nsizes of this quota
         this.mode = 0;
-        if (this.isTri) {
+        if (this.isTri || this.nSizes.length == 3) {
             this.mode = 3;
-        } else if (this.isDual) {
+        } else if (this.isDual || this.nSizes.length == 2) {
             this.mode = 2;
         } else {
             this.mode = 1;
@@ -96,8 +96,12 @@ class QuotaGroup {
 
         // Error with limit 0 for quota
         for (let i = 0; i < zeroLimits.length; i++) {
-            this.warnings.push("WARNING: Quota " + this.subQuotas[zeroLimits[i]].name +
-                                " has a limit of 0. Quota limit is set to 0 and inactive.");
+            this.warnings.push("WARNING: Quota " + this.subQuotas[zeroLimits[i]].name + " limit is set to 0 and inactive.");
+        }
+
+        // Check client specific warnings
+        for (let i = 0; i < this.subQuotas.length; i++) {
+            this.subQuotas[i].client.clientSpecificWarnings();
         }
 
         // true if no errors
@@ -167,7 +171,7 @@ class QuotaGroup {
             alertMsg += this.warnings[i].split("<b>").join("").split("</b>").join("") + "\n"
         }
         // write
-        document.getElementById("QuotaWarningsBuffer").innerHTML = message + "<br><br>";
+        document.getElementById("QuotaWarningsBuffer").innerHTML += message;
         return alertMsg;
     }
 
