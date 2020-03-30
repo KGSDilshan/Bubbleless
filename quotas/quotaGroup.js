@@ -57,6 +57,11 @@ class QuotaGroup {
         return this.group_name;
     }
 
+    
+    getRawFlex() {
+        return this.isRawFlex ? this.flexAmount : this.flexAmount * this.totalN;
+    }
+
 
     validateQuotas() {
         let limitTotal = 0;
@@ -187,5 +192,4 @@ class QuotaGroup {
 
         return grpData;
     }
-
 }
