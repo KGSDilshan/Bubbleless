@@ -208,7 +208,7 @@ class QuotaGroup {
         return grpData;
     }
 
-    hasCounters() {
+    includesCounters() {
         return this.hasCounters;
     }
 }

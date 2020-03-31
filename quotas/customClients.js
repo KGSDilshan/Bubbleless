@@ -71,7 +71,7 @@ class DBClient extends BaseClient {
             // Create an other-offsetter quota if the other quota does not exist
             if (!otherExists && ((isRaw && offset == group.totalN) || (!isRaw && offset == 100))) {
                 console.log(group, "Error: Ethnicity - Other quota does not exist");
-                group.warnings.push("WARNING: " + curGroupName + " - Other quota does not exist. Created. (Checklist)");
+                group.warnings.push("WARNING: " + curGroup.getName() + " - Other quota does not exist. Created. (Checklist)");
                 let newQuota = new Quota(
                     group,
                     "Other OFFSETTER",
@@ -102,7 +102,7 @@ class DBClient extends BaseClient {
 
             if (showErrors) {
                 console.log(group, "Error: Splits exist but quotas are not split");
-                group.warnings.push("WARNING: " + curGroupName + " quotas missing split quotas. Split quotas have been added for " + curGroupName + " (Checklist)");
+                group.warnings.push("WARNING: " + curGroup.getName() + " quotas missing split quotas. Split quotas have been added for " + curGroupName + " (Checklist)");
             }
         }
     }
@@ -194,20 +194,38 @@ class RNClient extends BaseClient {
             let curGroupName = QUOTA_GROUPS[j].getName().toLowerCase();
 
             // All quotas are inactive save for splits/control messages
-            if (!(curGroupName.includes("split") || curGroupName.includes("control")) && curGroup.active) {
-                curGroup.active = false;
-                console.log(curGroup, "Error: A non-split/control message quota is active");
-                curGroup.warnings.push("WARNING: A non-split/control message quota is active. Deactivating. (Checklist)");
+            if (!(curGroupName.includes("split") || curGroupName.includes("control"))) {
+                for (let i = 0; i < curGroup.subQuotas.length; i++) {
+                    let quota = curGroup.subQuotas[i];
+                    if (quota.active) {
+                        quota.active = false;
+                        console.log(curGroup, "Error: A non-split/control message quota is active");
+                        curGroup.warnings.push("WARNING: A non-split/control message quota is active. Deactivating " +
+                                    quota.name + " (Checklist)");
+                    }
+                }
+            } else {
+                for (let i = 0; i < curGroup.subQuotas.length; i++) {
+                    let quota = curGroup.subQuotas[i];
+                    if (!quota.active) {
+                        quota.active = true;
+                        console.log(curGroup, "Error: A split/control message quota is inactive");
+                        curGroup.warnings.push("WARNING: A split/control message quota is inactive. Activating " +
+                                    quota.name + " (Checklist)");
+                    }
+                }
             }
 
             // Phone type quotas are counters
-            if (curGroupName.includes("phone") && curGroup.valLimit != "999") {
+            if (curGroupName.includes("phone")) {
                 for (let i = 0; i < curGroup.subQuotas.length; i++) {
-                    let curQuota = curGroup.subQuotas[i];
-                    curQuota.counter = true;
-                    console.log("Error: Phone type " + curQuota.rawName + "quota is not a counter.");
-                    curGroup.warnings.push("WARNING: Phone type " + curQuota.rawName + 
-                                        "quota is not a counter. Changed to a counter. (Checklist)");
+                    let quota = curGroup.subQuotas[i];
+                    if (!quota.counter) {
+                        quota.counter = true;
+                        console.log("Error: Phone type " + quota.rawName + "quota is not a counter.");
+                        curGroup.warnings.push("WARNING: Phone type " + quota.rawName + 
+                                        " quota is not a counter. Changed to a counter. (Checklist)");
+                    }
                 }
             }
         }
@@ -238,14 +256,57 @@ class EMClient extends BaseClient {
             let curGroup = QUOTA_GROUPS[j];
             let curGroupName = QUOTA_GROUPS[j].getName().toLowerCase();
 
-            if (curGroup.hasCounters()) {
+            // Group includes counters but does not have flex specified
+            if (curGroup.includesCounters()) {
                 if (!curGroup.isFlex) {
                     console.log("Error: " + curGroupName + " quotas have counters but no flex.");
-                    curGroup.warnings.push("WARNING: " + curGroupName + " quotas have counters but no flex. Default 5% flex added (Checklist)");
+                    curGroup.warnings.push("WARNING: " + curGroup.getName() + " quotas have counters but no flex. Default 5% flex added (Checklist)");
 
                     curGroup.isFlex = true;
                     curGroup.isRawFlex = true;
                     curGroup.flexAmount = 5;
+                }
+            }
+
+            // Check for listed specific stuff
+            if (isNOL()) {
+                let showListedWarning = false;
+                // Everything should be pulling from sample
+                if (!curGroupName.includes("split")) {
+                    for (let i = 0; i < curGroup.subQuotas.length; i++) {
+                        let quota = curGroup.subQuotas[i];
+                        let questionCode = quota.qName.toLowerCase();
+                        let precodeName = "p" + curGroup.getName().split(" ").join("");
+                        // Everything should be pulling from sample
+                        if (questionCode != precodeName.toLowerCase()) {
+                            if (!showListedWarning) {
+                                console.log("Error: " + curGroupName + " quotas are not pulling from a precode.");
+                                curGroup.warnings.push("WARNING: " + curGroup.getName() +
+                                                " quotas are not pulling from a coded question. Changed to pull from " +
+                                                precodeName + " (Checklist)");
+                                showListedWarning = true;
+                            }
+                            quota.qName = precodeName;
+                        }
+                    }
+                }
+            } else {
+            // Check for unlisted specific stuff
+
+                if (curGroupName.includes("age")) {
+                    let showAgeWarning = false;
+                    for (let i = 0; i < curGroup.subQuotas.length; i++) {
+                        let quota = curGroup.subQuotas[i];
+                        // The age should be coded in some form
+                        if (!quota.qName.toLowerCase().includes("coded")) {
+                            if (!showAgeWarning) {
+                                console.log("Error: " + curGroupName + " quotas are not pulling from a coded question.");
+                                curGroup.warnings.push("WARNING: " + curGroup.getName() + " quotas are not pulling from a coded question. Changed to pull from QXXCoded (Checklist)");
+                                showAgeWarning = true;
+                            }
+                            quota.qName = "QXXCoded";
+                        }
+                    }
                 }
             }
         }
