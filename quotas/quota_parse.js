@@ -277,7 +277,7 @@ function ReadQuotaArr() {
 }
 
 function downloadQuotas() {
-    let full_data = "";
+    let full_data = '"Quota Name",Type,"Question Code","Option Code","Quota Limit","Quota Settings"' + "\n";
     for (let i = 0; i < QUOTA_GROUPS.length; i++) {
         full_data += QUOTA_GROUPS[i].displayQuotas();
     }

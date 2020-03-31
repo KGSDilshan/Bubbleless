@@ -15,9 +15,9 @@ function CreateClient(id) {
         case 8: // WL
             return new WLClient();
         case 9: // KT
-            return new KTClient();
+            return new KTClient(); // done
         case 10: // LR
-            return new LRClient();
+            return new LRClient(); // done
         case 11: // LP
             return new LPClient();
         case 12: // NRC
