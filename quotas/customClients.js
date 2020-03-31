@@ -51,11 +51,48 @@ class DBClient extends BaseClient {
         };
     }
 
+    clientSpecificQuotaTransformations(group) {
+        let curGroupName = group.group_name.toLowerCase();
+
+        // Add other offsetter for ethnicity quota
+        if (curGroupName.includes("ethnicity") || curGroupName.includes("race")) {
+            let offsetterNSize = 0;
+            let otherExists = false;
+            let isRaw = !group.rawSubQuotas[0][1].includes("%");
+
+            // Check for other option existing in current quotas
+            for (let i = 0; i < group.rawSubQuotas.length; i++) {
+                let quota = group.rawSubQuotas[i];
+                if(quota[0].toLowerCase().includes("other")) {
+                    otherExists = true;
+                } else {
+                    offsetterNSize += parseInt(quota[1].split("%").join(""));
+                }
+            }
+
+            // Create an other-offsetter quota if the other quota does not exist
+            if (!otherExists) {
+                console.log(group, "Error: Ethnicity - Other quota does not exist");
+                group.warnings.push("WARNING: Ethnicity - Other quota does not exist. Created Ethnicity - Other offsetter quota (Checklist)");
+                let newQuota = new Quota(
+                    group,
+                    "Other OFFSETTER",
+                    isRaw ? (group.totalN - offsetterNSize).toString() : (100 - offsetterNSize) + "%",
+                    group.rawSubQuotas[0].qName,
+                    [group.rawSubQuotas.length + 1],
+                    CLIENT
+                    );
+                newQuota.active = false;
+                group.subQuotas.push(newQuota);                    
+            }
+        }
+    }
+
     clientSpecificWarnings() {
         if (RAN_CSWARNINGS)
             return;
         RAN_CSWARNINGS = true;
-
+        
         for (let j = 0; j < QUOTA_GROUPS.length; j++) {
             let curGroup = QUOTA_GROUPS[j];
             let curGroupName = QUOTA_GROUPS[j].getName().toLowerCase();
@@ -63,10 +100,18 @@ class DBClient extends BaseClient {
             // Balance all quotas by splits except Geo, Lang, Phonetype
             if ((!(curGroupName.includes("geo")
             || curGroupName.includes("lang")
-            || curGroupName.includes("phone"))) && !this.check.splitQuotasChecked) {
+            || curGroupName.includes("phone")))) {
                 this.check.splitQuotasChecked = true;
-                if (!curGroup.hasSplits) {
-                    console.log(curGroup, "missing split quotas");
+
+                let splitsExist = false;
+                for (let i = 0; i < QUOTA_HEADERS.length; i++) {
+                    if (QUOTA_HEADERS[i].toLowerCase().includes("split")) {
+                        splitsExist = true;
+                    }
+                }
+
+                if (!curGroup.hasSplits && splitsExist) {
+                    console.log(curGroup, "Error: Splits exist but quotas are not split");
                     curGroup.warnings.push("WARNING: " + curGroupName + " Quotas missing split quotas");
                 }
             }
@@ -82,11 +127,11 @@ class DBClient extends BaseClient {
                 for (let i = 0; i < curGroup.subQuotas.length; i++) {
                     let quota = curGroup.subQuotas[i];
                     if(quota.rawName.toLowerCase().startsWith("m") && quota.qCodes[0] == 1) {
-                        console.log(curGroup, "Gender - Male is coded as 1 instead of 2. Recoded as 2");
+                        console.log(curGroup, "Error: Gender - Male is coded as 1 instead of 2. Recoded as 2");
                         curGroup.warnings.push("WARNING: " + quota.name + " Quota coded as 1, recoded to 2 (Checklist)");
                         quota.qCodes[0] = 2;
                     } else if (quota.rawName.toLowerCase().startsWith("f") && quota.qCodes[0] == 2) {
-                        console.log(curGroup, "Gender - Female is coded as 2 instead of 1. Recoded as 1");
+                        console.log(curGroup, "Error: Gender - Female is coded as 2 instead of 1. Recoded as 1");
                         curGroup.warnings.push("WARNING: " + quota.name + " Quota coded as 2, recoded to 1 (Checklist)");
                         quota.qCodes[0] = 1;
                     }
@@ -100,7 +145,7 @@ class DBClient extends BaseClient {
                     let quota = curGroup.subQuotas[i];
                     let n = quota.getRawNSize();
                     if(n !== curGroup.totalN / 2) {
-                        console.log(curGroup, "Phone Type - " + quota.name + " limit is not half of total N size");
+                        console.log(curGroup, "Error: Phone Type - " + quota.name + " limit is not half of total N size");
                         curGroup.warnings.push("WARNING: " + quota.name + " Quota not 50% of total N size. Changed to 50% of total N size (Checklist)");
                         quota.valLimit = 50;
                         quota.strLimit = "50%";
@@ -113,50 +158,6 @@ class DBClient extends BaseClient {
                 }
             }
 
-            // Add other offsetter for ethnicity quota
-            if ((curGroupName.includes("ethnicity") || curGroupName.includes("race")) && !this.check.ethnicityOtherOffsetterChecked) {
-                this.check.ethnicityOtherOffsetterChecked = true;
-
-                let offsetterNSize = 0;
-                let otherExists = false;
-
-                // Check for other option existing in current quotas
-                for (let i = 0; i < curGroup.subQuotas.length; i++) {
-                    let quota = curGroup.subQuotas[i];
-                    if(curGroup.subQuotas[i].rawName.toLowerCase().includes("other")) {
-                        otherExists = true;
-                    } else {
-                        offsetterNSize += quota.valLimit;
-                    }
-                }
-
-                // Check for n-size discrepencies and create n-size variable
-                // If the first subquota is raw, they all are
-                if (curGroup.subQuotas[0].isRaw && curGroup.totalN != offsetterNSize) {
-                    offsetterNSize = String.toString(parseInt(curGroup.totalN) - parseInt(offsetterNSize));
-                } else if (!curGroup.subQuotas[0].isRaw && offsetterNSize != 100) {
-                    offsetterNSize = (100 - offsetterNSize) + "%";
-                } else {
-                    offsetterNSize = curGroup.subQuotas[0].isRaw ? "0" : "0%";
-                }
-
-                // Create an other-offsetter quota if the other quota does not exist
-                if (!otherExists) {
-                    console.log(curGroup, "Ethnicity - Other quota does not exist");
-                    curGroup.warnings.push("WARNING: Ethnicity - Other quota does not exist. Created Ethnicity - Other offsetter quota (Checklist)");
-                    let newQuota = new Quota(
-                        curGroup,
-                        "Other OFFSETTER",
-                        offsetterNSize,
-                        curGroup.subQuotas[0].qName,
-                        [curGroup.subQuotas.length + 1],
-                        this.clientId
-                        );
-                    newQuota.active = false;
-                    curGroup.subQuotas.push(newQuota);                    
-                }
-            }
-
             // Presidential vote quota is inactive (??? - perhaps have the programmer add this in?)
             if ((curGroupName.includes("pres") || curGroupName.includes("vote 20")) && !this.check.presVoteInactiveChecked) {
                 this.check.presVoteInactiveChecked = true;
@@ -166,7 +167,7 @@ class DBClient extends BaseClient {
                     let quota = curGroup.subQuotas[i];
                     if (quota.active) {
                         if (!warningDisplayed) {
-                            console.log(curGroup, "Presidential Vote quota is active (Checklist)");
+                            console.log(curGroup, "Error: Presidential Vote quota is active");
                             curGroup.warnings.push("WARNING: Presidential Vote quota is active. Deactivating quota (Checklist)");
                             warningDisplayed = true;
                         }
