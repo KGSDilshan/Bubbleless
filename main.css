@@ -1,3 +1,5 @@
+[contenteditable="true"] br { display: none }
+
 /* Faint and dotted Horizontal Rule tag (<hr>) */
 .subtle_section {
 	ocupacity: 0.4;
