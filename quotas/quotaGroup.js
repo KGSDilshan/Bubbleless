@@ -40,6 +40,7 @@ class QuotaGroup {
         this.splits = config.splits;
         this.id = config.id;
         this.splitQuotas = [];
+        this.hasCounters = false;
 
         // figure out mode and nsizes of this quota
         this.mode = (this.includesPhone + this.includesEmail + this.includesText);
@@ -72,7 +73,11 @@ class QuotaGroup {
 
     
     getRawFlex() {
-        return this.isRawFlex ? this.flexAmount : this.flexAmount * this.totalN;
+        if (Number.isNaN(this.flexAmount)) {
+            throw "Flex is not defined!";
+        } else {
+            return this.isRawFlex ? this.flexAmount : Math.ceil(this.flexAmount / 100 * this.totalN);
+        }
     }
 
 
@@ -201,5 +206,9 @@ class QuotaGroup {
         }
 
         return grpData;
+    }
+
+    hasCounters() {
+        return this.hasCounters;
     }
 }

@@ -22,6 +22,7 @@ class Quota {
         this.counter = false;
         if (quotaName.includes("(counter)")) {
             this.counter = true;
+            this.group.hasCounters = true;
             this.name = this.name.split("(counter)").join("");
         }
         this.name = quotaGroup.group_name + " - " + this.name;

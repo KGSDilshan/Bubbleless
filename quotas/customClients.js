@@ -188,10 +188,6 @@ class RNClient extends BaseClient {
         super("RN");
     }
 
-    clientSpecificQuotaTransformations(group) {
-        return;
-    }
-
     clientSpecificWarnings() {
         for (let j = 0; j < QUOTA_GROUPS.length; j++) {
             let curGroup = QUOTA_GROUPS[j];
@@ -208,17 +204,23 @@ class RNClient extends BaseClient {
             if (curGroupName.includes("phone") && curGroup.valLimit != "999") {
                 for (let i = 0; i < curGroup.subQuotas.length; i++) {
                     let curQuota = curGroup.subQuotas[i];
-                    curQuota.valLimit = "999";
-                    curQuota.strLimit = "999";
-                    curQuota.limits = {
-                        phone: 999
-                    }
                     curQuota.counter = true;
                     console.log("Error: Phone type " + curQuota.rawName + "quota is not a counter.");
-                    curGroup.warnings.push("WARNING: Phone type " + curQuota.rawName + "quota is not a counter. Changed to a counter. (Checklist)");
+                    curGroup.warnings.push("WARNING: Phone type " + curQuota.rawName + 
+                                        "quota is not a counter. Changed to a counter. (Checklist)");
                 }
             }
         }
+    }
+
+    finalName(quota, qname, limit) {
+        // flex name modification
+        let name = qname;
+        if (quota.group.isFlex) {
+            name += " (" + (quota.group.isRawFlex ? "" : "Flex ") + quota.group.flexAmount + 
+                (quota.group.isRawFlex ? "" : "%") + " added)";
+        }
+        return name;
     }
 }
 
@@ -235,6 +237,35 @@ class EMClient extends BaseClient {
         for (let j = 0; j < QUOTA_GROUPS.length; j++) {
             let curGroup = QUOTA_GROUPS[j];
             let curGroupName = QUOTA_GROUPS[j].getName().toLowerCase();
+
+            if (curGroup.hasCounters()) {
+                if (!curGroup.isFlex) {
+                    console.log("Error: " + curGroupName + " quotas have counters but no flex.");
+                    curGroup.warnings.push("WARNING: " + curGroupName + " quotas have counters but no flex. Default 5% flex added (Checklist)");
+
+                    curGroup.isFlex = true;
+                    curGroup.isRawFlex = true;
+                    curGroup.flexAmount = 5;
+                }
+            }
         }
+    }
+    
+    finalName(quota, qname, limit) {
+        // flex name modification
+        let name = qname;
+        let flexAmt;
+        try {
+            flexAmt = quota.group.getRawFlex().toString();
+        } 
+        catch (e) {
+            console.log(e + " Defaulting to 5% flex.");
+            flexAmt = Math.ceil(quota.group.totalN * 0.05).toString();
+        }
+        // counter name modification
+        if (quota.counter) {
+            name += " (Max " + limit + " +/- " + flexAmt + ")";
+        }
+        return name;
     }
 }
