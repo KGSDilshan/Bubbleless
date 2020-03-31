@@ -170,14 +170,14 @@ class PBClient extends BaseClient {
         }
 
         // if tri mode, mode quotas need to be 1/3
-        if (QUOTA_GROUPS[0].mode == 3 && group.group_name.toLowerCase().includes("mode")) {
+        if (group.mode == 3 && group.group_name.toLowerCase().includes("mode")) {
             let expectedN = round05Ciel(QUOTA_GROUPS[0].totalN / 3);
             group.rawSubQuotas = [
                 ["Phone", expectedN, "pMode", "1"],
                 ["Email", expectedN, "pMode", "2"],
                 ["Text", expectedN, "pMode", "3"],
             ];
-            modeGrp.warnings.push("WARNING: Mode quotas need to be 1/3 total N. (Checklist)");
+            group.warnings.push("WARNING: Mode quotas need to be 1/3 total N. (Checklist)");
         }
     }
 
@@ -218,6 +218,7 @@ class PBClient extends BaseClient {
                     ["Landline(counter)", "0%", "pPhoneType", "1"],
                     ["Cell(counter)", "0%", "pPhoneType", "2"],
                 ];
+                console.log(configTemplate);
                 QUOTA_GROUPS.push(new QuotaGroup("PhoneType", configTemplate, rawQuotas));
             }
         }

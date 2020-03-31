@@ -157,7 +157,7 @@ function getRawSizes() {
 }
 
 function getBaseConfigTemplate() {
-    let configTemplate = {
+    return {
         id: generateId(),
         nSizes: getRawSizes().slice(),
         isTri: false,
