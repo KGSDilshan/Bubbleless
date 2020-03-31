@@ -32,7 +32,7 @@ class Quota {
         this.qCodes = quotaCodes; // arr of codes
         this.isRaw = false;
         this.active = this.valLimit != 0;
-        if (this.group.mode > 1 && !document.getElementById("OnlineQActivity").checked) {
+        if (!document.getElementById("OnlineQActivity").checked && !this.group.isPhone) {
             this.active = false;
         }
         this.action = 1; // term without warning
@@ -81,6 +81,9 @@ class Quota {
                             data += name + "," + this.csvMode + "," + "pMode" + "," + 2 + "," + this.limits[property] + "," + suffix + "\n";
                             break;
                         case "text":
+                            if (!document.getElementById("OnlineQActivity").checked) {
+                                this.active = false;
+                            }
                             name = this.client.finalName(this, this.name + " - Text", this.limits[property]);
                             this.client.counterQuota(this);
                             suffix = this.client.getSuffix(this);
@@ -88,6 +91,9 @@ class Quota {
                             data += name + "," + this.csvMode + "," + "pMode" + "," + 3 + "," + this.limits[property] + "," + suffix + "\n";
                             break;
                         default:
+                            if (!document.getElementById("OnlineQActivity").checked) {
+                                this.active = false;
+                            }
                             name = this.client.finalName(this, this.name, this.limits[property]);
                             this.client.counterQuota(this);
                             suffix = this.client.getSuffix(this);
