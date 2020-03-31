@@ -280,7 +280,7 @@ class EMClient extends BaseClient {
                             if (!showListedWarning) {
                                 console.log("Error: " + curGroupName + " quotas are not pulling from a precode.");
                                 curGroup.warnings.push("WARNING: " + curGroup.getName() +
-                                                " quotas are not pulling from a coded question. Changed to pull from " +
+                                                " quotas are not pulling from a precode. Changed to pull from " +
                                                 precodeName + " (Checklist)");
                                 showListedWarning = true;
                             }
