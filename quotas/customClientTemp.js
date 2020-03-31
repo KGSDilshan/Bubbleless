@@ -358,6 +358,7 @@ class LRClient extends BaseClient {
         }
         if (ethGrp == undefined) {
             // create eth quota
+            return;
         }
 
 
@@ -374,7 +375,7 @@ class LRClient extends BaseClient {
                 }
             }
             if (!seenPT) {
-
+                return;
             }
         }
     }
