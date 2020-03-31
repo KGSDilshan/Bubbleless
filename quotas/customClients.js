@@ -346,7 +346,7 @@ class NRClient extends BaseClient {
                         quota.qName = "PartyCoded";
                         console.log("Error: Party " + quota.rawName + "quota is not pulling from a coded question.");
                         curGroup.warnings.push("WARNING: Party " + quota.rawName + 
-                                        " quota is pulling from a coded question. Changed to pull from PartyCoded (Checklist)");
+                                        " quota is not pulling from a coded question. Changed to pull from PartyCoded (Checklist)");
                     }
                 }
             }
