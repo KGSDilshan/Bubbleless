@@ -27,9 +27,9 @@ function CreateClient(id) {
         case 14: // NR
             return new NRClient();
         case 15: // SX
-            return new SXClient();
+            return new SXClient(); // done
         case 16: // GSG
-            return new GSGClient();
+            return new GSGClient(); // done
         // fall through
         case 1: // McL
         default:
