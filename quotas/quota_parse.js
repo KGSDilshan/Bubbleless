@@ -146,8 +146,9 @@ function CreateQuotaGroup(QGname, quotaObj, rawSizes) {
     let retObj = NameGroupValidation(QGname, configTemplate);
     let config = retObj.template;
     let name = retObj.name;
-    console.log("group details", name, config);
+    CLIENT.validate(name, config, quotaObj);
     QUOTA_GROUPS.push(new QuotaGroup(name, config, quotaObj));
+    return group
 }
 
 function ReadQuotaArr() {
@@ -212,7 +213,7 @@ function ReadQuotaArr() {
     let alertMsg = "";
     document.getElementById("QuotaWarningsBuffer").innerHTML = "";
     // Check client specific warnings
-    CLIENT.clientSpecificWarnings();
+    CLIENT.clientSpecificWarningsPostGeneration();
     for (let i = 0; i < QUOTA_GROUPS.length; i++) {
         if (!QUOTA_GROUPS[i].validateQuotas()) {
             alertMsg += QUOTA_GROUPS[i].displayWarnings();

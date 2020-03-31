@@ -27,9 +27,13 @@ class QuotaGroup {
 
         // figure out mode and nsizes of this quota
         this.mode = 0;
-        if (this.isTri || this.nSizes.length == 3) {
+        let nSizeCount = 0;
+        for (let i = 0; i < this.nSizes.length; i++) {
+            nSizeCount += this.nSizes[i] == 0 ? 0 : 1;
+        }
+        if (this.isTri || nSizeCount == 3) {
             this.mode = 3;
-        } else if (this.isDual || this.nSizes.length == 2) {
+        } else if (this.isDual || nSizeCount == 2) {
             this.mode = 2;
         } else {
             this.mode = 1;
@@ -39,6 +43,8 @@ class QuotaGroup {
              ", but N Sizes input only contains " + this.nSizes.length.toString());
         }
 
+        // step 2
+        CLIENT.clientSpecificQuotaTransformations(this);
         // populate sub quotas array
         if (this.isStandard) {
             for (let i = 0; i < this.rawSubQuotas.length; i++) {
