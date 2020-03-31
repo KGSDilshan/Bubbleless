@@ -90,19 +90,19 @@ class DBClient extends BaseClient {
         || curGroupName.includes("lang")
         || curGroupName.includes("phone")))) {
 
-            let splitsExist = false;
+            let showErrors = false;
             for (let i = 0; i < QUOTA_HEADERS.length; i++) {
                 let quotaHeader = QUOTA_HEADERS[i].toLowerCase();
-                if (quotaHeader.includes("split") && quotaHeader != curGroupName) {
-                    splitsExist = true;
+                if (!group.splits.includes(quotaHeader) && quotaHeader.includes("split") && quotaHeader != curGroupName) {
+                    showErrors = true;
                     group.splits.push(QUOTA_HEADERS[i]);
                     group.hasSplits = true;
                 }
             }
 
-            if (!group.hasSplits && splitsExist) {
+            if (showErrors) {
                 console.log(group, "Error: Splits exist but quotas are not split");
-                group.warnings.push("WARNING: " + curGroupName + " Quotas missing split quotas");
+                group.warnings.push("WARNING: " + curGroupName + " Quotas missing split quotas. Split quotas have been added for " + curGroupName + " (Checklist)");
             }
         }
     }
