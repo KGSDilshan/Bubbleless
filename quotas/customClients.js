@@ -313,15 +313,15 @@ class EMClient extends BaseClient {
         // flex name modification
         let name = qname;
         let flexAmt;
-        try {
-            flexAmt = quota.group.getRawFlex().toString();
-        } 
-        catch (e) {
-            console.log(e + " Defaulting to 5% flex.");
-            flexAmt = Math.ceil(quota.group.totalN * 0.05).toString();
-        }
         // counter name modification
         if (quota.counter) {
+            try {
+                flexAmt = quota.group.getRawFlex().toString();
+            } 
+            catch (e) {
+                console.log(e + " Defaulting to 5% flex.");
+                flexAmt = Math.ceil(quota.group.totalN * 0.05).toString();
+            }
             name += " (Max " + limit + " +/- " + flexAmt + ")";
         }
         return name;
