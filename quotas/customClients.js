@@ -41,7 +41,6 @@ class DBClient extends BaseClient {
     constructor() {
         super("DB");
 
-        this.clientId = 3;
         this.check = {
             genderCodesChecked: false,
             phoneTypeQuotasChecked: false,
