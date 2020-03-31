@@ -157,11 +157,11 @@ class QuotaGroup {
                     let newPercent = ((foreignGroup.subQuotas[i].valLimit * this.subQuotas[j].valLimit)/100) + "%";
                     let newName = this.subQuotas[j].rawName + " - " + foreignGroup.subQuotas[i].rawName;
                     // then create a new quota with a merged name, percentage, question names, and codes
-                    let splitQuota = new Quota(this, newName, newPercent, this.subQuotas[j].qName, this.subQuotas[j].qCodes, this.clientId);
+                    let splitQuota = new Quota(this, newName, newPercent, this.subQuotas[j].qName, this.subQuotas[j].qCodes, CLIENT);
                     // inactive subsplits by default
                     splitQuota.active = false;
                     this.splitQuotas.push(splitQuota);
-                    splitQuota = new Quota(this, newName, newPercent, foreignGroup.subQuotas[i].qName, foreignGroup.subQuotas[i].qCodes, this.clientId);
+                    splitQuota = new Quota(this, newName, newPercent, foreignGroup.subQuotas[i].qName, foreignGroup.subQuotas[i].qCodes, CLIENT);
                     // inactive subsplits by default
                     splitQuota.active = false;
                     this.splitQuotas.push(splitQuota);

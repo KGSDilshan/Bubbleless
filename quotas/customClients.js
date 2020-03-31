@@ -43,10 +43,8 @@ class DBClient extends BaseClient {
 
         this.clientId = 3;
         this.check = {
-            splitQuotasChecked: false,
             genderCodesChecked: false,
             phoneTypeQuotasChecked: false,
-            ethnicityOtherOffsetterChecked: false,
             presVoteInactiveChecked: false
         };
     }
@@ -78,12 +76,32 @@ class DBClient extends BaseClient {
                     group,
                     "Other OFFSETTER",
                     isRaw ? (group.totalN - offsetterNSize).toString() : (100 - offsetterNSize) + "%",
-                    group.rawSubQuotas[0].qName,
+                    group.rawSubQuotas[0][2],
                     [group.rawSubQuotas.length + 1],
                     CLIENT
                     );
                 newQuota.active = false;
                 group.subQuotas.push(newQuota);                    
+            }
+        }
+
+        // Balance all quotas by splits except Geo, Lang, Phonetype
+        if ((!(curGroupName.includes("geo")
+        || curGroupName.includes("lang")
+        || curGroupName.includes("phone")))) {
+
+            let splitsExist = false;
+            for (let i = 0; i < QUOTA_HEADERS.length; i++) {
+                if (QUOTA_HEADERS[i].toLowerCase().includes("split")) {
+                    splitsExist = true;
+                    group.splits.push(QUOTA_HEADERS[i]);
+                    group.hasSplits = true;
+                }
+            }
+
+            if (!group.hasSplits && splitsExist) {
+                console.log(group, "Error: Splits exist but quotas are not split");
+                group.warnings.push("WARNING: " + curGroupName + " Quotas missing split quotas");
             }
         }
     }
@@ -96,25 +114,6 @@ class DBClient extends BaseClient {
         for (let j = 0; j < QUOTA_GROUPS.length; j++) {
             let curGroup = QUOTA_GROUPS[j];
             let curGroupName = QUOTA_GROUPS[j].getName().toLowerCase();
-
-            // Balance all quotas by splits except Geo, Lang, Phonetype
-            if ((!(curGroupName.includes("geo")
-            || curGroupName.includes("lang")
-            || curGroupName.includes("phone")))) {
-                this.check.splitQuotasChecked = true;
-
-                let splitsExist = false;
-                for (let i = 0; i < QUOTA_HEADERS.length; i++) {
-                    if (QUOTA_HEADERS[i].toLowerCase().includes("split")) {
-                        splitsExist = true;
-                    }
-                }
-
-                if (!curGroup.hasSplits && splitsExist) {
-                    console.log(curGroup, "Error: Splits exist but quotas are not split");
-                    curGroup.warnings.push("WARNING: " + curGroupName + " Quotas missing split quotas");
-                }
-            }
             
             // Gender codes are reversed
             /*
