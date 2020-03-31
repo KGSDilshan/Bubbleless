@@ -19,11 +19,11 @@ function CreateClient(id) {
         case 10: // LR
             return new LRClient(); // done
         case 11: // LP
-            return new LPClient();
+            return new LPClient(); // done
         case 12: // NRC
-            return new NRCClient();
+            return new NRCClient(); // done
         case 13: // FB
-            return new FBClient();
+            return new FBClient(); // done
         case 14: // NR
             return new NRClient();
         case 15: // SX

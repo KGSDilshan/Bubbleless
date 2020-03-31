@@ -232,7 +232,6 @@ class WLClient extends BaseClient {
 
     clientSpecificQuotaTransformations(group) {
         // every quota go off sample except ethnicity
-
         let gname = group.group_name.toLowerCase();
         if (gname.includes("ethnicity") || gname.includes("race")) {
             for (let i = 0; i < group.rawSubQuotas.length; i++) {
@@ -394,6 +393,62 @@ class LRClient extends BaseClient {
 class LPClient extends BaseClient {
     constructor() {
         super("LP");
+    }
+
+    clientSpecificQuotaTransformations(group) {
+        if (group.group_name.toLowerCase().includes("split")) return;
+        // every quota go off sample
+        let setToSample = false;
+        for (let i = 0; i < group.rawSubQuotas.length; i++) {
+            if (!group.rawSubQuotas[i][2].startsWith("p")) {
+                setToSample = true;
+                group.rawSubQuotas[i][2] = "p" + group.rawSubQuotas[i][2];
+            }
+        }
+        if (setToSample) {
+            group.warnings.push("WARNING: " + group.group_name + " needs to pull from sample. (Checklist)");
+        }
+    }
+}
+
+class NRCClient extends BaseClient {
+    constructor() {
+        super("NRC");
+    }
+
+    clientSpecificQuotaTransformations(group) {
+        if (group.group_name.toLowerCase().includes("split")) return;
+        // every quota go off sample except Party
+        let gname = group.group_name.toLowerCase();
+        if (gname.includes("party")) {
+            let showWarn = false;
+            for (let i = 0; i < group.rawSubQuotas.length; i++) {
+                if (group.rawSubQuotas[i][2].startsWith("p") && !group.rawSubQuotas[i][2].toLowerCase().startsWith("party")) {
+                    group.rawSubQuotas[i][2] = "partyCoded";
+                    showWarn = true;
+                }
+            }
+            if (showWarn) {
+                group.warnings.push("WARNING: " + group.group_name + " pulls from survey. (Checklist)");
+            }
+        } else {
+            let setToSample = false;
+            for (let i = 0; i < group.rawSubQuotas.length; i++) {
+                if (!group.rawSubQuotas[i][2].startsWith("p")) {
+                    setToSample = true;
+                    group.rawSubQuotas[i][2] = "p" + group.rawSubQuotas[i][2];
+                }
+            }
+            if (setToSample) {
+                group.warnings.push("WARNING: " + group.group_name + " needs to pull from sample. (Checklist)");
+            }
+        }
+    }
+}
+
+class FBClient extends BaseClient {
+    constructor() {
+        super("FB");
     }
 
     clientSpecificQuotaTransformations(group) {
