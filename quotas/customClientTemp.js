@@ -89,8 +89,64 @@ class FMClient extends BaseClient {
                 group.warnings.push("WARNING: Shouldn't have flex in " + group.group_name + " for online. **Unchanged** (Checklist)");
             }
         }
+    }
 
+    clientSpecificWarnings() {
+        if (this.randCSWarns)
+            return;
+        this.ranCSWarns = true;
 
+        // check if phone type quota exists
+        let seenPT = false;
+        let warnActivePT = false;
+        for (let i = 0; i < QUOTA_GROUPS.length; i++) {
+            if (QUOTA_GROUPS[i].getName().toLowerCase().includes("phonetype")) {
+                // make inactive
+                for (let j = 0; j < QUOTA_GROUPS[i].length; j++) {
+                    if (QUOTA_GROUPS[i].subQuotas.active) {
+                        QUOTA_GROUPS[i].subQuotas.active = false;
+                        warnActivePT = true;
+                    }
+                }
+                seenPT = true;
+                break;
+            }
+        }
+
+        if (!seenPT) {
+            // create Phonetype quota
+            let rawSizes = document.getElementById("QNSize").value;
+            rawSizes = rawSizes.split("-");
+            for (let i = 0; i < 3; i++) {
+                if (rawSizes.length <= i) {
+                    rawSizes[i] = 0;
+                } else {
+                    rawSizes[i] = parseInt(rawSizes[i]);
+                }
+            }
+            let configTemplate = {
+                id: generateId(),
+                nSizes: rawSizes,
+                isTri: false,
+                isDual: false,
+                isFlex: false,
+                isRawFlex: false,
+                flexAmount: false,
+                hasSplits: false,
+                nOverride: false,
+                nOverrideVal: undefined,
+                splits: []
+            };
+            let rawQuotas = [
+                ["Landline(counter)", "30%", "pPhoneType", "1"],
+                ["Cell", "70%", "pPhoneType", "2"],
+            ];
+            let grp = new QuotaGroup("PhoneType", configTemplate, rawQuotas);
+            QUOTA_GROUPS.push(grp);
+            for (let i = 0; i < grp.subQuotas.length; i++) {
+                grp.subQuotas[i].active = false;
+            }
+        }
     }
 
 }

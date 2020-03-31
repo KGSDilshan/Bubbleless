@@ -45,7 +45,7 @@ class BaseClient {
         RAN_CSWARNINGS = false;
     }
 
-    clientSpecificWarnings(quota) {
+    clientSpecificWarnings() {
         if (this.randCSWarns)
             return;
         this.ranCSWarns = true;
