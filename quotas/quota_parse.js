@@ -147,7 +147,6 @@ function CreateQuotaGroup(QGname, quotaObj, rawSizes) {
     let config = retObj.template;
     let name = retObj.name;
     QUOTA_GROUPS.push(new QuotaGroup(name, config, quotaObj));
-    return group
 }
 
 function ReadQuotaArr() {
