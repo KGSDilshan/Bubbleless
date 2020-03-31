@@ -51,7 +51,7 @@ class BaseClient {
         this.ranCSWarns = true;
     }
 
-    clientSpecificQuotaTransformations() {
+    clientSpecificQuotaTransformations(group) {
         return;
     }
 
