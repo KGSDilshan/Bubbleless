@@ -16,10 +16,12 @@ class FMClient extends BaseClient {
         if (group.group_name.toLowerCase().includes("phone")) {
             let redo = false;
             let seen = false;
+            let hasMode = 0;
             for (let i = 0; i < group.rawSubQuotas.length; i++) {
                 let name = group.rawSubQuotas[i][0];
                 let lname = name.toLowerCase();
                 let percent = group.rawSubQuotas[i][1];
+                let question = group.rawSubQuotas[i][2];
                 if (lname.startsWith("l") && !lname.includes("counter") ||
                     (lname.includes("counter") && !percent.includes("30"))) {
                     redo = true;
@@ -29,8 +31,11 @@ class FMClient extends BaseClient {
                     redo = true;
                     break;
                 }
-                if (lname.startsWith("c") or lname.startsWith("l")) {
+                if (lname.startsWith("c") || lname.startsWith("l")) {
                     seen = true;
+                }
+                if (question == "pMode") {
+                    hasMode++;
                 }
             }
             if (group.isFlex || group.isRaw) {
@@ -51,6 +56,17 @@ class FMClient extends BaseClient {
                 q = new Quota(group, "Cell", "70%", "pPhoneType", [2], CLIENT);
                 q.active = false;
                 this.subQuotas.push(q);
+            }
+
+            if (hasMode < 2 && group.includesPhone) {
+                // should have a mode attached to phone type
+                let q = new Quota(group, "Landline(counter)", "30%", "pMode", [1], CLIENT);
+                q.active = false;
+                group.subQuotas.push(q);
+                q = new Quota(group, "Cell", "70%", "pMode", [1], CLIENT);
+                q.active = false;
+                group.hasSplits = true;
+                group.splits.push("(mode)");
             }
         } else if (group.group_name.toLowerCase().includes("split") && group.isPhone == true) {
             // should be flex should be flat 5
@@ -113,7 +129,7 @@ class FMClient extends BaseClient {
             }
         }
 
-        if (!seenPT) {
+        if (!seenPT && QUOTA_GROUPS[0].includesPhone) {
             // create Phonetype quota
             let rawSizes = document.getElementById("QNSize").value;
             rawSizes = rawSizes.split("-");
@@ -137,6 +153,7 @@ class FMClient extends BaseClient {
                 nOverrideVal: undefined,
                 splits: []
             };
+
             let rawQuotas = [
                 ["Landline(counter)", "30%", "pPhoneType", "1"],
                 ["Cell", "70%", "pPhoneType", "2"],

@@ -122,6 +122,7 @@ class QuotaGroup {
     }
 
     createSplitQuotas() {
+        console.log(this.hasSplits, this.group_name, this.splits);
         if (!this.hasSplits) {
             return;
         }
@@ -136,6 +137,7 @@ class QuotaGroup {
                 }
             }
         }
+        console.log(validSplits);
         // generate quotas for each split
         for (let f = 0; f < validSplits.length; f++) {
             let foreignGroup;

@@ -179,8 +179,16 @@ class BaseClient {
             // percentage values
             switch (quota.group.mode) {
                 case 1:
-                    // phone only
-                    quota.limits.phone = round05Ciel((quota.group.nSizes[0] * lim)/100) + flexAddition;
+                    // phone only/single mode
+                    if (quota.group.Phone) {
+                        quota.limits.phone = round05Ciel((quota.group.nSizes[0] * lim)/100) + flexAddition;
+                    }
+                    if (quota.group.includesEmail) {
+                        quota.limits.phone = round05Ciel((quota.group.nSizes[1] * lim)/100) + flexAddition;
+                    }
+                    if (quota.group.includesTest) {
+                        quota.limits.phone = round05Ciel((quota.group.nSizes[2] * lim)/100) + flexAddition;
+                    }
                     break;
                 case 2:
                     if (quota.group.isDual) {
