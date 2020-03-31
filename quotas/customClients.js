@@ -291,8 +291,7 @@ class EMClient extends BaseClient {
                     }
                 }
             } else {
-            // Check for unlisted specific stuff
-
+                // Check for unlisted specific stuff
                 if (curGroupName.includes("age")) {
                     let showAgeWarning = false;
                     for (let i = 0; i < curGroup.subQuotas.length; i++) {
@@ -301,10 +300,10 @@ class EMClient extends BaseClient {
                         if (!quota.qName.toLowerCase().includes("coded")) {
                             if (!showAgeWarning) {
                                 console.log("Error: " + curGroupName + " quotas are not pulling from a coded question.");
-                                curGroup.warnings.push("WARNING: " + curGroup.getName() + " quotas are not pulling from a coded question. Changed to pull from QXXCoded (Checklist)");
+                                curGroup.warnings.push("WARNING: " + curGroup.getName() + " quotas are not pulling from a coded question. Changed to pull from QXCoded (Checklist)");
                                 showAgeWarning = true;
                             }
-                            quota.qName = "QXXCoded";
+                            quota.qName = "QXCoded";
                         }
                     }
                 }
