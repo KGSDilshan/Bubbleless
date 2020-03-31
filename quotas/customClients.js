@@ -36,7 +36,6 @@ class ALClient extends BaseClient {
     }
 }
 
-
 class DBClient extends BaseClient {
     constructor() {
         super("DB");
@@ -275,10 +274,9 @@ class EMClient extends BaseClient {
                 if (!curGroupName.includes("split")) {
                     for (let i = 0; i < curGroup.subQuotas.length; i++) {
                         let quota = curGroup.subQuotas[i];
-                        let questionCode = quota.qName.toLowerCase();
-                        let precodeName = "p" + curGroup.getName().split(" ").join("");
                         // Everything should be pulling from sample
-                        if (questionCode != precodeName.toLowerCase()) {
+                        if (!quota.qName.startsWith("p")) {
+                            let precodeName = "p" + curGroup.getName().split(" ").join("");
                             if (!showListedWarning) {
                                 console.log("Error: " + curGroupName + " quotas are not pulling from a precode.");
                                 curGroup.warnings.push("WARNING: " + curGroup.getName() +
@@ -325,6 +323,59 @@ class EMClient extends BaseClient {
         // counter name modification
         if (quota.counter) {
             name += " (Max " + limit + " +/- " + flexAmt + ")";
+        }
+        return name;
+    }
+}
+
+class NRClient extends BaseClient {
+    constructor() {
+        super("NR");
+    }
+
+    clientSpecificWarnings() {
+        for (let j = 0; j < QUOTA_GROUPS.length; j++) {
+            let curGroup = QUOTA_GROUPS[j];
+            let curGroupName = QUOTA_GROUPS[j].getName().toLowerCase();
+
+            // Party must pull from a coded question
+            if (curGroupName.includes("party")) {
+                for (let i = 0; i < curGroup.subQuotas.length; i++) {
+                    let quota = curGroup.subQuotas[i];
+                    if (!quota.qName.toLowerCase().includes("coded")) {
+                        quota.qName = "PartyCoded";
+                        console.log("Error: Party " + quota.rawName + "quota is not pulling from a coded question.");
+                        curGroup.warnings.push("WARNING: Party " + quota.rawName + 
+                                        " quota is pulling from a coded question. Changed to pull from PartyCoded (Checklist)");
+                    }
+                }
+            }
+
+            // County quota (if not raw), should be inactive
+            if (curGroupName.includes("county")) {
+                let showCountyWarning = false;
+                for (let i = 0; i < curGroup.subQuotas.length; i++) {
+                    let quota = curGroup.subQuotas[i];
+                    if (quota.active) {
+                        if (!showCountyWarning) {
+                            console.log("Error: Active " + curGroupName + " quota found.");
+                            curGroup.warnings.push("WARNING: One or more " + curGroup.getName() + 
+                                            " quotas are active. Deactivated quotas (Checklist)");
+                        }
+                        quota.active = false;
+                        showCountyWarning = true;
+                    }
+                }
+            }
+        }
+    }
+
+    finalName(quota, qname, limit) {
+        // flex name modification
+        let name = qname;
+        if (quota.group.isFlex) {
+            name += " (" + (quota.group.isRawFlex ? "" : "Flex ") + quota.group.flexAmount + 
+                (quota.group.isRawFlex ? "" : "%") + " added)";
         }
         return name;
     }
