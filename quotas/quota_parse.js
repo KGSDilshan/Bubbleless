@@ -125,15 +125,18 @@ function NameGroupValidation(OriginalName, template) {
 }
 
 function getQuotaByNames(nameList) {
-    let grps = [];
     for (let i = 0; i < QUOTA_GROUPS.length; i++) {
         for (let j = 0; j < nameList.length; j++) {
             if (QUOTA_GROUPS[i].group_name.toLowerCase().includes(nameList[j].toLowerCase())) {
-                grp.push(QUOTA_GROUPS[i]);
+                return QUOTA_GROUPS[i];
             }
         }
     }
-    return grp;
+    return undefined;
+}
+
+function isNOL() {
+    return document.getElementById("NOL").checked;
 }
 
 function getRawSizes() {
