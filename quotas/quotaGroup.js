@@ -117,6 +117,7 @@ class QuotaGroup {
     }
 
     createSplitQuotas() {
+        console.log(this.hasSplits, this.group_name, this.splits);
         if (!this.hasSplits) {
             return;
         }
@@ -131,6 +132,7 @@ class QuotaGroup {
                 }
             }
         }
+        console.log(validSplits);
         // generate quotas for each split
         for (let f = 0; f < validSplits.length; f++) {
             let foreignGroup;
@@ -152,11 +154,11 @@ class QuotaGroup {
                     let newPercent = ((foreignGroup.subQuotas[i].valLimit * this.subQuotas[j].valLimit)/100) + "%";
                     let newName = this.subQuotas[j].rawName + " - " + foreignGroup.subQuotas[i].rawName;
                     // then create a new quota with a merged name, percentage, question names, and codes
-                    let splitQuota = new Quota(this, newName, newPercent, this.subQuotas[j].qName, this.subQuotas[j].qCodes, this.clientId);
+                    let splitQuota = new Quota(this, newName, newPercent, this.subQuotas[j].qName, this.subQuotas[j].qCodes, CLIENT);
                     // inactive subsplits by default
                     splitQuota.active = false;
                     this.splitQuotas.push(splitQuota);
-                    splitQuota = new Quota(this, newName, newPercent, foreignGroup.subQuotas[i].qName, foreignGroup.subQuotas[i].qCodes, this.clientId);
+                    splitQuota = new Quota(this, newName, newPercent, foreignGroup.subQuotas[i].qName, foreignGroup.subQuotas[i].qCodes, CLIENT);
                     // inactive subsplits by default
                     splitQuota.active = false;
                     this.splitQuotas.push(splitQuota);
