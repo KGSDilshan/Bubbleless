@@ -146,7 +146,6 @@ function CreateQuotaGroup(QGname, quotaObj, rawSizes) {
     let retObj = NameGroupValidation(QGname, configTemplate);
     let config = retObj.template;
     let name = retObj.name;
-    CLIENT.validate(name, config, quotaObj);
     QUOTA_GROUPS.push(new QuotaGroup(name, config, quotaObj));
     return group
 }
