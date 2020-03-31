@@ -32,7 +32,7 @@ class Quota {
         this.qCodes = quotaCodes; // arr of codes
         this.isRaw = false;
         this.active = this.valLimit != 0;
-        if (!document.getElementById("OnlineQActivity").checked && !this.group.isPhone) {
+        if (!document.getElementById("OnlineQActivity").checked && !this.group.Phone) {
             this.active = false;
         }
         this.action = 1; // term without warning
