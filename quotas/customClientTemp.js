@@ -1,78 +1,152 @@
 class FMClient extends BaseClient {
     constructor() {
-        super("DB");
+        super("FM");
+    }
+
+    clientSpecificQuotaTransformations(group) {
+        // no group should have dual mode
+        if (this.mode > 1) {
+            group.isDual = false;
+            group.isTri = false;
+            group.nSizes = [group.totalN, group.totalN, group.totalN];
+            group.warnings.push("WARNING: In group: " + group.group_name + ", Client dual modes are on two links. Full N used.");
+        }
+
+        // phone mode quotas should contain counter for LL and max for cell
+        if (group.group_name.toLowerCase().includes("phone")) {
+            let redo = false;
+            let seen = false;
+            for (let i = 0; i < group.rawSubQuotas.length; i++) {
+                let name = group.rawSubQuotas[i][0];
+                let lname = name.toLowerCase();
+                let percent = group.rawSubQuotas[i][1];
+                if (lname.startsWith("l") && !lname.includes("counter") ||
+                    (lname.includes("counter") && !percent.includes("30"))) {
+                    redo = true;
+                    break;
+                }
+                if (lname.startsWith("c") && !percent.includes("70")) {
+                    redo = true;
+                    break;
+                }
+                if (lname.startsWith("c") or lname.startsWith("l")) {
+                    seen = true;
+                }
+            }
+            if (group.isFlex || group.isRaw) {
+                group.warnings.push("WARNING: PhoneType flex removed. (Checklist)");
+            }
+            group.isFlex = false;
+            group.flexAmount = 0;
+            group.isRaw = false;
+            if (redo || !seen) {
+                group.warnings.push("WARNING: PhoneType is always 30%(min) LL and 70% cell. (Checklist)");
+                group.rawSubQuotas = [];
+                group.isStandard = false;
+                group.rawSubQuotas.push(["Landline(counter)", "30%", "pPhoneType", "1"]);
+                group.rawSubQuotas.push(["Cell", "70%", "pPhoneType", "2"]);
+                let q = new Quota(group, "Landline(counter)", "30%", "pPhoneType", [1], CLIENT);
+                q.active = false;
+                this.subQuotas.push(q);
+                q = new Quota(group, "Cell", "70%", "pPhoneType", [2], CLIENT);
+                q.active = false;
+                this.subQuotas.push(q);
+            }
+        } else if (group.group_name.toLowerCase().includes("split") && group.isPhone == true) {
+            // should be flex should be flat 5
+            if (group.flexAmount != 5 || !group.isRawFlex) {
+                group.warnings.push("WARNING: Split quotas need to have 5n Flex. (Checklist)");
+                group.isFlex = true;
+                group.flexAmount = 5;
+                group.isRawFlex = true;
+            }
+        } else if (group.isPhone) {
+            // all quotas need 5% flex, if quota doesn't contain a counter
+            let hasCounter = false;
+            for (let i = 0; i < group.rawSubQuotas.length; i++) {
+                let name = group.rawSubQuotas[i][0];
+                let lname = name.toLowerCase();
+                if (!lname.includes("counter")) {
+                    hasCounter = true;
+                } else {
+                    // groups with counters shouldn't have flex.
+                    if (group.isFlex || group.isRawFlex) {
+                        group.warnings.push("WARNING: Shouldn't have flex in " + group.group_name + " because it's a counter. (Checklist)");
+                        group.isFlex = false;
+                        group.isRawFlex = false;
+                    }
+                }
+            }
+            if (!hasCounter && (group.flexAmount != 5 || !group.isFlex || group.isRawFlex)) {
+                group.warnings.push("WARNING: 5% flex added to group" + group.group_name + ". (Checklist)");
+                group.isFlex = true;
+                group.flexAmount = 5;
+                group.isRawFlex = true;
+            }
+        } else {
+            // no flex in online modes
+            if (group.isFlex || group.isRawFlex) {
+                group.warnings.push("WARNING: Shouldn't have flex in " + group.group_name + " for online. **Unchanged** (Checklist)");
+            }
+        }
     }
 
     clientSpecificWarnings() {
-        if (RAN_CSWARNINGS)
+        if (this.randCSWarns)
             return;
-        RAN_CSWARNINGS = true;
-        if (QUOTA_GROUPS.length == 0)
-            return;
+        this.ranCSWarns = true;
 
-        // if dual mode, n sizes should be equal
-        if (QUOTA_GROUPS[0].isDual == 2) {
-            // two modes established
-            let modeCount = 0;
-            // both modes are equal N
-            let prevMode = undefined;
-            let isCorrect = false;
-            let indexes = [];
-            for (let i = 0; i < QUOTA_GROUPS[0].nSizes.length; i++) {
-                let nSize = QUOTA_GROUPS[0].nSizes[i];
-                if (prevMode == undefined && nSize > 0) {
-                    // first non-zero nSize
-                    prevMove = nSize;
-                    modeCount++;
-                    index.push(i);
-                } else if (modeCount > 0 && prevMode == nSize) {
-                    // found second nSize and it matches the first one
-                    isCorrect = true;
-                    break;
-                } else if (modeCount > 0 && prevMode != nSize && nSize > 0) {
-                    // found an nSize that's non-zero and doesn't match
-                    index.push(i);
-                    break;
-                }
-            }
-
-            if (!isCorrect) {
-                QUOTA_GROUPS[0].warnings.push("WARNING: Dual mode N sizes must be equal for FM. (Checklist)");
-                alert("Client Requires Dual mode N Size to each be half of total N. Continue if intended, otherwise adjust and process again.");
-            }
-        }
-
-        // if mode is phone, add 5% flex to all quotas that aren't counters
+        // check if phone type quota exists
+        let seenPT = false;
+        let warnActivePT = false;
         for (let i = 0; i < QUOTA_GROUPS.length; i++) {
-            if (QUOTA_GROUPS[i].mode == 1) {
-                // check that quota group includes 5% flex
-                /*
-                    needs to be changed if isflex && flexAmount != 5
-                    needs to be changed if !isflex
-                    needs to be changed if isRawFlex && not a split quota
-                */
-                if ((QUOTA_GROUPS[i].isFlex && QUOTA_GROUPS[i].flexAmount != 5)
-                    || !QUOTA_GROUPS[i].isFlex
-                    || (QUOTA_GROUPS[i].isRawFlex && !QUOTA_GROUPS[i].group_name.toLowerCase().includes("split"))) {
-                    if (QUOTA_GROUPS[i].name.toLowerCase().includes("phone")) {
-                        continue;
-                    } else {
-
-                    }
-                }
+            if (QUOTA_GROUPS[i].getName().toLowerCase().includes("phonetype")) {
+                // make inactive
                 for (let j = 0; j < QUOTA_GROUPS[i].length; j++) {
-                    let quota = QUOTA_GROUPS[i].subQuotas[j];
-                    if (quota.counter == false && !quota.rawName.includes("phone")) {
-                        return;
-                        // TODO
+                    if (QUOTA_GROUPS[i].subQuotas.active) {
+                        QUOTA_GROUPS[i].subQuotas.active = false;
+                        warnActivePT = true;
                     }
                 }
+                seenPT = true;
+                break;
             }
         }
 
-        // phone type quotas should be inactive
-        // LL Min 30%
-        // Splits should be +5 added
-
+        if (!seenPT) {
+            // create Phonetype quota
+            let rawSizes = document.getElementById("QNSize").value;
+            rawSizes = rawSizes.split("-");
+            for (let i = 0; i < 3; i++) {
+                if (rawSizes.length <= i) {
+                    rawSizes[i] = 0;
+                } else {
+                    rawSizes[i] = parseInt(rawSizes[i]);
+                }
+            }
+            let configTemplate = {
+                id: generateId(),
+                nSizes: rawSizes,
+                isTri: false,
+                isDual: false,
+                isFlex: false,
+                isRawFlex: false,
+                flexAmount: false,
+                hasSplits: false,
+                nOverride: false,
+                nOverrideVal: undefined,
+                splits: []
+            };
+            let rawQuotas = [
+                ["Landline(counter)", "30%", "pPhoneType", "1"],
+                ["Cell", "70%", "pPhoneType", "2"],
+            ];
+            let grp = new QuotaGroup("PhoneType", configTemplate, rawQuotas);
+            QUOTA_GROUPS.push(grp);
+            for (let i = 0; i < grp.subQuotas.length; i++) {
+                grp.subQuotas[i].active = false;
+            }
+        }
     }
+
 }

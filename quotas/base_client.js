@@ -45,7 +45,7 @@ class BaseClient {
         RAN_CSWARNINGS = false;
     }
 
-    clientSpecificWarnings(quota) {
+    clientSpecificWarnings() {
         if (this.randCSWarns)
             return;
         this.ranCSWarns = true;
@@ -88,7 +88,7 @@ class BaseClient {
         let minVal = quota.valLimit;
         switch (quota.group.mode) {
             case 1:
-                // phone only
+                // phone only/single mode
                 quota.limits.phone = counterLim;
                 break;
             case 2:

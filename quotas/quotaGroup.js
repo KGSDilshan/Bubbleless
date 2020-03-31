@@ -9,12 +9,28 @@ class QuotaGroup {
         // total N is all nsizes totaled together
         this.totalN = this.nSizes.reduce((a, b) => a + b, 0);
         this.flexAmount = parseFloat(config.flexAmount);
-        if (config.nOverride == true) {
-            for (let i = 0; i < this.nSizes.length; i++) {
+        this.includesPhone = false;
+        this.includesEmail = false;
+        this.includesText = false;
+        this.Online = false;
+        this.mode = 0;
+        for (let i = 0; i < this.nSizes.length; i++) {
+            if (config.nOverride == true && this.nSizes[i] != 0) {
                 this.nSizes[i] = config.nOverrideVal;
             }
-            this.totalN = config.nOverrideVal;
+            if (this.nSizes[i] > 0 && i == 0) {
+                this.includesPhone = true;
+            }
+            if (this.nSizes[i] > 0 && i == 1) {
+                this.includesEmail = true;
+                this.Online = true;
+            }
+            if (this.nSizes[i] > 0 && i == 2) {
+                this.includesText = true;
+                this.Online = true;
+            }
         }
+        this.Phone = this.Online ? false : true;
         this.subQuotas = [];
         this.rawSubQuotas = subQuotas.slice();
         this.isStandard = true; // placeholder property for client specific and tabled quotas
@@ -26,19 +42,11 @@ class QuotaGroup {
         this.splitQuotas = [];
 
         // figure out mode and nsizes of this quota
-        this.mode = 0;
-        let nSizeCount = 0;
-        for (let i = 0; i < this.nSizes.length; i++) {
-            nSizeCount += this.nSizes[i] == 0 ? 0 : 1;
-        }
-        if (this.isTri || nSizeCount == 3) {
-            this.mode = 3;
-        } else if (this.isDual || nSizeCount == 2) {
-            this.mode = 2;
-        } else {
-            this.mode = 1;
-        }
+        this.mode = (this.includesPhone + this.includesEmail + this.includesText);
+
         if (this.nSizes.length < this.mode) {
+            this.warnings.push("ERROR: " + this.group_name + " is mode " + this.mode.toString() +
+             ", but N Sizes input only contains " + this.nSizes.length.toString());
             alert("Quota group " + this.group_name + " is mode " + this.mode.toString() +
              ", but N Sizes input only contains " + this.nSizes.length.toString());
         }

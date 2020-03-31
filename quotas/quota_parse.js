@@ -162,8 +162,12 @@ function ReadQuotaArr() {
         return;
     }
     rawSizes = rawSizes.split("-");
-    for (let i = 0; i < rawSizes.length; i++) {
-        rawSizes[i] = parseInt(rawSizes[i]);
+    for (let i = 0; i < 3; i++) {
+        if (rawSizes.length <= i) {
+            rawSizes[i] = 0;
+        } else {
+            rawSizes[i] = parseInt(rawSizes[i]);
+        }
     }
     let content = ReadQuotaTables();
     if (content.length <= 1 && content[0] =="") {
