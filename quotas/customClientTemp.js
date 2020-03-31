@@ -232,7 +232,6 @@ class WLClient extends BaseClient {
 
     clientSpecificQuotaTransformations(group) {
         // every quota go off sample except ethnicity
-
         let gname = group.group_name.toLowerCase();
         if (gname.includes("ethnicity") || gname.includes("race")) {
             for (let i = 0; i < group.rawSubQuotas.length; i++) {
@@ -388,5 +387,169 @@ class LRClient extends BaseClient {
 
         // Always keep the quotas with 2 or more conditions inactive (i.e. Gender – Male Region 1)
         // handled in split quotas
+    }
+}
+
+class LPClient extends BaseClient {
+    constructor() {
+        super("LP");
+    }
+
+    clientSpecificQuotaTransformations(group) {
+        if (group.group_name.toLowerCase().includes("split")) return;
+        // every quota go off sample
+        let setToSample = false;
+        for (let i = 0; i < group.rawSubQuotas.length; i++) {
+            if (!group.rawSubQuotas[i][2].startsWith("p")) {
+                setToSample = true;
+                group.rawSubQuotas[i][2] = "p" + group.rawSubQuotas[i][2];
+            }
+        }
+        if (setToSample) {
+            group.warnings.push("WARNING: " + group.group_name + " needs to pull from sample. (Checklist)");
+        }
+    }
+}
+
+class NRCClient extends BaseClient {
+    constructor() {
+        super("NRC");
+    }
+
+    clientSpecificQuotaTransformations(group) {
+        if (group.group_name.toLowerCase().includes("split")) return;
+        // every quota go off sample except Party
+        let gname = group.group_name.toLowerCase();
+        if (gname.includes("party")) {
+            let showWarn = false;
+            for (let i = 0; i < group.rawSubQuotas.length; i++) {
+                if (group.rawSubQuotas[i][2].startsWith("p") && !group.rawSubQuotas[i][2].toLowerCase().startsWith("party")) {
+                    group.rawSubQuotas[i][2] = "partyCoded";
+                    showWarn = true;
+                }
+            }
+            if (showWarn) {
+                group.warnings.push("WARNING: " + group.group_name + " pulls from survey. (Checklist)");
+            }
+        } else {
+            let setToSample = false;
+            for (let i = 0; i < group.rawSubQuotas.length; i++) {
+                if (!group.rawSubQuotas[i][2].startsWith("p")) {
+                    setToSample = true;
+                    group.rawSubQuotas[i][2] = "p" + group.rawSubQuotas[i][2];
+                }
+            }
+            if (setToSample) {
+                group.warnings.push("WARNING: " + group.group_name + " needs to pull from sample. (Checklist)");
+            }
+        }
+    }
+}
+
+class FBClient extends BaseClient {
+    constructor() {
+        super("FB");
+    }
+
+    clientSpecificQuotaTransformations(group) {
+        if (group.group_name.toLowerCase().includes("split")) return;
+        // every quota go off sample
+        let setToSample = false;
+        for (let i = 0; i < group.rawSubQuotas.length; i++) {
+            if (!group.rawSubQuotas[i][2].startsWith("p")) {
+                setToSample = true;
+                group.rawSubQuotas[i][2] = "p" + group.rawSubQuotas[i][2];
+            }
+        }
+        if (setToSample) {
+            group.warnings.push("WARNING: " + group.group_name + " needs to pull from sample. (Checklist)");
+        }
+    }
+}
+
+class SXClient extends BaseClient {
+    constructor() {
+        super("SX");
+    }
+
+    clientSpecificQuotaTransformations(group) {
+        // phone type is max 65% cell
+        if (group.group_name.toLowerCase().includes("phonetype")) {
+            let showWarn = false;
+            for (let i = 0; i < group.rawSubQuotas.length; i++) {
+                let name = group.rawSubQuotas[i][0].toLowerCase();
+                let percentage = group.rawSubQuotas[i][1];
+                if (name.startsWith("l")) {
+                    // min 35%
+                    if (!name.includes("counter")) {
+                        group.rawSubQuotas[i][0] = group.rawSubQuotas[i][0] + "(counter)";
+                        showWarn = true;
+                    }
+                } else if (name.startsWith("c")) {
+                    // 65% max
+                    if (!percentage.toString().startsWith("65")) {
+                        group.rawSubQuotas[i][1] = "65%";
+                        showWarn = true;
+                    }
+                }
+            }
+            if (showWarn) {
+                group.warnings.push("WARNING: " + group.group_name + " Cell is max 65% and LL is min 35%. (Checklist)");
+            }
+        }
+    }
+}
+
+class GSGClient extends BaseClient {
+    constructor() {
+        super("GSG");
+    }
+
+    clientSpecificQuotaTransformations(group) {
+        // need gender by region quotas
+        if (group.group_name.toLowerCase().includes("gender")) {
+            // check if the splits include region
+            let names = ["(region)", "(district)", "(geo)"];
+            let isSplit = false;
+            if (group.hasSplits) {
+                for (let i = 0; i < group.rawSubQuotas && isSplit == false; i++) {
+                    for (let j = 0; j < names.length; j++) {
+                        if (group.rawSubQuotas[i].toLowerCase() == names[j].toLowerCase()) {
+                            isSplit = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (!isSplit) {
+                group.warnings.push("WARNING: " + group.group_name + " Requires region splits as well. (Checklist)");
+                group.splits.push("(region)");
+                group.hasSplits = true;
+            }
+        }
+        // main splits. label HARD QUOTA to name
+        if (group.group_name.toLowerCase().includes("split") && !group.group_name.includes("HARD QUOTA")) {
+            group.group_name += " HARD QUOTA";
+            group.warnings.push("WARNING: Main splits require label 'HARD QUOTA'. (Checklist)");
+        }
+    }
+
+    clientSpecificWarnings() {
+        if (this.randCSWarns)
+            return;
+        this.ranCSWarns = true;
+        // all quotas inactive including splits
+        let setInactive = false;
+        for (let i = 0; i < QUOTA_GROUPS.length; i++) {
+            for (let j = 0; j < QUOTA_GROUPS[i].subQuotas.length; j++) {
+                if (QUOTA_GROUPS[i].subQuotas[j].active) {
+                    QUOTA_GROUPS[i].subQuotas[j].active = false;
+                    setInactive = true;
+                }
+            }
+        }
+        if (setInactive) {
+            QUOTA_GROUPS[i].warnings.push("WARNING: All quotas set inactive. (Checklist)");
+        }
     }
 }
