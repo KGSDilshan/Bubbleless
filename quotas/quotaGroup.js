@@ -71,7 +71,7 @@ class QuotaGroup {
         return this.group_name;
     }
 
-    
+
     getRawFlex() {
         if (Number.isNaN(this.flexAmount)) {
             throw "Flex is not defined!";
@@ -86,7 +86,10 @@ class QuotaGroup {
         let dupeQs = [];
         let zeroLimits = [];
         let raw = this.subQuotas[0].isRaw;
+        let containsCounter = false;
         for (let i = 0; i < this.subQuotas.length; i++) {
+            if (this.subQuotas[i].counter)
+                containsCounter = true;
             limitTotal += this.subQuotas[i].valLimit;
             // unique quota names
             for (let j = 0; j < this.subQuotas.length; j++) {
@@ -97,17 +100,17 @@ class QuotaGroup {
                         dupeQs.push(i);
                     }
             }
-            if (this.subQuotas[i].valLimit == 0) {
+            if (this.subQuotas[i].valLimit == 0 && !this.subQuotas[i].counter) {
                 zeroLimits.push(i);
             }
         }
 
         dupeQs = dupeQs.splice(0, dupeQs.length, ...(new Set(dupeQs)));
         // limit related errors
-        if (!raw && Math.abs(limitTotal - 100) > 0.01) {
+        if (!raw && Math.abs(limitTotal - 100) > 0.01 && !containsCounter) {
             this.warnings.push("WARNING: In group: " + this.getName() +
                                 ", limit doesn't add up to 100%. Currently: " +  limitTotal + "%");
-        } else if (raw && limitTotal != this.totalN) {
+        } else if (raw && limitTotal != this.totalN && !containsCounter) {
             this.warnings.push("WARNING: In group: " + this.getName() + ", sum of raw limits don't match Nsize " +
                                 this.totalN + "currently at: " + limitTotal);
         }

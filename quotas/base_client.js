@@ -55,6 +55,34 @@ class BaseClient {
         return;
     }
 
+    missingGender() {
+        return;
+    }
+
+    missingAge() {
+        return;
+    }
+
+    missingParty() {
+        return;
+    }
+
+    missingRegion() {
+        return;
+    }
+
+    missingEthnicity() {
+        return;
+    }
+
+    missingPhoneType() {
+        return;
+    }
+
+    missingMode() {
+        return;
+    }
+
     getSuffix(quota) {
         let suffix = '"{""action"":""1"",""autoload_url"":""1"",""active"":""' + (quota.active ? 1 : 0) +
                     '"",""qls"":[{""quotals_language"":""en"",""quotals_name"":""x"",""quotals_url"":"""",' +
@@ -66,7 +94,7 @@ class BaseClient {
     finalName(quota, qname, limit) {
         // flex name modification
         let name = qname;
-        if (quota.group.isFlex) {
+        if (quota.group.isFlex && !quota.counter) {
             name += " (" + (quota.group.isRawFlex ? "" : "Flex ") + quota.group.flexAmount + (quota.group.isRawFlex ? "" : "%") + " added)";
         }
         // counter name modification
