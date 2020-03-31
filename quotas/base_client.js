@@ -1,19 +1,19 @@
 function CreateClient(id) {
     switch (id) {
         case 2: // AL
-            return new ALClient(); // done
+            return new ALClient();
         case 3: // DB
-            return new DBClient(); // done
+            return new DBClient();
         case 4: // FM
-            return new FMClient(); // done
+            return new FMClient();
         case 5: // RN
             return new RNClient();
         case 6: // EM
             return new EMClient();
         case 7: // PB
-            return new PBClient(); // done
+            return new PBClient();
         case 8: // WL
-            return new WLClient(); // done
+            return new WLClient();
         case 9: // KT
             return new KTClient(); // done
         case 10: // LR
