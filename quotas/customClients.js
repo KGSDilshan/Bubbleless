@@ -102,7 +102,7 @@ class DBClient extends BaseClient {
 
             if (showErrors) {
                 console.log(group, "Error: Splits exist but quotas are not split");
-                group.warnings.push("WARNING: " + curGroupName + " Quotas missing split quotas. Split quotas have been added for " + curGroupName + " (Checklist)");
+                group.warnings.push("WARNING: " + curGroupName + " quotas missing split quotas. Split quotas have been added for " + curGroupName + " (Checklist)");
             }
         }
     }
@@ -128,11 +128,11 @@ class DBClient extends BaseClient {
                     let quota = curGroup.subQuotas[i];
                     if(quota.rawName.toLowerCase().startsWith("m") && quota.qCodes[0] == 1) {
                         console.log(curGroup, "Error: Gender - Male is coded as 1 instead of 2. Recoded as 2");
-                        curGroup.warnings.push("WARNING: " + quota.name + " Quota coded as 1, recoded to 2 (Checklist)");
+                        curGroup.warnings.push("WARNING: " + quota.name + " quota coded as 1, recoded to 2 (Checklist)");
                         quota.qCodes[0] = 2;
                     } else if (quota.rawName.toLowerCase().startsWith("f") && quota.qCodes[0] == 2) {
                         console.log(curGroup, "Error: Gender - Female is coded as 2 instead of 1. Recoded as 1");
-                        curGroup.warnings.push("WARNING: " + quota.name + " Quota coded as 2, recoded to 1 (Checklist)");
+                        curGroup.warnings.push("WARNING: " + quota.name + " quota coded as 2, recoded to 1 (Checklist)");
                         quota.qCodes[0] = 1;
                     }
                 }
@@ -146,7 +146,7 @@ class DBClient extends BaseClient {
                     let n = quota.getRawNSize();
                     if(n !== curGroup.totalN / 2) {
                         console.log(curGroup, "Error: Phone Type - " + quota.name + " limit is not half of total N size");
-                        curGroup.warnings.push("WARNING: " + quota.name + " Quota not 50% of total N size. Changed to 50% of total N size (Checklist)");
+                        curGroup.warnings.push("WARNING: " + quota.name + " quota not 50% of total N size. Changed to 50% of total N size (Checklist)");
                         quota.valLimit = 50;
                         quota.strLimit = "50%";
                         for (const property in quota.limits) {
@@ -175,6 +175,10 @@ class DBClient extends BaseClient {
                     }
                 }
             }
+        }
+
+        if (!this.check.genderCodesChecked  && QUOTA_GROUPS.length > 0) {
+            QUOTA_GROUPS[0].warnings.push("WARNING: Gender quota not defined");
         }
     }
 }
