@@ -53,7 +53,7 @@ class DBClient extends BaseClient {
 
         // Add other offsetter for ethnicity quota
         if (curGroupName.includes("ethnicity") || curGroupName.includes("race")) {
-            let offsetterNSize = 0;
+            let offset = 0;
             let otherExists = false;
             let isRaw = !group.rawSubQuotas[0][1].includes("%");
 
@@ -64,18 +64,18 @@ class DBClient extends BaseClient {
                     otherExists = true;
                     break;
                 } else {
-                    offsetterNSize += parseInt(quota[1].split("%").join(""));
+                    offset += parseInt(quota[1].split("%").join(""));
                 }
             }
 
             // Create an other-offsetter quota if the other quota does not exist
-            if (!otherExists && ((isRaw && offsetterNSize == group.totalN) || (!isRaw && offsetterNSize == 100))) {
+            if (!otherExists && ((isRaw && offset == group.totalN) || (!isRaw && offset == 100))) {
                 console.log(group, "Error: Ethnicity - Other quota does not exist");
                 group.warnings.push("WARNING: " + curGroupName + " - Other quota does not exist. Created. (Checklist)");
                 let newQuota = new Quota(
                     group,
                     "Other OFFSETTER",
-                    isRaw ? (group.totalN - offsetterNSize).toString() : (100 - offsetterNSize) + "%",
+                    isRaw ? (group.totalN - offset).toString() : (100 - offset) + "%",
                     group.rawSubQuotas[0][2],
                     [group.rawSubQuotas.length + 1],
                     CLIENT
@@ -111,11 +111,11 @@ class DBClient extends BaseClient {
         if (RAN_CSWARNINGS)
             return;
         RAN_CSWARNINGS = true;
-        
+
         for (let j = 0; j < QUOTA_GROUPS.length; j++) {
             let curGroup = QUOTA_GROUPS[j];
             let curGroupName = QUOTA_GROUPS[j].getName().toLowerCase();
-            
+
             // Gender codes are reversed
             /*
             - If gender starts with an "m", it's male
@@ -168,10 +168,10 @@ class DBClient extends BaseClient {
                     if (quota.active) {
                         if (!warningDisplayed) {
                             console.log(curGroup, "Error: Presidential Vote quota is active");
-                            curGroup.warnings.push("WARNING: Presidential Vote quota is active. Deactivating quota (Checklist)");
+                            curGroup.warnings.push("WARNING: Presidential Vote quota is active. Deactivating. (Checklist)");
                             warningDisplayed = true;
                         }
-                        quota.active = false;    
+                        quota.active = false;
                     }
                 }
             }
@@ -179,6 +179,62 @@ class DBClient extends BaseClient {
 
         if (!this.check.genderCodesChecked  && QUOTA_GROUPS.length > 0) {
             QUOTA_GROUPS[0].warnings.push("WARNING: Gender quota not defined");
+        }
+    }
+}
+
+class RNClient extends BaseClient {
+    constructor() {
+        super("RN");
+    }
+
+    clientSpecificQuotaTransformations(group) {
+        return;
+    }
+
+    clientSpecificWarnings() {
+        for (let j = 0; j < QUOTA_GROUPS.length; j++) {
+            let curGroup = QUOTA_GROUPS[j];
+            let curGroupName = QUOTA_GROUPS[j].getName().toLowerCase();
+
+            // All quotas are inactive save for splits/control messages
+            if (!(curGroupName.includes("split") || curGroupName.includes("control")) && curGroup.active) {
+                curGroup.active = false;
+                console.log(curGroup, "Error: A non-split/control message quota is active");
+                curGroup.warnings.push("WARNING: A non-split/control message quota is active. Deactivating. (Checklist)");
+            }
+
+            // Phone type quotas are counters
+            if (curGroupName.includes("phone") && curGroup.valLimit != "999") {
+                for (let i = 0; i < curGroup.subQuotas.length; i++) {
+                    let curQuota = curGroup.subQuotas[i];
+                    curQuota.valLimit = "999";
+                    curQuota.strLimit = "999";
+                    curQuota.limits = {
+                        phone: 999
+                    }
+                    curQuota.counter = true;
+                    console.log("Error: Phone type " + curQuota.rawName + "quota is not a counter.");
+                    curGroup.warnings.push("WARNING: Phone type " + curQuota.rawName + "quota is not a counter. Changed to a counter. (Checklist)");
+                }
+            }
+        }
+    }
+}
+
+class EMClient extends BaseClient {
+    constructor() {
+        super("EM");
+    }
+
+    clientSpecificQuotaTransformations(group) {
+        return;
+    }
+
+    clientSpecificWarnings() {
+        for (let j = 0; j < QUOTA_GROUPS.length; j++) {
+            let curGroup = QUOTA_GROUPS[j];
+            let curGroupName = QUOTA_GROUPS[j].getName().toLowerCase();
         }
     }
 }
