@@ -81,7 +81,7 @@ class DBClient extends BaseClient {
                     CLIENT
                     );
                 newQuota.active = false;
-                group.subQuotas.push(newQuota);                    
+                group.subQuotas.push(newQuota);
             }
         }
 
@@ -92,7 +92,8 @@ class DBClient extends BaseClient {
 
             let splitsExist = false;
             for (let i = 0; i < QUOTA_HEADERS.length; i++) {
-                if (QUOTA_HEADERS[i].toLowerCase().includes("split")) {
+                let quotaHeader = QUOTA_HEADERS[i].toLowerCase();
+                if (quotaHeader.includes("split") && quotaHeader != curGroupName) {
                     splitsExist = true;
                     group.splits.push(QUOTA_HEADERS[i]);
                     group.hasSplits = true;
