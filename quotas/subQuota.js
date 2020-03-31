@@ -44,6 +44,9 @@ class Quota {
         this.client.calcLimit(this);
     }
 
+    getRawNSize() {
+        return parseInt(this.isRaw ? this.valLimit : this.valLimit * this.group.totalN / 100);
+    }
 
     display() {
         // for each code, we need a new quota
