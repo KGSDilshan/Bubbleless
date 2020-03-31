@@ -244,3 +244,23 @@ class WLClient extends BaseClient {
         }
     }
 }
+
+class KTClient extends BaseClient {
+    constructor() {
+        super("KT");
+    }
+
+    clientSpecificQuotaTransformations(group) {
+        // every quota go off sample except ethnicity
+        let setToSample = false;
+        for (let i = 0; i < group.rawSubQuotas.length; i++) {
+            if (!group.rawSubQuotas[i][2].startsWith("p")) {
+                setToSample = true;
+                group.rawSubQuotas[i][2] = "p" + group.rawSubQuotas[i][2];
+            }
+        }
+        if (setToSample) {
+            group.warnings.push("WARNING: " + group.group_name + " needs to pull from sample. (Checklist)");
+        }
+    }
+}
