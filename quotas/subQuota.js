@@ -45,7 +45,7 @@ class Quota {
     }
 
     getRawNSize() {
-        return parseInt(this.isRaw ? this.valLimit : this.valLimit * this.group.fullN / 100);
+        return parseInt(this.isRaw ? this.valLimit : this.valLimit * this.group.totalN / 100);
     }
 
     display() {
