@@ -131,29 +131,7 @@ class FMClient extends BaseClient {
 
         if (!seenPT && QUOTA_GROUPS[0].includesPhone) {
             // create Phonetype quota
-            let rawSizes = document.getElementById("QNSize").value;
-            rawSizes = rawSizes.split("-");
-            for (let i = 0; i < 3; i++) {
-                if (rawSizes.length <= i) {
-                    rawSizes[i] = 0;
-                } else {
-                    rawSizes[i] = parseInt(rawSizes[i]);
-                }
-            }
-            let configTemplate = {
-                id: generateId(),
-                nSizes: rawSizes,
-                isTri: false,
-                isDual: false,
-                isFlex: false,
-                isRawFlex: false,
-                flexAmount: false,
-                hasSplits: false,
-                nOverride: false,
-                nOverrideVal: undefined,
-                splits: []
-            };
-
+            let configTemplate = getBaseConfigTemplate();
             let rawQuotas = [
                 ["Landline(counter)", "30%", "pPhoneType", "1"],
                 ["Cell", "70%", "pPhoneType", "2"],
@@ -166,4 +144,71 @@ class FMClient extends BaseClient {
         }
     }
 
+}
+
+class PBClient extends BaseClient {
+    constructor() {
+        super("PB");
+    }
+
+    clientSpecificQuotaTransformations(group) {
+        // Phone type is all 999 counters
+        let setToCounter = false;
+        if (group.group_name.toLowerCase().includes("phonetype")) {
+            for (let i = 0; i < group.rawSubQuotas.length; i++) {
+                // for each sub quota add the "(counter)" key word to it
+                let name = group.rawQuotas[i][0];
+                if (!name.includes("(counter)")) {
+                    group.rawQuotas[i][0] = name + "(counter)";
+                    group.rawQuotas[i][1] =  "0%";
+                    setToCounter = true;
+                }
+            }
+            if (setToCounter) {
+                group.warnings.push("WARNING: " + group.group_name + " Quotas made as counter and inactive. (Checklist)");
+            }
+        }
+    }
+
+    finalName(quota, qname, limit) {
+        // flex name modification
+        let name = qname;
+        if (quota.group.isFlex) {
+            name += " (" + (quota.group.isRawFlex ? "" : "Flex ") + quota.group.flexAmount + (quota.group.isRawFlex ? "" : "%") + " added)";
+        }
+        // counter name modification
+        if (quota.counter == true) {
+            if (limit == 0 || quota.group.name.toLowerCase().includes("phonetype"))
+                name += " (Min : " + limit + ")";
+            quota.active = false;
+        }
+        return name;
+    }
+
+    clientSpecificWarnings() {
+        if (this.randCSWarns)
+            return;
+        this.ranCSWarns = true;
+
+        // check existance of PT quota
+        if (QUOTA_GROUPS[0].includesPhone) {
+            let seenPT = false;
+            for (let i = 0; i < QUOTA_GROUPS.length; i++) {
+                let grp = QUOTA_GROUPS[i];
+                if (grp.group_name.toLowerCase().includes("phonetype")) {
+                    seenPT = true;
+                }
+            }
+            if (!seenPT) {
+                QUOTA_GROUPS[0].warnings.push("WARNING: Missing Phonetype quotas")
+                // create Phonetype quota
+                let configTemplate = getBaseConfigTemplate();
+                let rawQuotas = [
+                    ["Landline(counter)", "0%", "pPhoneType", "1"],
+                    ["Cell(counter)", "0%", "pPhoneType", "2"],
+                ];
+                QUOTA_GROUPS.push(new QuotaGroup("PhoneType", configTemplate, rawQuotas));
+            }
+        }
+    }
 }

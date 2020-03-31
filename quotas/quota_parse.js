@@ -124,6 +124,39 @@ function NameGroupValidation(OriginalName, template) {
     };
 }
 
+function getRawSizes() {
+    let rawSizes = document.getElementById("QNSize").value;
+    if (rawSizes == "" || !rawSizes) {
+        alert("Missing N-sizes. Please specify this manditory field to continue");
+        return;
+    }
+    rawSizes = rawSizes.split("-");
+    for (let i = 0; i < 3; i++) {
+        if (rawSizes.length <= i) {
+            rawSizes[i] = 0;
+        } else {
+            rawSizes[i] = parseInt(rawSizes[i]);
+        }
+    }
+    return rawSizes;
+}
+
+function getBaseConfigTemplate() {
+    let configTemplate = {
+        id: generateId(),
+        nSizes: getRawSizes().slice(),
+        isTri: false,
+        isDual: false,
+        isFlex: false,
+        isRawFlex: false,
+        flexAmount: false,
+        hasSplits: false,
+        nOverride: false,
+        nOverrideVal: undefined,
+        splits: []
+    };
+}
+
 function CreateQuotaGroup(QGname, quotaObj, rawSizes) {
     if (QGname == "" || QGname == undefined) {
         return;
@@ -156,19 +189,7 @@ function ReadQuotaArr() {
         warningBuffer.removeChild(warningBuffer.firstChild);
     }
 
-    let rawSizes = document.getElementById("QNSize").value;
-    if (rawSizes == "" || !rawSizes) {
-        alert("Missing N-sizes. Please specify this manditory field to continue");
-        return;
-    }
-    rawSizes = rawSizes.split("-");
-    for (let i = 0; i < 3; i++) {
-        if (rawSizes.length <= i) {
-            rawSizes[i] = 0;
-        } else {
-            rawSizes[i] = parseInt(rawSizes[i]);
-        }
-    }
+    let rawSizes = getRawSizes()
     let content = ReadQuotaTables();
     if (content.length <= 1 && content[0] =="") {
         alert("Nothing to process...");
