@@ -62,15 +62,16 @@ class DBClient extends BaseClient {
                 let quota = group.rawSubQuotas[i];
                 if(quota[0].toLowerCase().includes("other")) {
                     otherExists = true;
+                    break;
                 } else {
                     offsetterNSize += parseInt(quota[1].split("%").join(""));
                 }
             }
 
             // Create an other-offsetter quota if the other quota does not exist
-            if (!otherExists) {
+            if (!otherExists && ((isRaw && offsetterNSize == group.totalN) || (!isRaw && offsetterNSize == 100))) {
                 console.log(group, "Error: Ethnicity - Other quota does not exist");
-                group.warnings.push("WARNING: Ethnicity - Other quota does not exist. Created Ethnicity - Other offsetter quota (Checklist)");
+                group.warnings.push("WARNING: " + curGroupName + " - Other quota does not exist. Created. (Checklist)");
                 let newQuota = new Quota(
                     group,
                     "Other OFFSETTER",
