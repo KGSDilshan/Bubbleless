@@ -305,6 +305,22 @@ class EMClient extends BaseClient {
                         }
                     }
                 }
+
+                if (curGroupName.includes("gender") || curGroupName.includes("sex")) {
+                    let showGenderWarning = false;
+                    for (let i = 0; i < curGroup.subQuotas.length; i++) {
+                        let quota = curGroup.subQuotas[i];
+                        // The gender should be pulling from the qst
+                        if (!quota.qName.toLowerCase().startsWith("q")) {
+                            if (!showGenderWarning) {
+                                console.log("Error: " + curGroupName + " quotas are not pulling from a question.");
+                                curGroup.warnings.push("WARNING: " + curGroup.getName() + " quotas are not pulling from a question. Changed to pull from QX (Checklist)");
+                                showGenderWarning = true;
+                            }
+                            quota.qName = "QX";
+                        }
+                    }
+                }
             }
         }
     }
