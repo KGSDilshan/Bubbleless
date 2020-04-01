@@ -504,7 +504,8 @@ class TNClient extends BaseClient {
                     }
                 }
             } else {
-                let defaultModeN = (fullN / numModes).toString();
+                numModes = isPhone + isEmail + isTexting;
+                let defaultModeN = Math.round(fullN / numModes).toString();
                 if (isPhone) {
                     modes.push(["Phone", defaultModeN, "pMode", "1"]);
                 }
