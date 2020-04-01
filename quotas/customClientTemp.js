@@ -280,7 +280,7 @@ class WLClient extends BaseClient {
             for (let i = 0; i < group.rawSubQuotas.length; i++) {
                 if (!group.rawSubQuotas[i][2].startsWith("p") && !gname.includes("split")) {
                     setToSample = true;
-                    group.rawSubQuotas[i][2] = "p" + group.rawSubQuotas[i][2];
+                    break;
                 }
             }
             if (setToSample) {
@@ -305,7 +305,7 @@ class KTClient extends BaseClient {
         for (let i = 0; i < group.rawSubQuotas.length; i++) {
             if (!group.rawSubQuotas[i][2].startsWith("p")) {
                 setToSample = true;
-                group.rawSubQuotas[i][2] = "p" + group.rawSubQuotas[i][2];
+                break;
             }
         }
         if (setToSample) {
@@ -330,7 +330,7 @@ class LRClient extends BaseClient {
             for (let i = 0; i < group.rawSubQuotas.length; i++) {
                 if (!group.rawSubQuotas[i][2].startsWith("p")) {
                     setToSample = true;
-                    group.rawSubQuotas[i][2] = "p" + group.rawSubQuotas[i][2];
+                    break;
                 }
             }
             if (setToSample) {
@@ -340,97 +340,18 @@ class LRClient extends BaseClient {
                 });
             }
         }
-
     }
 
-    finalName(quota, qname, limit) {
-        // flex name modification
-        let name = qname;
-        if (quota.group.isFlex) {
-            name += " (" + (quota.group.isRawFlex ? "" : "Flex ") + quota.group.flexAmount + (quota.group.isRawFlex ? "" : "%") + " added)";
-        }
-
-        if (quota.counter == true) {
-            if (limit > 0)
-                name += " (Min : " + limit + ")";
-            quota.active = false;
-        }
-        return name;
-    }
 
     clientSpecificWarnings() {
         if (this.randCSWarns)
             return;
         this.ranCSWarns = true;
 
-        // “Gender”, “Party”, “Age”, “Race”, must be quotas as counters if non-existant
         // Add “DLCC Support”, “DLCC Turnout”, AND “VoteSelect” as counters if exists in sample
-        let genderGrp = getQuotaByNames(["gender", "sex"]);
-        let partyGrp = getQuotaByNames(["party"]);
-        let ageGrp = getQuotaByNames(["age"]);
-        let ethGrp = getQuotaByNames(["race", "ethnicity"]);
         let dlccSupportGrp = getQuotaByNames(["dlcc support", "support"]);
         let dlccTurnoutGrp = getQuotaByNames(["dlcc turnout", "turnout"]);
         let VoteSelect = getQuotaByNames(["vote select, voteselect"]);
-        let configTemplate = getBaseConfigTemplate();
-        if (genderGrp == undefined) {
-            // create gender quota
-            GLOBAL_WARNINGS.push({
-                message: "WARNING: Missing Gender quotas, added as counters (Checklist)",
-                callback : undefined,
-            });
-            let rawQuotas = [
-                ["Male(counter)", "0%", "pGender", "1"],
-                ["Female(counter)", "0%", "pGender", "2"],
-            ];
-            QUOTA_GROUPS.push(new QuotaGroup("Gender", configTemplate, rawQuotas));
-        }
-        if (partyGrp == undefined) {
-            // create party quota
-            GLOBAL_WARNINGS.push({
-                message: "WARNING: Missing Party quotas, added as counters (Checklist)",
-                callback : undefined,
-            });
-            let rawQuotas = [
-                ["Democrat(counter)", "0%", "pParty", "1"],
-                ["Republican(counter)", "0%", "pParty", "2"],
-                ["NPP(counter)", "0%", "pParty", "3"],
-                ["Other(counter)", "0%", "pParty", "4"],
-            ];
-            QUOTA_GROUPS.push(new QuotaGroup("Party", configTemplate, rawQuotas));
-        }
-        if (ageGrp == undefined) {
-            // create age quota
-            GLOBAL_WARNINGS.push({
-                message: "WARNING: Missing Age quotas, added as counters (Checklist)",
-                callback : undefined,
-            });
-            let rawQuotas = [
-                ["18-29(counter)", "0%", "pAge", "1"],
-                ["30-39(counter)", "0%", "pAge", "2"],
-                ["40-49(counter)", "0%", "pAge", "3"],
-                ["50-64(counter)", "0%", "pAge", "4"],
-                ["65+(counter)", "0%", "pAge", "5"],
-                ["Other(counter)", "0%", "pAge", "6"],
-            ];
-            QUOTA_GROUPS.push(new QuotaGroup("Age", configTemplate, rawQuotas));
-        }
-        if (ethGrp == undefined) {
-            // create eth quota
-            GLOBAL_WARNINGS.push({
-                message: "WARNING: Missing Ethnicity quotas, added as counters (Checklist)",
-                callback : undefined,
-            });
-            let rawQuotas = [
-                ["AA(counter)", "0%", "pEthnicity", "1"],
-                ["Asian(counter)", "0%", "pEthnicity", "2"],
-                ["Latino(counter)", "0%", "pEthnicity", "3"],
-                ["Other(counter)", "0%", "pEthnicity", "4"],
-            ];
-            QUOTA_GROUPS.push(new QuotaGroup("Ethnicity", configTemplate, rawQuotas));
-        }
-
-        // Add “DLCC Support”, “DLCC Turnout”, AND “VoteSelect” as counters if exists in sample
         if (dlccSupportGrp == undefined) {
             GLOBAL_WARNINGS.push({
                 message: "WARNING: Missing DLCC Support Quota. If in sample, must have as a counter quota (Checklist)",
@@ -467,7 +388,7 @@ class LPClient extends BaseClient {
         for (let i = 0; i < group.rawSubQuotas.length; i++) {
             if (!group.rawSubQuotas[i][2].startsWith("p")) {
                 setToSample = true;
-                group.rawSubQuotas[i][2] = "p" + group.rawSubQuotas[i][2];
+                break;
             }
         }
         if (setToSample) {
@@ -484,6 +405,23 @@ class NRCClient extends BaseClient {
         super("NRC");
     }
 
+    partyQuotaFromSurveyNRC(group) {
+        for (let i = 0; i < group.subQuotas.length; i++) {
+            group.subQuotas[i].qName = "PartyCoded";
+        }
+    }
+
+    missingParty() {
+        let configTemplate = getBaseConfigTemplate();
+        let rawQuotas = [
+            ["Democrat(counter)", "0%", "PartyCoded", "1"],
+            ["Republican(counter)", "0%", "PartyCoded", "2"],
+            ["NPP(counter)", "0%", "PartyCoded", "3"],
+            ["Other(counter)", "0%", "PartyCoded", "4"],
+        ];
+        QUOTA_GROUPS.push(new QuotaGroup("Party", configTemplate, rawQuotas));
+    }
+
     clientSpecificQuotaTransformations(group) {
         if (group.group_name.toLowerCase().includes("split")) return;
         // every quota go off sample except Party
@@ -492,14 +430,15 @@ class NRCClient extends BaseClient {
             let showWarn = false;
             for (let i = 0; i < group.rawSubQuotas.length; i++) {
                 if (group.rawSubQuotas[i][2].startsWith("p") && !group.rawSubQuotas[i][2].toLowerCase().startsWith("party")) {
-                    group.rawSubQuotas[i][2] = "PartyCoded";
                     showWarn = true;
+                    break;
                 }
             }
             if (showWarn) {
                 GLOBAL_WARNINGS.push({
                     message: "WARNING: " + group.group_name + " pulls from survey. (Checklist)",
-                    callback : undefined,
+                    callback : partyQuotaFromSurveyNRC,
+                    group: group,
                 });
             }
         } else {
@@ -507,7 +446,7 @@ class NRCClient extends BaseClient {
             for (let i = 0; i < group.rawSubQuotas.length; i++) {
                 if (!group.rawSubQuotas[i][2].startsWith("p")) {
                     setToSample = true;
-                    group.rawSubQuotas[i][2] = "p" + group.rawSubQuotas[i][2];
+                    break;
                 }
             }
             if (setToSample) {
@@ -532,6 +471,7 @@ class FBClient extends BaseClient {
         for (let i = 0; i < group.rawSubQuotas.length; i++) {
             if (!group.rawSubQuotas[i][2].startsWith("p")) {
                 setToSample = true;
+                break;
             }
         }
         if (setToSample) {
@@ -594,11 +534,13 @@ class SXClient extends BaseClient {
                     // min 35%
                     if (!name.includes("counter")) {
                         showWarn = true;
+                        break;
                     }
                 } else if (name.startsWith("c")) {
                     // 65% max
                     if (!percentage.toString().startsWith("65")) {
                         showWarn = true;
+                        break;
                     }
                 }
             }
