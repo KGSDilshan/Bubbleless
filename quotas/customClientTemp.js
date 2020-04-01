@@ -532,7 +532,6 @@ class FBClient extends BaseClient {
         for (let i = 0; i < group.rawSubQuotas.length; i++) {
             if (!group.rawSubQuotas[i][2].startsWith("p")) {
                 setToSample = true;
-                group.rawSubQuotas[i][2] = "p" + group.rawSubQuotas[i][2];
             }
         }
         if (setToSample) {
@@ -544,9 +543,44 @@ class FBClient extends BaseClient {
     }
 }
 
+
 class SXClient extends BaseClient {
     constructor() {
         super("SX");
+    }
+
+    missingPhoneType() {
+        let configTemplate = getBaseConfigTemplate();
+        let rawQuotas = [
+            ["Landline(counter)", "35%", "pPhoneType", "1"],
+            ["Cell", "65%", "pPhoneType", "2"],
+        ];
+        QUOTA_GROUPS.push(new QuotaGroup("PhoneType", configTemplate, rawQuotas));
+    }
+
+    adjustPhoneTypeSX(group) {
+        for (let i = 0; i < group.subQuotas.length; i++) {
+            let name = group.subQuotas[i].rawName.toLowerCase();
+            let percentage = group.subQuotas[i].valLimit;
+            if (name.startsWith("l")) {
+                // min 35%
+                if (!name.includes("counter")) {
+                    group.subQuotas[i].counter = true;
+                }
+                if (group.subQuotas[i].strLimit != "35%") {
+                    group.subQuotas[i].valLimit = "35";
+                    group.subQuotas[i].isRaw = false;
+                    group.subQuotas[i].strLimit = "35%";
+                }
+            } else if (name.startsWith("c")) {
+                // 65% max
+                if (group.subQuotas[i].strLimit != "65%") {
+                    group.subQuotas[i].valLimit = "65";
+                    group.subQuotas[i].isRaw = false;
+                    group.subQuotas[i].strLimit = "65%";
+                }
+            }
+        }
     }
 
     clientSpecificQuotaTransformations(group) {
@@ -559,13 +593,11 @@ class SXClient extends BaseClient {
                 if (name.startsWith("l")) {
                     // min 35%
                     if (!name.includes("counter")) {
-                        group.rawSubQuotas[i][0] = group.rawSubQuotas[i][0] + "(counter)";
                         showWarn = true;
                     }
                 } else if (name.startsWith("c")) {
                     // 65% max
                     if (!percentage.toString().startsWith("65")) {
-                        group.rawSubQuotas[i][1] = "65%";
                         showWarn = true;
                     }
                 }
@@ -573,34 +605,14 @@ class SXClient extends BaseClient {
             if (showWarn) {
                 GLOBAL_WARNINGS.push({
                     message: "WARNING: " + group.group_name + " Cell is max 65% and LL is min 35%. (Checklist)",
-                    callback : undefined,
+                    callback : this.adjustPhoneTypeSX,
+                    group: group,
                 });
             }
         }
     }
-
-    clientSpecificWarnings() {
-        if (this.randCSWarns)
-            return;
-        this.ranCSWarns = true;
-        let pt = getQuotaByNames(["phonetype"]);
-        if (pt == undefined && QUOTA_GROUPS[0].includesPhone) {
-            // create gender quota
-            GLOBAL_WARNINGS.push({
-                message: "WARNING: Missing Phonetype quotas, added. (Checklist)",
-                callback : undefined,
-            });
-
-            let configTemplate = getBaseConfigTemplate();
-            let rawQuotas = [
-                ["Landline(counter)", "35%", "pPhoneType", "1"],
-                ["Cell", "65%", "pPhoneType", "2"],
-            ];
-            QUOTA_GROUPS.push(new QuotaGroup("PhoneType", configTemplate, rawQuotas));
-        }
-
-    }
 }
+
 
 class GSGClient extends BaseClient {
     constructor() {
