@@ -519,19 +519,4 @@ class TNClient extends BaseClient {
             CreateQuotaGroup("Mode", modes, rawSizes);
         }
     }
-
-    recalculatePhoneTypeLimits() {
-        // Phone type quotas should use phone mode n-size
-        /*if (curGroupName.includes("phone")) {
-            for (let i = 0; i < curGroup.subQuotas.length; i++) {
-                let quota = curGroup.subQuotas[i];
-                if (!quota.counter) {
-                    quota.counter = true;
-                    console.log("Error: Phone type " + quota.rawName + "quota is not a counter.");
-                    curGroup.warnings.push("WARNING: Phone type " + quota.rawName +
-                                    " quota is not a counter. Changed to a counter. (Checklist)");
-                }
-            }
-        }*/
-    }
 }
