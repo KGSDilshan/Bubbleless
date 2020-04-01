@@ -56,30 +56,63 @@ class BaseClient {
     }
 
     missingGender() {
+        GLOBAL_WARNINGS.push("WARNING: Missing Gender Quotas (Required). If not a quota, include as counters.");
         return;
     }
 
     missingAge() {
+        GLOBAL_WARNINGS.push("WARNING: Missing Age Quotas (Required). If not a quota, include as counters.");
         return;
     }
 
     missingParty() {
+        GLOBAL_WARNINGS.push("WARNING: Missing Party Quotas (Required). If not a quota, include as counters.");
         return;
     }
 
     missingRegion() {
+        GLOBAL_WARNINGS.push("WARNING: Missing Region Quotas (Required). If not a quota, include as counters.");
         return;
     }
 
     missingEthnicity() {
+        GLOBAL_WARNINGS.push("WARNING: Missing Ethnicity Quotas (Required). If not a quota, include as counters.");
         return;
     }
 
     missingPhoneType() {
+        GLOBAL_WARNINGS.push("WARNING: Missing PhoneType Quotas (Required). If not a quota, include as counters.");
         return;
     }
 
     missingMode() {
+        GLOBAL_WARNINGS.push("WARNING: Missing Mode Quotas (Required). If not a quota, include as counters.");
+        return;
+    }
+
+    checkMissingQuotas() {
+        let genderGrp = getQuotaByNames(["gender", "sex"]);
+        let ageGrp = getQuotaByNames(["age"]);
+        let partyGrp = getQuotaByNames(["party"]);
+        let regionGrp = getQuotaByNames(["region, geo"]);
+        let ethnicityGrp = getQuotaByNames(["ethnicity, race"]);
+        let phoneTypeGrp = getQuotaByNames(["phonetype"]);
+        let modeGrp = getQuotaByNames(["mode"]);
+
+        if (genderGrp == undefined)
+            this.missingGender();
+        if (ageGrp == undefined)
+            this.missingAge();
+        if (partyGrp == undefined)
+            this.missingParty();
+        if (regionGrp == undefined)
+            this.missingRegion();
+        if (ethnicityGrp == undefined)
+            this.missingEthnicity();
+        if (phoneGrp == undefined && IncludesPhone)
+            this.missingPhone();
+        if (modeGrp == undefined && SurveyMode > 1)
+            this.missingMode();
         return;
     }
 

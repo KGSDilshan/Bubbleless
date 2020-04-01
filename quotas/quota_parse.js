@@ -1,5 +1,13 @@
 var QUOTA_GROUPS = [];
 var QUOTA_HEADERS = [];
+var QUOTA_MODE = undefined;
+var GLOBAL_WARNINGS = [];
+var IncludesPhone = undefined;
+var IncludesEmail = undefined;
+var IncludesText = undefined;
+var ModeOnline = undefined;
+var ModePhone = undefined;
+var SurveyMode = undefined;
 
 var QUOTA_PROPERTIES = [
     {
@@ -218,6 +226,7 @@ function ReadQuotaArr() {
     QUOTA_GROUPS = [];
     QUOTA_HEADERS = [];
     RAN_CSWARNINGS = false;
+    QUOTA_MODE = 0;
     CLIENT = CreateClient(parseInt(document.getElementById("clientSelect").value));
     document.getElementById("QuotaWarningsBuffer").innerHTML = "";
     // Grab all the headers
@@ -226,6 +235,27 @@ function ReadQuotaArr() {
             QUOTA_HEADERS.push(row.toLowerCase().replace(/\s+/g, '').split("(")[0].trim());
         }
     });
+
+    // set the mode
+    IncludesPhone = false;
+    IncludesEmail = false;
+    IncludesText = false;
+    ModeOnline = false;
+    for (let i = 0; i < rawSizes.length; i++) {
+        if (rawSizes[i] > 0 && i == 0) {
+            IncludesPhone = true;
+        }
+        if (rawSizes[i] > 0 && i == 1) {
+            IncludesEmail = true;
+            ModeOnline = true;
+        }
+        if (rawSizes[i] > 0 && i == 2) {
+            IncludesText = true;
+            ModeOnline = true;
+        }
+    }
+    ModePhone = ModeOnline ? false : true;
+    SurveyMode = (IncludesPhone + IncludesEmail + IncludesText);
 
     while (i < content.length) {
         let line = content[i].trim().split("\t");
@@ -254,11 +284,14 @@ function ReadQuotaArr() {
     CLIENT.clientSpecificWarnings();
     for (let i = 0; i < QUOTA_GROUPS.length; i++) {
         if (!QUOTA_GROUPS[i].validateQuotas()) {
-            alertMsg += QUOTA_GROUPS[i].displayWarnings();
+            alertMsg += displayWarnings(QUOTA_GROUPS.warnings);
             counter++;
         }
     }
 
+    // global warnings
+    displayWarnings(GLOBAL_WARNINGS);
+    
     if (counter == 0) {
         // no errors
         console.log("no errors");
@@ -274,6 +307,22 @@ function ReadQuotaArr() {
         QUOTA_GROUPS[i].createSplitQuotas();
     }
 
+}
+
+function displayWarnings(warnings) {
+    let message = "";
+    let alertMsg = "";
+    for (let i = 0; i < warnings.length; i++) {
+        let htmlAlert;
+        htmlAlert = '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
+        htmlAlert += warnings[i] + "<br>";
+        htmlAlert += '<button type="button" class="close" data-dismiss="alert" aria-label="Close">';
+        htmlAlert += '<span aria-hidden="true">&times;</span></button></div>';
+        message += htmlAlert;
+        alertMsg += warnings[i].split("<b>").join("").split("</b>").join("") + "\n"
+    }
+    // write
+    document.getElementById("QuotaWarningsBuffer").innerHTML += message;
 }
 
 function downloadQuotas() {
