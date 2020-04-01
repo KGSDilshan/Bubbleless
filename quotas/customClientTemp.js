@@ -591,7 +591,6 @@ class SXClient extends BaseClient {
                 callback : undefined,
             });
 
-
             let configTemplate = getBaseConfigTemplate();
             let rawQuotas = [
                 ["Landline(counter)", "35%", "pPhoneType", "1"],
@@ -611,12 +610,10 @@ class GSGClient extends BaseClient {
     addSplitsToGenderGSG(grp) {
         grp.splits.push("(region)");
         grp.hasSplits = true;
-        console.log("region splits");
     }
 
     addTrailingHardQuota(grp) {
-        grp.trailingNameStr += " (HARD QUOTA)";
-        console.log("applied hard quota");
+        grp.group_name = "HARD QUOTA - " + grp.group_name;
     }
 
     clientSpecificQuotaTransformations(group) {
@@ -626,11 +623,12 @@ class GSGClient extends BaseClient {
             let names = ["(region)", "(district)", "(geo)"];
             let isSplit = false;
             if (group.hasSplits) {
-                for (let i = 0; i < group.rawSubQuotas && isSplit == false; i++) {
+                loopNested:
+                for (let i = 0; i < group.splits.length; i++) {
                     for (let j = 0; j < names.length; j++) {
-                        if (group.rawSubQuotas[i].toLowerCase() == names[j].toLowerCase()) {
+                        if (group.splits[i].toLowerCase() == names[j].toLowerCase()) {
                             isSplit = true;
-                            break;
+                            break loopNested;
                         }
                     }
                 }
@@ -681,18 +679,5 @@ class GSGClient extends BaseClient {
                 group: undefined,
             });
         }
-    }
-
-    finalName(quota, qname, limit) {
-        // flex name modification
-        let name = qname + quota.group.trailingNameStr;
-        if (quota.group.isFlex && !quota.counter) {
-            name += " (" + (quota.group.isRawFlex ? "" : "Flex ") + quota.group.flexAmount + (quota.group.isRawFlex ? "" : "%") + " added)";
-        }
-        // counter name modification
-        if (quota.counter == true) {
-            name += " (Min : " + limit + ")";
-        }
-        return name;
     }
 }

@@ -210,7 +210,7 @@ function ReadQuotaArr() {
     while (warningBuffer.firstChild) {
         warningBuffer.removeChild(warningBuffer.firstChild);
     }
-
+    console.log("REPROCESSING ALL!");
     let rawSizes = getRawSizes();
     TotalNSize = rawSizes.reduce((a, b) => a + b, 0);
     let content = ReadQuotaTables();
@@ -311,7 +311,7 @@ function displayWarnings(warnings) {
     let message = "<form>";
     let alertMsg = "";
     for (let i = 0; i < warnings.length; i++) {
-        let htmlAlert = '<div class="row">';
+        let htmlAlert = '<div class="row" id="warningRow' + i + '">';
         htmlAlert += '<div class="col">';
         htmlAlert += '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
         htmlAlert += warnings[i].message + "<br>";
@@ -336,7 +336,9 @@ function displayWarnings(warnings) {
 function execWarningCB(i) {
     GLOBAL_WARNINGS[i].callback(GLOBAL_WARNINGS[i].group);
     // reload UI with changes
-    console.log(SerializeTableFromObjects());
+    ClearQuotaTables();
+    StrToQuotaTable(SerializeTableFromObjects());
+    DeleteTable("warningRow" + i);
 }
 
 function SerializeTableFromObjects() {
