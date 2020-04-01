@@ -177,7 +177,7 @@ class DBClient extends BaseClient {
             }
 
             // Presidential vote quota is inactive (??? - perhaps have the programmer add this in?)
-            if ((curGroupName.includes("pres") || curGroupName.includes("vote 20")) && !presVoteInactiveChecked) {
+            if ((curGroupName.includes("pres") || curGroupName.includes("vote 20"))) {
                 let warningDisplayed = false;
                 for (let i = 0; i < curGroup.subQuotas.length; i++) {
                     let quota = curGroup.subQuotas[i];
