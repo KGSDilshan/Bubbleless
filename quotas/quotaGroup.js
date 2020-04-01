@@ -38,7 +38,6 @@ class QuotaGroup {
         this.textWarnings = [];
         this.hasSplits = config.hasSplits;
         this.splits = config.splits;
-        this.id = config.id;
         this.splitQuotas = [];
         this.hasCounters = false;
         this.trailingNameStr = "";
