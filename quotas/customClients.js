@@ -39,12 +39,6 @@ class ALClient extends BaseClient {
 class DBClient extends BaseClient {
     constructor() {
         super("DB");
-
-        this.check = {
-            genderCodesChecked: false,
-            phoneTypeQuotasChecked: false,
-            presVoteInactiveChecked: false
-        };
     }
 
     clientSpecificQuotaTransformations(group) {
@@ -109,8 +103,10 @@ class DBClient extends BaseClient {
     clientSpecificWarnings() {
         if (RAN_CSWARNINGS)
             return;
-        RAN_CSWARNINGS = true;
-
+        RAN_CSWARNINGS = true;        
+        let genderCodesChecked = false;
+        let phoneTypeQuotasChecked = false;
+        let presVoteInactiveChecked = false;
         for (let j = 0; j < QUOTA_GROUPS.length; j++) {
             let curGroup = QUOTA_GROUPS[j];
             let curGroupName = QUOTA_GROUPS[j].getName().toLowerCase();
@@ -121,8 +117,8 @@ class DBClient extends BaseClient {
             - If gender starts with an "f", it's female
             */
             if ((curGroupName.includes("gender")
-            || curGroupName.includes("sex")) && !this.check.genderCodesChecked) {
-                this.check.genderCodesChecked = true;
+            || curGroupName.includes("sex")) && !genderCodesChecked) {
+                genderCodesChecked = true;
                 for (let i = 0; i < curGroup.subQuotas.length; i++) {
                     let quota = curGroup.subQuotas[i];
                     if(quota.rawName.toLowerCase().startsWith("m") && quota.qCodes[0] == 1) {
@@ -138,8 +134,8 @@ class DBClient extends BaseClient {
             }
 
             // Phone Type 50% LL, 50% Cell
-            if (curGroupName.includes("phone") && !this.check.phoneTypeQuotasChecked) {
-                this.check.phoneTypeQuotasChecked = true;
+            if (curGroupName.includes("phone") && !phoneTypeQuotasChecked) {
+                phoneTypeQuotasChecked = true;
                 for (let i = 0; i < curGroup.subQuotas.length; i++) {
                     let quota = curGroup.subQuotas[i];
                     let n = quota.getRawNSize();
@@ -158,8 +154,8 @@ class DBClient extends BaseClient {
             }
 
             // Presidential vote quota is inactive (??? - perhaps have the programmer add this in?)
-            if ((curGroupName.includes("pres") || curGroupName.includes("vote 20")) && !this.check.presVoteInactiveChecked) {
-                this.check.presVoteInactiveChecked = true;
+            if ((curGroupName.includes("pres") || curGroupName.includes("vote 20")) && !presVoteInactiveChecked) {
+                presVoteInactiveChecked = true;
 
                 let warningDisplayed = false;
                 for (let i = 0; i < curGroup.subQuotas.length; i++) {
@@ -176,7 +172,7 @@ class DBClient extends BaseClient {
             }
         }
 
-        if (!this.check.genderCodesChecked  && QUOTA_GROUPS.length > 0) {
+        if (!genderCodesChecked  && QUOTA_GROUPS.length > 0) {
             QUOTA_GROUPS[0].warnings.push("WARNING: Gender quota not defined");
         }
     }
@@ -188,6 +184,9 @@ class RNClient extends BaseClient {
     }
 
     clientSpecificWarnings() {
+        if (RAN_CSWARNINGS)
+            return;
+        RAN_CSWARNINGS = true;
         for (let j = 0; j < QUOTA_GROUPS.length; j++) {
             let curGroup = QUOTA_GROUPS[j];
             let curGroupName = QUOTA_GROUPS[j].getName().toLowerCase();
@@ -222,7 +221,7 @@ class RNClient extends BaseClient {
                     if (!quota.counter) {
                         quota.counter = true;
                         console.log("Error: Phone type " + quota.rawName + "quota is not a counter.");
-                        curGroup.warnings.push("WARNING: Phone type " + quota.rawName + 
+                        curGroup.warnings.push("WARNING: Phone type " + quota.rawName +
                                         " quota is not a counter. Changed to a counter. (Checklist)");
                     }
                 }
@@ -234,7 +233,7 @@ class RNClient extends BaseClient {
         // flex name modification
         let name = qname;
         if (quota.group.isFlex) {
-            name += " (" + (quota.group.isRawFlex ? "" : "Flex ") + quota.group.flexAmount + 
+            name += " (" + (quota.group.isRawFlex ? "" : "Flex ") + quota.group.flexAmount +
                 (quota.group.isRawFlex ? "" : "%") + " added)";
         }
         return name;
@@ -246,11 +245,10 @@ class EMClient extends BaseClient {
         super("EM");
     }
 
-    clientSpecificQuotaTransformations(group) {
-        return;
-    }
-
     clientSpecificWarnings() {
+        if (RAN_CSWARNINGS)
+            return;
+        RAN_CSWARNINGS = true;
         for (let j = 0; j < QUOTA_GROUPS.length; j++) {
             let curGroup = QUOTA_GROUPS[j];
             let curGroupName = QUOTA_GROUPS[j].getName().toLowerCase();
@@ -279,8 +277,8 @@ class EMClient extends BaseClient {
                             let precodeName = "p" + curGroup.getName().split(" ").join("");
                             if (!showListedWarning) {
                                 console.log("Error: " + curGroupName + " quotas are not pulling from a precode.");
-                                curGroup.warnings.push("WARNING: " + curGroup.getName() +
-                                                " quotas are not pulling from a precode. Changed to pull from " +
+                                curGroup.warnings.push("WARNING: NOL - " + curGroup.getName() +
+                                                " quotas are pulling from a question (" + quota.qName + "). Changed to pull from " +
                                                 precodeName + " (Checklist)");
                                 showListedWarning = true;
                             }
@@ -298,7 +296,8 @@ class EMClient extends BaseClient {
                         if (!quota.qName.toLowerCase().includes("coded")) {
                             if (!showAgeWarning) {
                                 console.log("Error: " + curGroupName + " quotas are not pulling from a coded question.");
-                                curGroup.warnings.push("WARNING: " + curGroup.getName() + " quotas are not pulling from a coded question. Changed to pull from QXCoded (Checklist)");
+                                curGroup.warnings.push("WARNING: Unlisted - " + curGroup.getName() +
+                                    " quotas are not pulling from a coded question. Changed to pull from QXCoded (Checklist)");
                                 showAgeWarning = true;
                             }
                             quota.qName = "QXCoded";
@@ -314,7 +313,8 @@ class EMClient extends BaseClient {
                         if (!quota.qName.toLowerCase().startsWith("q")) {
                             if (!showGenderWarning) {
                                 console.log("Error: " + curGroupName + " quotas are not pulling from a question.");
-                                curGroup.warnings.push("WARNING: " + curGroup.getName() + " quotas are not pulling from a question. Changed to pull from QX (Checklist)");
+                                curGroup.warnings.push("WARNING: Unlisted - " + curGroup.getName() +
+                                    " quotas are pulling from a precode (" + quota.qName + "). Changed to pull from QX (Checklist)");
                                 showGenderWarning = true;
                             }
                             quota.qName = "QX";
@@ -324,7 +324,7 @@ class EMClient extends BaseClient {
             }
         }
     }
-    
+
     finalName(quota, qname, limit) {
         // flex name modification
         let name = qname;
@@ -333,7 +333,7 @@ class EMClient extends BaseClient {
         if (quota.counter) {
             try {
                 flexAmt = quota.group.getRawFlex().toString();
-            } 
+            }
             catch (e) {
                 console.log(e + " Defaulting to 5% flex.");
                 flexAmt = Math.ceil(quota.group.totalN * 0.05).toString();
@@ -350,6 +350,9 @@ class NRClient extends BaseClient {
     }
 
     clientSpecificWarnings() {
+        if (RAN_CSWARNINGS)
+            return;
+        RAN_CSWARNINGS = true;
         for (let j = 0; j < QUOTA_GROUPS.length; j++) {
             let curGroup = QUOTA_GROUPS[j];
             let curGroupName = QUOTA_GROUPS[j].getName().toLowerCase();
@@ -359,10 +362,10 @@ class NRClient extends BaseClient {
                 for (let i = 0; i < curGroup.subQuotas.length; i++) {
                     let quota = curGroup.subQuotas[i];
                     if (!quota.qName.toLowerCase().includes("coded")) {
+                        console.log("Error: Party " + quota.rawName + "quota looks like it's pulling from a precode.");
+                        curGroup.warnings.push("WARNING: Party " + quota.rawName +
+                        " quota is pulling from a precode (" + quota.qName + "). Changed to pull from PartyCoded (Checklist)");
                         quota.qName = "PartyCoded";
-                        console.log("Error: Party " + quota.rawName + "quota is not pulling from a coded question.");
-                        curGroup.warnings.push("WARNING: Party " + quota.rawName + 
-                                        " quota is not pulling from a coded question. Changed to pull from PartyCoded (Checklist)");
                     }
                 }
             }
@@ -375,7 +378,7 @@ class NRClient extends BaseClient {
                     if (quota.active) {
                         if (!showCountyWarning) {
                             console.log("Error: Active " + curGroupName + " quota found.");
-                            curGroup.warnings.push("WARNING: One or more " + curGroup.getName() + 
+                            curGroup.warnings.push("WARNING: One or more " + curGroup.getName() +
                                             " quotas are active. Deactivated quotas (Checklist)");
                         }
                         quota.active = false;
@@ -385,14 +388,150 @@ class NRClient extends BaseClient {
             }
         }
     }
+}
 
-    finalName(quota, qname, limit) {
-        // flex name modification
-        let name = qname;
-        if (quota.group.isFlex) {
-            name += " (" + (quota.group.isRawFlex ? "" : "Flex ") + quota.group.flexAmount + 
-                (quota.group.isRawFlex ? "" : "%") + " added)";
+class TNClient extends BaseClient {
+    constructor() {
+        super("TN")
+    }
+
+    clientSpecificQuotaTransformations(group) {
+        let curGroupName = group.group_name.toLowerCase();
+
+        // Internally mode limits should add up to the full n
+        // If there are single/dual/tri mode limits specified, and mode limits are percentages
+        // it needs to be updated before being made a quota
+        // Additionally this means that mode valLimit will always be usable as an n size
+        if (curGroupName.includes("mode") && group.rawSubQuotas[0][1].toString().includes("%")) {
+            let fullN = getRawSizes();
+            fullN = fullN.reduce((accumulator, currentValue) => accumulator + currentValue);
+            for (let i = 0; i < group.rawSubQuotas.length; i++) {
+                let nSize = parseFloat(group.rawSubQuotas[i][1].split("%").join("")) / 100;
+                nSize = Math.round(nSize * fullN);
+                group.rawSubQuotas[i][1] = nSize.toString();
+            }
+            // Shouldn't display a warning to user because technically the percentage they enter is correct
+            console.log("Mode quotas were percentage; Recalculated so they're using the correct full N.");
         }
-        return name;
+    }
+
+    clientSpecificWarnings() {
+        if (RAN_CSWARNINGS)
+            return;
+        RAN_CSWARNINGS = true;
+        let modeCounterChecked = false;
+        let isMultiMode = false;
+        let isPhone = false;
+        let isEmail = false;
+        let isTexting = false;
+
+        let fullN = 0;
+        let roundingOffset = Math.round(fullN / 100);   // 1% of full N
+        let numModes = 0;
+        let rawSizes = getRawSizes();
+        for (let x = 0; x < rawSizes.length; x++) {
+            if (rawSizes[x] > 0) {
+                numModes++;
+            }
+        }
+        fullN = rawSizes.reduce((accumulator, currentValue) => accumulator + currentValue);
+
+        for (let j = 0; j < QUOTA_GROUPS.length; j++) {
+            let curGroup = QUOTA_GROUPS[j];
+            let curGroupName = QUOTA_GROUPS[j].getName().toLowerCase();
+
+            // Mode quotas default to equal splits of full N
+            if (curGroupName.includes("mode")) {
+                modeCounterChecked = true;
+                // If there's a mode group use the length of the subquotas to determine number of modes
+                let modeSplitN = Math.round(fullN / curGroup.subQuotas.length);
+                let quotaNCount = 0;
+                for (let i = 0; i < curGroup.subQuotas.length; i++) {
+                    let quota = curGroup.subQuotas[i];
+                    // Compare the limits to the full N split by mode evenly, within 1% of the n size due to rounding
+                    // quota.valLimit should always be 'raw' due to the check in clientSpecificQuotaTransformations
+                    if (quota.valLimit < modeSplitN - roundingOffset || quota.valLimit > modeSplitN + roundingOffset) {
+                        // Can't tell whether the n-sizes are correct here so just issue a warning
+                        console.log("Warning: Mode limits are not in range of the default.");
+                        curGroup.warnings.push("WARNING: Mode - " + quota.rawName +
+                            " limit (" + quota.valLimit + ") does not match the default (" + modeSplitN +
+                            "). Please confirm the N-size. No change has been made. (Checklist)");
+                    }
+                    quotaNCount += quota.valLimit;
+                }
+                // Mode limits should add up to *around* full N, with an error margin of 1%
+                if (quotaNCount < fullN - roundingOffset || quotaNCount > fullN + roundingOffset) {
+                    console.log("Error: Mode limits do not add up to the full N-size.");
+                    curGroup.warnings.push("WARNING: Mode limits do not add up to the full N-size. Please confirm N-sizes. No change has been made. (Checklist)");
+                }
+            }
+
+            if (curGroup.mode > 1 || numModes > 1) {
+                isMultiMode = true;
+            }
+            if (curGroup.includesPhone) {
+                isPhone = true;
+            }
+            if (curGroup.includesEmail) {
+                isEmail = true;
+            }
+            if (curGroup.includesText) {
+                isTexting = true;
+            }
+        }
+
+        // If there is no mode quota and the survey is multi mode
+        if (!modeCounterChecked && isMultiMode) {
+            console.log("Error: Mode quotas not found.");
+            QUOTA_GROUPS[0].warnings.push("WARNING: Mode quotas not found but there are quotas with multiple modes. Mode quotas at their default n-size have been added. (Checklist)");
+            let modes = [];
+            if (numModes > 1) {
+                for (let x = 0; x < rawSizes.length; x++) {
+                    let qName, limit;
+                    if (rawSizes[x] > 0) {
+                        switch (x) {
+                            case 0:
+                                qName = "Phone";
+                                break;
+                            case 1:
+                                qName = "Email";
+                                break;
+                            case 2:
+                                qName = "Texting";
+                                break;
+                        }
+                        modes.push([qName, rawSizes[x].toString(), "pMode", (x + 1).toString()]);
+                    }
+                }
+            } else {
+                let defaultModeN = (fullN / numModes).toString();
+                if (isPhone) {
+                    modes.push(["Phone", defaultModeN, "pMode", "1"]);
+                }
+                if (isEmail) {
+                    modes.push(["Email", defaultModeN, "pMode", "2"]);
+                }
+                if (isTexting) {
+                    modes.push(["Texting", defaultModeN, "pMode", "3"]);
+                }
+            }
+            
+            CreateQuotaGroup("Mode", modes, rawSizes);
+        }
+    }
+
+    recalculatePhoneTypeLimits() {
+        // Phone type quotas should use phone mode n-size
+        /*if (curGroupName.includes("phone")) {
+            for (let i = 0; i < curGroup.subQuotas.length; i++) {
+                let quota = curGroup.subQuotas[i];
+                if (!quota.counter) {
+                    quota.counter = true;
+                    console.log("Error: Phone type " + quota.rawName + "quota is not a counter.");
+                    curGroup.warnings.push("WARNING: Phone type " + quota.rawName +
+                                    " quota is not a counter. Changed to a counter. (Checklist)");
+                }
+            }
+        }*/
     }
 }

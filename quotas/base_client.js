@@ -30,6 +30,8 @@ function CreateClient(id) {
             return new SXClient();
         case 16: // GSG
             return new GSGClient(); // done
+        case 17: // TN
+            return new TNClient();
         // fall through
         case 1: // McL
         default:

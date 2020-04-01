@@ -264,7 +264,7 @@ function ReadQuotaArr() {
 
     } else {
         alert(alertMsg);
-        document.getElementById("QuotaWarningsBuffer").innerHTML += '<button type="submit" class="btn btn-danger mb-2" onClick=downloadQuotas() >Awknowledge Warnings and Download Quotas</button>';
+        document.getElementById("QuotaWarningsBuffer").innerHTML += '<button type="submit" class="btn btn-danger mb-2" onClick=downloadQuotas() >Acknowledge Warnings and Download Quotas</button>';
     }
 
     // create split quotas after validation
