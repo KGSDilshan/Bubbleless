@@ -35,8 +35,8 @@ class QuotaGroup {
                  ", but quota is mode " + this.nSizes.length.toString() + " in group " + this.group_name,
                  callback : undefined,
              });
-            alert("Quota group " + this.group_name + " is mode " + this.mode.toString() +
-             ", but N Sizes input only contains " + this.nSizes.length.toString());
+            alert("ERROR: Survey is mode " + this.mode.toString() +
+             ", but quota is mode " + this.nSizes.length.toString() + " in group " + this.group_name);
         }
 
         // step 2
