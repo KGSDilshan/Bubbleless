@@ -9,33 +9,15 @@ class QuotaGroup {
         // total N is all nsizes totaled together
         this.totalN = this.nSizes.reduce((a, b) => a + b, 0);
         this.flexAmount = parseFloat(config.flexAmount);
-        this.includesPhone = false;
-        this.includesEmail = false;
-        this.includesText = false;
-        this.Online = false;
-        this.mode = 0;
-        for (let i = 0; i < this.nSizes.length; i++) {
-            if (config.nOverride == true && this.nSizes[i] != 0) {
-                this.nSizes[i] = config.nOverrideVal;
-            }
-            if (this.nSizes[i] > 0 && i == 0) {
-                this.includesPhone = true;
-            }
-            if (this.nSizes[i] > 0 && i == 1) {
-                this.includesEmail = true;
-                this.Online = true;
-            }
-            if (this.nSizes[i] > 0 && i == 2) {
-                this.includesText = true;
-                this.Online = true;
-            }
-        }
-        this.Phone = this.Online ? false : true;
+        this.includesPhone = IncludesPhone;
+        this.includesEmail = IncludesEmail;
+        this.includesText = IncludesText;
+        this.Online = ModeOnline;
+        this.mode = SurveyMode;
+        this.Phone = ModePhone;
         this.subQuotas = [];
         this.rawSubQuotas = subQuotas.slice();
         this.isStandard = true; // placeholder property for client specific and tabled quotas
-        this.warnings = [];
-        this.textWarnings = [];
         this.hasSplits = config.hasSplits;
         this.splits = config.splits;
         this.splitQuotas = [];
@@ -43,11 +25,15 @@ class QuotaGroup {
         this.trailingNameStr = "";
 
         // figure out mode and nsizes of this quota
-        this.mode = (this.includesPhone + this.includesEmail + this.includesText);
-
-        if (this.nSizes.length < this.mode) {
-            this.warnings.push("ERROR: " + this.group_name + " is mode " + this.mode.toString() +
-             ", but N Sizes input only contains " + this.nSizes.length.toString());
+        this.mode = SurveyMode;
+        let splitToInt = this.isTri ? 3 : (this.isDual ? 2 : 1);
+        console.log("SPLIT TO INT", splitToInt);
+        if (this.nSizes.length < this.mode || splitToInt != this.mode) {
+            GLOBAL_WARNINGS.push({
+                message : "ERROR: " + this.group_name + " is mode " + this.mode.toString() +
+                 ", but N Sizes input only contains " + this.nSizes.length.toString(),
+                 callback : undefined,
+             });
             alert("Quota group " + this.group_name + " is mode " + this.mode.toString() +
              ", but N Sizes input only contains " + this.nSizes.length.toString());
         }
@@ -109,25 +95,35 @@ class QuotaGroup {
         dupeQs = dupeQs.splice(0, dupeQs.length, ...(new Set(dupeQs)));
         // limit related errors
         if (!raw && Math.abs(limitTotal - 100) > 0.01 && !containsCounter) {
-            this.warnings.push("WARNING: In group: " + this.getName() +
-                                ", limit doesn't add up to 100%. Currently: " +  limitTotal + "%");
+            GLOBAL_WARNINGS.push({
+                message : "WARNING: In group: " + this.getName() + ", limit doesn't add up to 100%. Currently: " +  limitTotal + "%",
+                callback : undefined,
+            });
         } else if (raw && limitTotal != this.totalN && !containsCounter) {
-            this.warnings.push("WARNING: In group: " + this.getName() + ", sum of raw limits don't match Nsize " +
-                                this.totalN + "currently at: " + limitTotal);
+            GLOBAL_WARNINGS.push({
+                message : "WARNING: In group: " + this.getName() + ", sum of raw limits don't match Nsize " + this.totalN + "currently at: " + limitTotal,
+                callback : undefined,
+            });
         }
 
         // Error with duplicate Question Names
         for (let i = 0; i < dupeQs.length; i++) {
-            this.warnings.push("WARNING: In group: " + this.getName() + ", duplicate name found for " + this.subQuotas[dupeQs[i]].name);
+            GLOBAL_WARNINGS.push({
+                message : "WARNING: In group: " + this.getName() + ", duplicate name found for " + this.subQuotas[dupeQs[i]].name,
+                callback : undefined,
+            });
         }
 
         // Error with limit 0 for quota
         for (let i = 0; i < zeroLimits.length; i++) {
-            this.warnings.push("WARNING: Quota " + this.subQuotas[zeroLimits[i]].name + " limit is set to 0 and inactive.");
+            GLOBAL_WARNINGS.push({
+                message : "WARNING: Quota " + this.subQuotas[zeroLimits[i]].name + " limit is set to 0 and inactive.",
+                callback: undefined,
+            });
         }
 
         // true if no errors
-        return this.warnings.length == 0;
+        return GLOBAL_WARNINGS.length == 0;
     }
 
     createSplitQuotas() {
@@ -181,23 +177,6 @@ class QuotaGroup {
         }
     }
 
-
-    displayWarnings() {
-        let message = "";
-        let alertMsg = "";
-        for (let i = 0; i < this.warnings.length; i++) {
-            let htmlAlert;
-            htmlAlert = '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
-            htmlAlert += this.warnings[i] + "<br>";
-            htmlAlert += '<button type="button" class="close" data-dismiss="alert" aria-label="Close">';
-            htmlAlert += '<span aria-hidden="true">&times;</span></button></div>';
-            message += htmlAlert;
-            alertMsg += this.warnings[i].split("<b>").join("").split("</b>").join("") + "\n"
-        }
-        // write
-        document.getElementById("QuotaWarningsBuffer").innerHTML += message;
-        return alertMsg;
-    }
 
     displayQuotas() {
         let grpData = "";

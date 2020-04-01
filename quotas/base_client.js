@@ -85,6 +85,60 @@ class BaseClient {
         return;
     }
 
+    checkMissingQuotas() {
+        let genderGrp = getQuotaByNames(["gender", "sex"]);
+        let ageGrp = getQuotaByNames(["age"]);
+        let partyGrp = getQuotaByNames(["party"]);
+        let regionGrp = getQuotaByNames(["region, geo", "district"]);
+        let ethnicityGrp = getQuotaByNames(["ethnicity, race"]);
+        let phoneTypeGrp = getQuotaByNames(["phonetype"]);
+        let modeGrp = getQuotaByNames(["mode"]);
+
+        if (genderGrp == undefined) {
+            GLOBAL_WARNINGS.push({
+                message : "WARNING: Missing Gender Quotas (Required). If not quotas, counters.",
+                callback : this.missingGender,
+            });
+        }
+        if (ageGrp == undefined) {
+            GLOBAL_WARNINGS.push({
+                message : "WARNING: Missing Age Quotas (Required). If not quotas, counters.",
+                callback : this.missingAge,
+            });
+        }
+        if (partyGrp == undefined) {
+            GLOBAL_WARNINGS.push({
+                message : "WARNING: Missing Party Quotas (Required). If not quotas, counters.",
+                callback : this.missingParty,
+            });
+        }
+        if (regionGrp == undefined) {
+            GLOBAL_WARNINGS.push({
+                message : "WARNING: Missing Region Quotas (Required). If not quotas, counters.",
+                callback : this.missingRegion,
+            });
+        }
+        if (ethnicityGrp == undefined) {
+            GLOBAL_WARNINGS.push({
+                message : "WARNING: Missing Ethnicity Quotas (Required). If not quotas, counters.",
+                callback : this.missingEthnicity,
+            });
+        }
+        if (phoneTypeGrp == undefined && IncludesPhone) {
+            GLOBAL_WARNINGS.push({
+                message : "WARNING: Missing PhoneType Quotas (Required). If not quotas, counters.",
+                callback : this.missingPhoneType,
+            });
+        }
+        if (modeGrp == undefined && SurveyMode > 1) {
+            GLOBAL_WARNINGS.push({
+                message : "WARNING: Missing Mode Quotas (Required). If not quotas, counters.",
+                callback : this.missingMode,
+            });
+        }
+        return;
+    }
+
     getSuffix(quota) {
         let suffix = '"{""action"":""1"",""autoload_url"":""1"",""active"":""' + (quota.active ? 1 : 0) +
                     '"",""qls"":[{""quotals_language"":""en"",""quotals_name"":""x"",""quotals_url"":"""",' +

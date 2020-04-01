@@ -1,5 +1,14 @@
 var QUOTA_GROUPS = [];
 var QUOTA_HEADERS = [];
+var QUOTA_MODE = undefined;
+var GLOBAL_WARNINGS = [];
+var IncludesPhone = undefined;
+var IncludesEmail = undefined;
+var IncludesText = undefined;
+var ModeOnline = undefined;
+var ModePhone = undefined;
+var SurveyMode = undefined;
+var TotalNSize = undefined;
 
 var QUOTA_PROPERTIES = [
     {
@@ -202,7 +211,8 @@ function ReadQuotaArr() {
         warningBuffer.removeChild(warningBuffer.firstChild);
     }
 
-    let rawSizes = getRawSizes()
+    let rawSizes = getRawSizes();
+    TotalNSize = rawSizes.reduce((a, b) => a + b, 0);
     let content = ReadQuotaTables();
     if (content.length <= 1 && content[0] =="") {
         alert("Nothing to process...");
@@ -215,7 +225,9 @@ function ReadQuotaArr() {
     // Initialize quota groups/headers
     QUOTA_GROUPS = [];
     QUOTA_HEADERS = [];
+    GLOBAL_WARNINGS = [];
     RAN_CSWARNINGS = false;
+    QUOTA_MODE = 0;
     CLIENT = CreateClient(parseInt(document.getElementById("clientSelect").value));
     document.getElementById("QuotaWarningsBuffer").innerHTML = "";
     // Grab all the headers
@@ -224,6 +236,27 @@ function ReadQuotaArr() {
             QUOTA_HEADERS.push(row.toLowerCase().replace(/\s+/g, '').split("(")[0].trim());
         }
     });
+
+    // set the mode
+    IncludesPhone = false;
+    IncludesEmail = false;
+    IncludesText = false;
+    ModeOnline = false;
+    for (let i = 0; i < rawSizes.length; i++) {
+        if (rawSizes[i] > 0 && i == 0) {
+            IncludesPhone = true;
+        }
+        if (rawSizes[i] > 0 && i == 1) {
+            IncludesEmail = true;
+            ModeOnline = true;
+        }
+        if (rawSizes[i] > 0 && i == 2) {
+            IncludesText = true;
+            ModeOnline = true;
+        }
+    }
+    ModePhone = ModeOnline ? false : true;
+    SurveyMode = (IncludesPhone + IncludesEmail + IncludesText);
 
     while (i < content.length) {
         let line = content[i].trim().split("\t");
@@ -245,19 +278,19 @@ function ReadQuotaArr() {
     }
 
     // when quotas have been generated, run validation
-    let counter = 0;
     let alertMsg = "";
     document.getElementById("QuotaWarningsBuffer").innerHTML = "";
     // Check client specific warnings
     CLIENT.clientSpecificWarnings();
     for (let i = 0; i < QUOTA_GROUPS.length; i++) {
-        if (!QUOTA_GROUPS[i].validateQuotas()) {
-            alertMsg += QUOTA_GROUPS[i].displayWarnings();
-            counter++;
-        }
+        QUOTA_GROUPS[i].validateQuotas()
     }
 
-    if (counter == 0) {
+    // global warnings
+    CLIENT.checkMissingQuotas();
+    alertMsg = displayWarnings(GLOBAL_WARNINGS) + "\n" + alertMsg
+
+    if (GLOBAL_WARNINGS.length == 0) {
         // no errors
         console.log("no errors");
         document.getElementById("QuotaWarningsBuffer").innerHTML += '<button type="submit" class="btn btn-success mb-2" onClick=downloadQuotas() >Download Quotas</button>';
@@ -272,6 +305,97 @@ function ReadQuotaArr() {
         QUOTA_GROUPS[i].createSplitQuotas();
     }
 
+}
+
+function displayWarnings(warnings) {
+    let message = "<form>";
+    let alertMsg = "";
+    for (let i = 0; i < warnings.length; i++) {
+        let htmlAlert = '<div class="row">';
+        htmlAlert += '<div class="col">';
+        htmlAlert += '<div class="alert alert-danger alert-dismissible fade show" role="alert">';
+        htmlAlert += warnings[i].message + "<br>";
+        htmlAlert += '<button type="button" class="close" data-dismiss="alert" aria-label="Close">';
+        htmlAlert += '<span aria-hidden="true">&times;</span></button></div>';
+        htmlAlert += '</div>';
+        if (warnings[i].callback != undefined) {
+            htmlAlert += '<div class="col-xs-2" id="warningButton' + i + '">';
+            htmlAlert += '<button type="button" class="btn btn-warning btn-lg" onClick="execWarningCB(' + i + ')">Apply Changes</button>';
+            htmlAlert += '</div>';
+        }
+        htmlAlert += '</div>';
+        message += htmlAlert;
+        alertMsg += warnings[i].message.split("<b>").join("").split("</b>").join("") + "\n"
+    }
+    message += "</form>"
+    // write
+    document.getElementById("QuotaWarningsBuffer").innerHTML += message;
+    return alertMsg;
+}
+
+function execWarningCB(i) {
+    GLOBAL_WARNINGS[i].callback(GLOBAL_WARNINGS[i].group);
+    // reload UI with changes
+    console.log(SerializeTableFromObjects());
+}
+
+function SerializeTableFromObjects() {
+    let arrData = "";
+    for (let i = 0; i < QUOTA_GROUPS.length; i++) {
+        qGrp = QUOTA_GROUPS[i];
+        /*
+          Header = Name (flex N[%])(Splits)
+        */
+        let header = qGrp.group_name;
+        // flex text
+        if (qGrp.isFlex) {
+            header += "(flex " + qGrp.flexAmount.toString() + (qGrp.isRawFlex ? "%)" : ")");
+        }
+        // split text
+        for (let j = 0; j < qGrp.splits.length; j++) {
+            header += qGrp.splits[j];
+        }
+        /*
+          Sub Quota text = Name\tpercentage\tquestion\tcodes(csv)
+        */
+        let lines = "";
+        for (let j = 0; j < qGrp.subQuotas.length; j++) {
+            let q = qGrp.subQuotas[j];
+            let name =  q.rawName;
+            // name change based on counter status
+            if (q.counter) {
+                // is a counter, check if name contains (counter)
+                if (!q.rawName.includes("(counter)")) {
+                    name += "(counter)";
+                }
+            } else {
+                // is not a counter, make sure name doesn't contain (counter)
+                if (q.rawName.includes("(counter)")) {
+                    name = name.split("(counter)").join("");
+                }
+            }
+            // name change based on activity status
+            if (!q.active) {
+                // is a counter, check if name contains (counter)
+                if (!q.rawName.includes("(inactive)")) {
+                    name += "(inactive)";
+                }
+            } else {
+                // is not a counter, make sure name doesn't contain (counter)
+                if (q.rawName.includes("(inactive)")) {
+                    name = name.split("(inactive)").join("");
+                }
+            }
+            lines += name + "\t";
+            lines += q.valLimit + (q.isRaw ? "\t" : "%\t");
+            lines += q.qName + "\t";
+            lines += q.qCodes.join(",");
+            lines += "\n";
+        }
+        arrData += header + "\n" + lines;
+    }
+
+    return arrData.trim();
 }
 
 function downloadQuotas() {

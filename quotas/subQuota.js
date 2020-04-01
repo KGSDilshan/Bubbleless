@@ -36,6 +36,9 @@ class Quota {
         if (!document.getElementById("OnlineQActivity").checked && !this.group.Phone) {
             this.active = false;
         }
+        if (quotaName.includes("(inactive)")) {
+            this.active = false;
+        }
         this.action = 1; // term without warning
         this.csvMode = "Simple";
         this.calculateLimit();
