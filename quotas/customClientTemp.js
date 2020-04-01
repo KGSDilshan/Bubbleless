@@ -425,7 +425,7 @@ class NRCClient extends BaseClient {
             let showWarn = false;
             for (let i = 0; i < group.rawSubQuotas.length; i++) {
                 if (group.rawSubQuotas[i][2].startsWith("p") && !group.rawSubQuotas[i][2].toLowerCase().startsWith("party")) {
-                    group.rawSubQuotas[i][2] = "partyCoded";
+                    group.rawSubQuotas[i][2] = "PartyCoded";
                     showWarn = true;
                 }
             }
@@ -499,6 +499,24 @@ class SXClient extends BaseClient {
             }
         }
     }
+
+    clientSpecificWarnings() {
+        if (this.randCSWarns)
+            return;
+        this.ranCSWarns = true;
+        let pt = getQuotaByNames(["phonetype"]);
+        if (pt == undefined && QUOTA_GROUPS[0].includesPhone) {
+            let configTemplate = getBaseConfigTemplate();
+            // create gender quota
+            QUOTA_GROUPS[0].warnings.push("WARNING: Missing Phonetype quotas, added. (Checklist)");
+            let rawQuotas = [
+                ["Landline(counter)", "35%", "pPhoneType", "1"],
+                ["Cell", "65%", "pPhoneType", "2"],
+            ];
+            QUOTA_GROUPS.push(new QuotaGroup("PhoneType", configTemplate, rawQuotas));
+        }
+
+    }
 }
 
 class GSGClient extends BaseClient {
@@ -530,7 +548,7 @@ class GSGClient extends BaseClient {
         }
         // main splits. label HARD QUOTA to name
         if (group.group_name.toLowerCase().includes("split") && !group.group_name.includes("HARD QUOTA")) {
-            group.group_name += " HARD QUOTA";
+            group.trailingNameStr += " (HARD QUOTA)";
             group.warnings.push("WARNING: Main splits require label 'HARD QUOTA'. (Checklist)");
         }
     }
@@ -550,7 +568,20 @@ class GSGClient extends BaseClient {
             }
         }
         if (setInactive) {
-            QUOTA_GROUPS[i].warnings.push("WARNING: All quotas set inactive. (Checklist)");
+            QUOTA_GROUPS[0].warnings.push("WARNING: All quotas set inactive. (Checklist)");
         }
+    }
+
+    finalName(quota, qname, limit) {
+        // flex name modification
+        let name = qname + quota.group.trailingNameStr;
+        if (quota.group.isFlex && !quota.counter) {
+            name += " (" + (quota.group.isRawFlex ? "" : "Flex ") + quota.group.flexAmount + (quota.group.isRawFlex ? "" : "%") + " added)";
+        }
+        // counter name modification
+        if (quota.counter == true) {
+            name += " (Min : " + limit + ")";
+        }
+        return name;
     }
 }

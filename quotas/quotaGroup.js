@@ -41,6 +41,7 @@ class QuotaGroup {
         this.id = config.id;
         this.splitQuotas = [];
         this.hasCounters = false;
+        this.trailingNameStr = "";
 
         // figure out mode and nsizes of this quota
         this.mode = (this.includesPhone + this.includesEmail + this.includesText);
@@ -64,6 +65,7 @@ class QuotaGroup {
                 this.subQuotas.push(new Quota(this, name, percent, question, codes, CLIENT));
             }
         }
+
     }
 
 
@@ -165,7 +167,7 @@ class QuotaGroup {
                 for (let j = 0; j < this.subQuotas.length; j++) {
                     // multiply percentage from foriegn quota with the subquota's percentage
                     let newPercent = ((foreignGroup.subQuotas[i].valLimit * this.subQuotas[j].valLimit)/100) + "%";
-                    let newName = this.subQuotas[j].rawName + " - " + foreignGroup.subQuotas[i].rawName;
+                    let newName = this.subQuotas[j].rawName + " - " + foreignGroup.subQuotas[i].rawName + this.trailingNameStr;
                     // then create a new quota with a merged name, percentage, question names, and codes
                     let splitQuota = new Quota(this, newName, newPercent, this.subQuotas[j].qName, this.subQuotas[j].qCodes, CLIENT);
                     // inactive subsplits by default
