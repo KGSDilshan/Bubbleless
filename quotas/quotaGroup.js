@@ -27,7 +27,6 @@ class QuotaGroup {
         // figure out mode and nsizes of this quota
         this.mode = SurveyMode;
         let splitToInt = this.isTri ? 3 : (this.isDual ? 2 : 1);
-        console.log("SPLIT TO INT", splitToInt);
         if (splitToInt > this.mode) {
             GLOBAL_WARNINGS.push({
                 message : "ERROR: Survey is mode " + this.mode.toString() +

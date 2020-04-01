@@ -111,7 +111,6 @@ class BaseClient {
             rawQuotas.push(["Text(counter)", "0%", "pMode", "3"]);
         }
         QUOTA_GROUPS.push(new QuotaGroup("Mode", configTemplate, rawQuotas));
-        return;
     }
 
     checkMissingQuotas() {
@@ -288,8 +287,11 @@ class BaseClient {
             } else if (flex) {
                 flexAddition += round05Ciel((quota.group.totalN * flexAmount) / 100);
             }
-            console.log(lim, quota.name)
             // percentage values
+            if (quota.group.group_name.toLowerCase().includes("phonetype")) {
+                quota.limits.phone = round05Ciel((quota.group.nSizes[0] * lim)/100) + flexAddition;
+                return;
+            }
             switch (quota.group.mode) {
                 case 1:
                     // phone only/single mode

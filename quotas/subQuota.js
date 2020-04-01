@@ -26,8 +26,8 @@ class Quota {
             this.name = this.name.split("(counter)").join("");
         }
         this.name = quotaGroup.group_name + " - " + this.name;
-        this.strLimit = quotaPercentage;
-        this.valLimit = parseFloat(quotaPercentage.split("%").join(""));
+        this.strLimit = quotaPercentage.toString();
+        this.valLimit = parseFloat(this.strLimit.split("%").join(""));
         this.limits = {};
         this.qName = questionName;
         this.qCodes = quotaCodes; // arr of codes

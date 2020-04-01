@@ -377,7 +377,7 @@ function SerializeTableFromObjects() {
                 }
             }
             // name change based on activity status
-            if (!q.active) {
+            if (!q.active && !q.counter) {
                 // is a counter, check if name contains (counter)
                 if (!q.rawName.includes("(inactive)")) {
                     name += "(inactive)";
