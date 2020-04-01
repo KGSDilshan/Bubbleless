@@ -158,7 +158,6 @@ function getRawSizes() {
 
 function getBaseConfigTemplate() {
     return {
-        id: generateId(),
         nSizes: getRawSizes().slice(),
         isTri: false,
         isDual: false,
@@ -178,7 +177,6 @@ function CreateQuotaGroup(QGname, quotaObj, rawSizes) {
     }
 
     let configTemplate = {
-        id: generateId(),
         nSizes: rawSizes.slice(),
         isTri: false,
         isDual: false,
@@ -294,13 +292,4 @@ function downloadQuotas() {
     downloadLink.style.display = "none";
     document.body.appendChild(downloadLink);
     downloadLink.click();
-}
-
-function generateId() {
-    let newId = QUOTA_GROUPS.length;
-
-    while (QUOTA_GROUPS.find(x => x.id === newId)) {
-        newId++;
-    }
-    return newId;
 }
