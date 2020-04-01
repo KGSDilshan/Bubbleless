@@ -109,7 +109,6 @@ class BaseClient {
             rawQuotas.push(["Text(counter)", "0%", "pMode", "3"]);
         }
         QUOTA_GROUPS.push(new QuotaGroup("Mode", configTemplate, rawQuotas));
-        return;
     }
 
     checkMissingQuotas() {
