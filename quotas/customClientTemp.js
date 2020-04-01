@@ -9,7 +9,11 @@ class FMClient extends BaseClient {
             group.isDual = false;
             group.isTri = false;
             group.nSizes = [group.totalN, group.totalN, group.totalN];
-            group.warnings.push("WARNING: In group: " + group.group_name + ", Client dual modes are on two links. Full N used.");
+            GLOBAL_WARNINGS.push({
+                message: "WARNING: In group: " + group.group_name + ", Client dual modes are on two links. Full N used.",
+                callback: undefined,
+                group: group,
+            });
         }
 
         // phone mode quotas should contain counter for LL and max for cell
@@ -39,13 +43,19 @@ class FMClient extends BaseClient {
                 }
             }
             if (group.isFlex || group.isRaw) {
-                group.warnings.push("WARNING: PhoneType flex removed. (Checklist)");
+                GLOBAL_WARNINGS.push({
+                    message: "WARNING: PhoneType flex removed. (Checklist)",
+                    callback : undefined,
+                });
             }
             group.isFlex = false;
             group.flexAmount = 0;
             group.isRaw = false;
             if (redo || !seen) {
-                group.warnings.push("WARNING: PhoneType is always 30%(min) LL and 70% cell. (Checklist)");
+                GLOBAL_WARNINGS.push({
+                    message: "WARNING: PhoneType is always 30%(min) LL and 70% cell. (Checklist)",
+                    callback : undefined,
+                });
                 group.rawSubQuotas = [];
                 group.isStandard = false;
                 group.rawSubQuotas.push(["Landline(counter)", "30%", "pPhoneType", "1"]);
@@ -71,7 +81,10 @@ class FMClient extends BaseClient {
         } else if (group.group_name.toLowerCase().includes("split") && group.isPhone == true) {
             // should be flex should be flat 5
             if (group.flexAmount != 5 || !group.isRawFlex) {
-                group.warnings.push("WARNING: Split quotas need to have 5n Flex. (Checklist)");
+                GLOBAL_WARNINGS.push({
+                    message: "WARNING: Split quotas need to have 5n Flex. (Checklist)",
+                    callback : undefined,
+                });
                 group.isFlex = true;
                 group.flexAmount = 5;
                 group.isRawFlex = true;
@@ -87,14 +100,20 @@ class FMClient extends BaseClient {
                 } else {
                     // groups with counters shouldn't have flex.
                     if (group.isFlex || group.isRawFlex) {
-                        group.warnings.push("WARNING: Shouldn't have flex in " + group.group_name + " because it's a counter. (Checklist)");
+                        GLOBAL_WARNINGS.push({
+                            message: "WARNING: Shouldn't have flex in " + group.group_name + " because it's a counter. (Checklist)",
+                            callback : undefined,
+                        });
                         group.isFlex = false;
                         group.isRawFlex = false;
                     }
                 }
             }
             if (!hasCounter && (group.flexAmount != 5 || !group.isFlex || group.isRawFlex)) {
-                group.warnings.push("WARNING: 5% flex added to group" + group.group_name + ". (Checklist)");
+                GLOBAL_WARNINGS.push({
+                    message: "WARNING: 5% flex added to group" + group.group_name + ". (Checklist)",
+                    callback : undefined,
+                });
                 group.isFlex = true;
                 group.flexAmount = 5;
                 group.isRawFlex = true;
@@ -102,7 +121,10 @@ class FMClient extends BaseClient {
         } else {
             // no flex in online modes
             if (group.isFlex || group.isRawFlex) {
-                group.warnings.push("WARNING: Shouldn't have flex in " + group.group_name + " for online. **Unchanged** (Checklist)");
+                GLOBAL_WARNINGS.push({
+                    message: "WARNING: Shouldn't have flex in " + group.group_name + " for online. **Unchanged** (Checklist)",
+                    callback : undefined,
+                });
             }
         }
     }
@@ -165,7 +187,10 @@ class PBClient extends BaseClient {
                 }
             }
             if (setToCounter) {
-                group.warnings.push("WARNING: " + group.group_name + " Quotas made as counter and inactive. (Checklist)");
+                GLOBAL_WARNINGS.push({
+                    message: "WARNING: " + group.group_name + " Quotas made as counter and inactive. (Checklist)",
+                    callback : undefined,
+                });
             }
         }
 
@@ -177,7 +202,10 @@ class PBClient extends BaseClient {
                 ["Email", expectedN, "pMode", "2"],
                 ["Text", expectedN, "pMode", "3"],
             ];
-            group.warnings.push("WARNING: Mode quotas need to be 1/3 total N. (Checklist)");
+            GLOBAL_WARNINGS.push({
+                message: "WARNING: Mode quotas need to be 1/3 total N. (Checklist)",
+                callback : undefined,
+            });
         }
     }
 
@@ -211,7 +239,10 @@ class PBClient extends BaseClient {
                 }
             }
             if (!seenPT) {
-                QUOTA_GROUPS[0].warnings.push("WARNING: Missing Phonetype quotas")
+                GLOBAL_WARNINGS.push({
+                    message: "WARNING: Missing Phonetype quotas",
+                    callback: undefined,
+                });
                 // create Phonetype quota
                 let configTemplate = getBaseConfigTemplate();
                 let rawQuotas = [
@@ -237,7 +268,10 @@ class WLClient extends BaseClient {
         if (gname.includes("ethnicity") || gname.includes("race")) {
             for (let i = 0; i < group.rawSubQuotas.length; i++) {
                 if (group.rawSubQuotas[i][2].startsWith("p")) {
-                    group.warnings.push("WARNING: " + group.group_name + " should be pulling from survey. (Checklist)");
+                    GLOBAL_WARNINGS.push({
+                        message: "WARNING: " + group.group_name + " should be pulling from survey. (Checklist)",
+                        callback : undefined,
+                    });
                     return;
                 }
             }
@@ -250,7 +284,10 @@ class WLClient extends BaseClient {
                 }
             }
             if (setToSample) {
-                group.warnings.push("WARNING: " + group.group_name + " needs to pull from sample. (Checklist)");
+                GLOBAL_WARNINGS.push({
+                    message: "WARNING: " + group.group_name + " needs to pull from sample. (Checklist)",
+                    callback : undefined,
+                });
             }
         }
     }
@@ -272,7 +309,10 @@ class KTClient extends BaseClient {
             }
         }
         if (setToSample) {
-            group.warnings.push("WARNING: " + group.group_name + " needs to pull from sample. (Checklist)");
+            GLOBAL_WARNINGS.push({
+                message: "WARNING: " + group.group_name + " needs to pull from sample. (Checklist)",
+                callback : undefined,
+            });
         }
     }
 }
@@ -294,7 +334,10 @@ class LRClient extends BaseClient {
                 }
             }
             if (setToSample) {
-                group.warnings.push("WARNING: " + group.group_name + " needs to pull from sample. (Checklist)");
+                GLOBAL_WARNINGS.push({
+                    message: "WARNING: " + group.group_name + " needs to pull from sample. (Checklist)",
+                    callback : undefined,
+                });
             }
         }
 
@@ -332,7 +375,10 @@ class LRClient extends BaseClient {
         let configTemplate = getBaseConfigTemplate();
         if (genderGrp == undefined) {
             // create gender quota
-            QUOTA_GROUPS[0].warnings.push("WARNING: Missing Gender quotas, added as counters (Checklist)");
+            GLOBAL_WARNINGS.push({
+                message: "WARNING: Missing Gender quotas, added as counters (Checklist)",
+                callback : undefined,
+            });
             let rawQuotas = [
                 ["Male(counter)", "0%", "pGender", "1"],
                 ["Female(counter)", "0%", "pGender", "2"],
@@ -341,7 +387,10 @@ class LRClient extends BaseClient {
         }
         if (partyGrp == undefined) {
             // create party quota
-            QUOTA_GROUPS[0].warnings.push("WARNING: Missing Party quotas, added as counters (Checklist)");
+            GLOBAL_WARNINGS.push({
+                message: "WARNING: Missing Party quotas, added as counters (Checklist)",
+                callback : undefined,
+            });
             let rawQuotas = [
                 ["Democrat(counter)", "0%", "pParty", "1"],
                 ["Republican(counter)", "0%", "pParty", "2"],
@@ -352,7 +401,10 @@ class LRClient extends BaseClient {
         }
         if (ageGrp == undefined) {
             // create age quota
-            QUOTA_GROUPS[0].warnings.push("WARNING: Missing Age quotas, added as counters (Checklist)");
+            GLOBAL_WARNINGS.push({
+                message: "WARNING: Missing Age quotas, added as counters (Checklist)",
+                callback : undefined,
+            });
             let rawQuotas = [
                 ["18-29(counter)", "0%", "pAge", "1"],
                 ["30-39(counter)", "0%", "pAge", "2"],
@@ -365,7 +417,10 @@ class LRClient extends BaseClient {
         }
         if (ethGrp == undefined) {
             // create eth quota
-            QUOTA_GROUPS[0].warnings.push("WARNING: Missing Ethnicity quotas, added as counters (Checklist)");
+            GLOBAL_WARNINGS.push({
+                message: "WARNING: Missing Ethnicity quotas, added as counters (Checklist)",
+                callback : undefined,
+            });
             let rawQuotas = [
                 ["AA(counter)", "0%", "pEthnicity", "1"],
                 ["Asian(counter)", "0%", "pEthnicity", "2"],
@@ -377,13 +432,22 @@ class LRClient extends BaseClient {
 
         // Add “DLCC Support”, “DLCC Turnout”, AND “VoteSelect” as counters if exists in sample
         if (dlccSupportGrp == undefined) {
-            QUOTA_GROUPS[0].warnings.push("WARNING: Missing DLCC Support Quota. If in sample, must have as a counter quota (Checklist)");
+            GLOBAL_WARNINGS.push({
+                message: "WARNING: Missing DLCC Support Quota. If in sample, must have as a counter quota (Checklist)",
+                callback : undefined,
+            });
         }
         if (dlccTurnoutGrp == undefined) {
-            QUOTA_GROUPS[0].warnings.push("WARNING: Missing DLCC Turnout Quota. If in sample, must have as a counter quota (Checklist)");
+            GLOBAL_WARNINGS.push({
+                message: "WARNING: Missing DLCC Turnout Quota. If in sample, must have as a counter quota (Checklist)",
+                callback : undefined,
+            });
         }
         if (VoteSelect == undefined) {
-            QUOTA_GROUPS[0].warnings.push("WARNING: Missing VoteSelect Quota. If in sample, must have as a counter quota (Checklist)");
+            GLOBAL_WARNINGS.push({
+                message: "WARNING: Missing VoteSelect Quota. If in sample, must have as a counter quota (Checklist)",
+                callback : undefined,
+            });
         }
 
         // Always keep the quotas with 2 or more conditions inactive (i.e. Gender – Male Region 1)
@@ -407,7 +471,10 @@ class LPClient extends BaseClient {
             }
         }
         if (setToSample) {
-            group.warnings.push("WARNING: " + group.group_name + " needs to pull from sample. (Checklist)");
+            GLOBAL_WARNINGS.push({
+                message: "WARNING: " + group.group_name + " needs to pull from sample. (Checklist)",
+                callback : undefined,
+            });
         }
     }
 }
@@ -430,7 +497,10 @@ class NRCClient extends BaseClient {
                 }
             }
             if (showWarn) {
-                group.warnings.push("WARNING: " + group.group_name + " pulls from survey. (Checklist)");
+                GLOBAL_WARNINGS.push({
+                    message: "WARNING: " + group.group_name + " pulls from survey. (Checklist)",
+                    callback : undefined,
+                });
             }
         } else {
             let setToSample = false;
@@ -441,7 +511,10 @@ class NRCClient extends BaseClient {
                 }
             }
             if (setToSample) {
-                group.warnings.push("WARNING: " + group.group_name + " needs to pull from sample. (Checklist)");
+                GLOBAL_WARNINGS.push({
+                    message: "WARNING: " + group.group_name + " needs to pull from sample. (Checklist)",
+                    callback : undefined,
+                });
             }
         }
     }
@@ -463,7 +536,10 @@ class FBClient extends BaseClient {
             }
         }
         if (setToSample) {
-            group.warnings.push("WARNING: " + group.group_name + " needs to pull from sample. (Checklist)");
+            GLOBAL_WARNINGS.push({
+                message: "WARNING: " + group.group_name + " needs to pull from sample. (Checklist)",
+                callback : undefined,
+            });
         }
     }
 }
@@ -495,7 +571,10 @@ class SXClient extends BaseClient {
                 }
             }
             if (showWarn) {
-                group.warnings.push("WARNING: " + group.group_name + " Cell is max 65% and LL is min 35%. (Checklist)");
+                GLOBAL_WARNINGS.push({
+                    message: "WARNING: " + group.group_name + " Cell is max 65% and LL is min 35%. (Checklist)",
+                    callback : undefined,
+                });
             }
         }
     }
@@ -506,9 +585,14 @@ class SXClient extends BaseClient {
         this.ranCSWarns = true;
         let pt = getQuotaByNames(["phonetype"]);
         if (pt == undefined && QUOTA_GROUPS[0].includesPhone) {
-            let configTemplate = getBaseConfigTemplate();
             // create gender quota
-            QUOTA_GROUPS[0].warnings.push("WARNING: Missing Phonetype quotas, added. (Checklist)");
+            GLOBAL_WARNINGS.push({
+                message: "WARNING: Missing Phonetype quotas, added. (Checklist)",
+                callback : undefined,
+            });
+
+
+            let configTemplate = getBaseConfigTemplate();
             let rawQuotas = [
                 ["Landline(counter)", "35%", "pPhoneType", "1"],
                 ["Cell", "65%", "pPhoneType", "2"],
@@ -522,6 +606,17 @@ class SXClient extends BaseClient {
 class GSGClient extends BaseClient {
     constructor() {
         super("GSG");
+    }
+
+    addSplitsToGenderGSG(grp) {
+        grp.splits.push("(region)");
+        grp.hasSplits = true;
+        console.log("region splits");
+    }
+
+    addTrailingHardQuota(grp) {
+        grp.trailingNameStr += " (HARD QUOTA)";
+        console.log("applied hard quota");
     }
 
     clientSpecificQuotaTransformations(group) {
@@ -541,15 +636,28 @@ class GSGClient extends BaseClient {
                 }
             }
             if (!isSplit) {
-                group.warnings.push("WARNING: " + group.group_name + " Requires region splits as well. (Checklist)");
-                group.splits.push("(region)");
-                group.hasSplits = true;
+                GLOBAL_WARNINGS.push({
+                    message: "WARNING: " + group.group_name + " Requires region splits as well. (Checklist)",
+                    callback : this.addSplitsToGenderGSG,
+                    group: group,
+                });
             }
         }
         // main splits. label HARD QUOTA to name
         if (group.group_name.toLowerCase().includes("split") && !group.group_name.includes("HARD QUOTA")) {
-            group.trailingNameStr += " (HARD QUOTA)";
-            group.warnings.push("WARNING: Main splits require label 'HARD QUOTA'. (Checklist)");
+            GLOBAL_WARNINGS.push({
+                message: "WARNING: Main splits require label 'HARD QUOTA'. (Checklist)",
+                callback : this.addTrailingHardQuota,
+                group: group,
+            });
+        }
+    }
+
+    setAllQuotasInactiveGSG() {
+        for (let i = 0; i < QUOTA_GROUPS.length; i++) {
+            for (let j = 0; j < QUOTA_GROUPS[i].subQuotas.length; j++) {
+                QUOTA_GROUPS[i].subQuotas[j].active = false;
+            }
         }
     }
 
@@ -562,13 +670,16 @@ class GSGClient extends BaseClient {
         for (let i = 0; i < QUOTA_GROUPS.length; i++) {
             for (let j = 0; j < QUOTA_GROUPS[i].subQuotas.length; j++) {
                 if (QUOTA_GROUPS[i].subQuotas[j].active) {
-                    QUOTA_GROUPS[i].subQuotas[j].active = false;
                     setInactive = true;
                 }
             }
         }
         if (setInactive) {
-            QUOTA_GROUPS[0].warnings.push("WARNING: All quotas set inactive. (Checklist)");
+            GLOBAL_WARNINGS.push({
+                message: "WARNING: All quotas set inactive. (Checklist)",
+                callback: this.setAllQuotasInactiveGSG,
+                group: undefined,
+            });
         }
     }
 

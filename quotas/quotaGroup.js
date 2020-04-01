@@ -18,8 +18,6 @@ class QuotaGroup {
         this.subQuotas = [];
         this.rawSubQuotas = subQuotas.slice();
         this.isStandard = true; // placeholder property for client specific and tabled quotas
-        this.warnings = [];
-        this.textWarnings = [];
         this.hasSplits = config.hasSplits;
         this.splits = config.splits;
         this.id = config.id;
@@ -29,10 +27,13 @@ class QuotaGroup {
 
         // figure out mode and nsizes of this quota
         this.mode = SurveyMode;
-
-        if (this.nSizes.length < this.mode) {
-            this.warnings.push("ERROR: " + this.group_name + " is mode " + this.mode.toString() +
-             ", but N Sizes input only contains " + this.nSizes.length.toString());
+        let splitToInt = this.isTri ? 3 : (this.isDual ? 2 : 1);
+        if (this.nSizes.length < this.mode || splitToInt < this.mode) {
+            GLOBAL_WARNINGS.push({
+                message : "ERROR: " + this.group_name + " is mode " + this.mode.toString() +
+                 ", but N Sizes input only contains " + this.nSizes.length.toString(),
+                 callback : undefined,
+             });
             alert("Quota group " + this.group_name + " is mode " + this.mode.toString() +
              ", but N Sizes input only contains " + this.nSizes.length.toString());
         }
@@ -94,25 +95,35 @@ class QuotaGroup {
         dupeQs = dupeQs.splice(0, dupeQs.length, ...(new Set(dupeQs)));
         // limit related errors
         if (!raw && Math.abs(limitTotal - 100) > 0.01 && !containsCounter) {
-            this.warnings.push("WARNING: In group: " + this.getName() +
-                                ", limit doesn't add up to 100%. Currently: " +  limitTotal + "%");
+            GLOBAL_WARNINGS.push({
+                message : "WARNING: In group: " + this.getName() + ", limit doesn't add up to 100%. Currently: " +  limitTotal + "%",
+                callback : undefined,
+            });
         } else if (raw && limitTotal != this.totalN && !containsCounter) {
-            this.warnings.push("WARNING: In group: " + this.getName() + ", sum of raw limits don't match Nsize " +
-                                this.totalN + "currently at: " + limitTotal);
+            GLOBAL_WARNINGS.push({
+                message : "WARNING: In group: " + this.getName() + ", sum of raw limits don't match Nsize " + this.totalN + "currently at: " + limitTotal,
+                callback : undefined,
+            });
         }
 
         // Error with duplicate Question Names
         for (let i = 0; i < dupeQs.length; i++) {
-            this.warnings.push("WARNING: In group: " + this.getName() + ", duplicate name found for " + this.subQuotas[dupeQs[i]].name);
+            GLOBAL_WARNINGS.push({
+                message : "WARNING: In group: " + this.getName() + ", duplicate name found for " + this.subQuotas[dupeQs[i]].name,
+                callback : undefined,
+            });
         }
 
         // Error with limit 0 for quota
         for (let i = 0; i < zeroLimits.length; i++) {
-            this.warnings.push("WARNING: Quota " + this.subQuotas[zeroLimits[i]].name + " limit is set to 0 and inactive.");
+            GLOBAL_WARNINGS.push({
+                message : "WARNING: Quota " + this.subQuotas[zeroLimits[i]].name + " limit is set to 0 and inactive.",
+                callback: undefined,
+            });
         }
 
         // true if no errors
-        return this.warnings.length == 0;
+        return GLOBAL_WARNINGS.length == 0;
     }
 
     createSplitQuotas() {
