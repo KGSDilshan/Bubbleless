@@ -29,14 +29,14 @@ class QuotaGroup {
         this.mode = SurveyMode;
         let splitToInt = this.isTri ? 3 : (this.isDual ? 2 : 1);
         console.log("SPLIT TO INT", splitToInt);
-        if (this.nSizes.length < this.mode || splitToInt != this.mode) {
+        if (splitToInt > this.mode) {
             GLOBAL_WARNINGS.push({
                 message : "ERROR: Survey is mode " + this.mode.toString() +
-                 ", but quota is mode " + this.nSizes.length.toString() + " in group " + this.group_name,
+                 ", but quota is mode " + splitToInt + " in group " + this.group_name,
                  callback : undefined,
              });
             alert("ERROR: Survey is mode " + this.mode.toString() +
-             ", but quota is mode " + this.nSizes.length.toString() + " in group " + this.group_name);
+             ", but quota is mode " + splitToInt + " in group " + this.group_name);
         }
 
         // step 2

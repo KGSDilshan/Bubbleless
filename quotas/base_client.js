@@ -56,30 +56,59 @@ class BaseClient {
     }
 
     missingGender() {
-        return;
-    }
-
-    missingAge() {
-        return;
+        let configTemplate = getBaseConfigTemplate();
+        let rawQuotas = [
+            ["Male(counter)", "0%", "pGender", "1"],
+            ["Female(counter)", "0%", "pGender", "2"],
+        ];
+        QUOTA_GROUPS.push(new QuotaGroup("Gender", configTemplate, rawQuotas));
     }
 
     missingParty() {
-        return;
-    }
-
-    missingRegion() {
-        return;
+        let configTemplate = getBaseConfigTemplate();
+        let rawQuotas = [
+            ["Democrat(counter)", "0%", "pParty", "1"],
+            ["Republican(counter)", "0%", "pParty", "2"],
+            ["NPP(counter)", "0%", "pParty", "3"],
+            ["Other(counter)", "0%", "pParty", "4"],
+        ];
+        QUOTA_GROUPS.push(new QuotaGroup("Party", configTemplate, rawQuotas));
     }
 
     missingEthnicity() {
-        return;
+        let configTemplate = getBaseConfigTemplate();
+        let rawQuotas = [
+            ["White(counter)", "0%", "pEthnicity", "1"],
+            ["Latino(counter)", "0%", "pEthnicity", "2"],
+            ["African American(counter)", "0%", "pEthnicity", "3"],
+            ["Asian(counter)", "0%", "pEthnicity", "4"],
+            ["Other(counter)", "0%", "pEthnicity", "5"],
+        ];
+        QUOTA_GROUPS.push(new QuotaGroup("Ethnicity", configTemplate, rawQuotas));
     }
 
     missingPhoneType() {
-        return;
+        let configTemplate = getBaseConfigTemplate();
+        let rawQuotas = [
+            ["Landline(counter)", "0%", "pPhoneType", "1"],
+            ["Cell(counter)", "0%", "pPhoneType", "2"],
+        ];
+        QUOTA_GROUPS.push(new QuotaGroup("PhoneType", configTemplate, rawQuotas));
     }
 
     missingMode() {
+        let configTemplate = getBaseConfigTemplate();
+        let rawQuotas = [];
+        if (IncludesPhone) {
+            rawQuotas.push(["Phone(counter)", "0%", "pMode", "1"]);
+        }
+        if (IncludesEmail) {
+            rawQuotas.push(["Email(counter)", "0%", "pMode", "2"]);
+        }
+        if (IncludesText) {
+            rawQuotas.push(["Text(counter)", "0%", "pMode", "3"]);
+        }
+        QUOTA_GROUPS.push(new QuotaGroup("Mode", configTemplate, rawQuotas));
         return;
     }
 
@@ -87,8 +116,8 @@ class BaseClient {
         let genderGrp = getQuotaByNames(["gender", "sex"]);
         let ageGrp = getQuotaByNames(["age"]);
         let partyGrp = getQuotaByNames(["party"]);
-        let regionGrp = getQuotaByNames(["region, geo", "district"]);
-        let ethnicityGrp = getQuotaByNames(["ethnicity, race"]);
+        let regionGrp = getQuotaByNames(["region", "geo", "district"]);
+        let ethnicityGrp = getQuotaByNames(["ethnicity", "race"]);
         let phoneTypeGrp = getQuotaByNames(["phonetype"]);
         let modeGrp = getQuotaByNames(["mode"]);
 
@@ -101,7 +130,7 @@ class BaseClient {
         if (ageGrp == undefined) {
             GLOBAL_WARNINGS.push({
                 message : "WARNING: Missing Age Quotas (Required). If not quotas, counters.",
-                callback : this.missingAge,
+                callback : undefined,
             });
         }
         if (partyGrp == undefined) {
@@ -113,7 +142,7 @@ class BaseClient {
         if (regionGrp == undefined) {
             GLOBAL_WARNINGS.push({
                 message : "WARNING: Missing Region Quotas (Required). If not quotas, counters.",
-                callback : this.missingRegion,
+                callback : undefined,
             });
         }
         if (ethnicityGrp == undefined) {
@@ -152,7 +181,7 @@ class BaseClient {
             name += " (" + (quota.group.isRawFlex ? "" : "Flex ") + quota.group.flexAmount + (quota.group.isRawFlex ? "" : "%") + " added)";
         }
         // counter name modification
-        if (quota.counter == true) {
+        if (quota.counter == true && limit > 0) {
             name += " (Min : " + limit + ")";
         }
         return name;

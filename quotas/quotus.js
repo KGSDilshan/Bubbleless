@@ -78,6 +78,40 @@ function ClearQuotaTables() {
     console.log("ClearQuotaTables: Quota tables cleared.");
 }
 
+function StrToQuotaTable(str) {
+    const qBuff = document.getElementById("QuotasBuffer");
+    let data = str.split("\n");
+    let data_table = "";
+    data = data.map(r => r.split("\t"));
+    for (let a = 0; a < data.length; a++) {
+        // If the length of the current row is 1, it's a header; End the current table and start a new one
+        if (data[a].length == 1) {
+            if (a > 0) {
+                data_table += '</tbody>';
+                data_table += '</table><br><br></div>';
+                TABLE_COUNTER++;
+            }
+            let unbracketed_name = data[a][0].replace(/\([a-zA-Z0-9 %]*\)/gi,"");
+            data_table += UITableHTML(unbracketed_name);
+            data_table += '<thead>';
+            data_table += '<tr>';
+            data_table += '<th scope="col" colspan="5" contenteditable="true">' + data[a][0] + '</th>';
+            data_table += '</tr>';
+            data_table += '</thead>';
+            data_table += '<tbody>';
+        } else {
+            data_table += '<tr>';
+            data[a].forEach(td => {
+                data_table += '<td contenteditable="true">' + td + '</td>';
+            });
+            data_table += '</tr>';
+        }
+    }
+    data_table += '</tbody>';
+    data_table += '</table>';
+    qBuff.innerHTML += data_table + "<br><br>";
+    TABLE_COUNTER++;
+}
 
 function ImportQuotas(event) {
     ClearQuotaTables();
@@ -90,38 +124,7 @@ function ImportQuotas(event) {
             alert("This action requires a valid .dat file to be uploaded.");
         } else {
             reader.addEventListener("loadend", function (event) {
-                const qBuff = document.getElementById("QuotasBuffer");
-                let data = event.target.result.split("\n");
-                let data_table = "";
-                data = data.map(r => r.split("\t"));
-				for (let a = 0; a < data.length; a++) {
-                    // If the length of the current row is 1, it's a header; End the current table and start a new one
-                    if (data[a].length == 1) {
-                        if (a > 0) {
-                            data_table += '</tbody>';
-                            data_table += '</table><br><br></div>';
-                            TABLE_COUNTER++;
-                        }
-                        let unbracketed_name = data[a][0].replace(/\([a-zA-Z0-9 %]*\)/gi,"");
-                        data_table += UITableHTML(unbracketed_name);
-                        data_table += '<thead>';
-                        data_table += '<tr>';
-                        data_table += '<th scope="col" colspan="5" contenteditable="true">' + data[a][0] + '</th>';
-                        data_table += '</tr>';
-                        data_table += '</thead>';
-                        data_table += '<tbody>';
-                    } else {
-                        data_table += '<tr>';
-                        data[a].forEach(td => {
-                            data_table += '<td contenteditable="true">' + td + '</td>';
-                        });
-                        data_table += '</tr>';
-                    }
-				}
-		        data_table += '</tbody>';
-		        data_table += '</table>';
-                qBuff.innerHTML += data_table + "<br><br>";
-                TABLE_COUNTER++;
+                StrToQuotaTable(event.target.result);
             });
             reader.readAsText(qFile);
         }

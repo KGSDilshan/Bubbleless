@@ -38,6 +38,7 @@ class Quota {
         }
         if (quotaName.includes("(inactive)")) {
             this.active = false;
+            this.name = this.name.split("(inactive)").join("");
         }
         this.action = 1; // term without warning
         this.csvMode = "Simple";
