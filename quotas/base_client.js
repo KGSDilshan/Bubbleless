@@ -119,8 +119,8 @@ class BaseClient {
         let ageGrp = getQuotaByNames(["age"]);
         let partyGrp = getQuotaByNames(["party"]);
         let regionGrp = getQuotaByNames(["region", "geo", "district"]);
-        let ethnicityGrp = getQuotaByNames(["ethnicity", "race"]);
-        let phoneTypeGrp = getQuotaByNames(["phonetype"]);
+        let ethnicityGrp = getQuotaByNames(["ethnic", "race"]);
+        let phoneTypeGrp = getQuotaByNames(["phone"]);
         let modeGrp = getQuotaByNames(["mode"]);
 
         if (genderGrp == undefined) {

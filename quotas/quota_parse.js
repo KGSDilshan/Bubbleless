@@ -288,7 +288,7 @@ function ReadQuotaArr() {
 
     // global warnings
     CLIENT.checkMissingQuotas();
-    alertMsg = displayWarnings(GLOBAL_WARNINGS) + "\n" + alertMsg
+    alertMsg = displayWarnings(GLOBAL_WARNINGS) + "\n" + alertMsg;
 
     if (GLOBAL_WARNINGS.length == 0) {
         // no errors
@@ -334,7 +334,7 @@ function displayWarnings(warnings) {
 }
 
 function execWarningCB(i) {
-    GLOBAL_WARNINGS[i].callback(GLOBAL_WARNINGS[i].group);
+    GLOBAL_WARNINGS[i].callback(GLOBAL_WARNINGS[i].group, GLOBAL_WARNINGS[i].args);
     // reload UI with changes
     ClearQuotaTables();
     StrToQuotaTable(SerializeTableFromObjects());
