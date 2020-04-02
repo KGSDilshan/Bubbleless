@@ -78,9 +78,7 @@ class DBClient extends BaseClient {
                     message: "WARNING: " + group.getName() + " - Other quota does not exist. Created. (Checklist)",
                     callback: this.appendEthnicityOtherHandler,
                     group: group,
-                    args: {
-                        newQuota: newQuota
-                    }
+                    args: newQuota
                 });
             }
         }
@@ -92,9 +90,12 @@ class DBClient extends BaseClient {
 
             let showErrors = false;
             let splitsToAdd = [];
+            debugger;
             for (let i = 0; i < QUOTA_HEADERS.length; i++) {
-                let quotaHeader = QUOTA_HEADERS[i].toLowerCase();
-                if (!group.splits.includes(quotaHeader) && quotaHeader.includes("split") && quotaHeader != curGroupName) {
+                let quotaHeader = "(" + QUOTA_HEADERS[i].toLowerCase() + ")";
+                if (!group.splits.includes(quotaHeader) &&
+                    quotaHeader.includes("split") &&
+                    quotaHeader != "(" + curGroupName + ")") {
                     showErrors = true;
                     splitsToAdd.push("(" + QUOTA_HEADERS[i] + ")");
                 }
@@ -106,9 +107,7 @@ class DBClient extends BaseClient {
                     message: "WARNING: " + group.getName() + " quotas missing split quotas. Add split quotas for " + curGroupName + "? (Checklist)",
                     callback: this.splitQuotasBySplitHandler,
                     group: group,
-                    args: {
-                        splits: splitsToAdd
-                    }
+                    args: splitsToAdd
                 });
             }
         }
@@ -129,31 +128,29 @@ class DBClient extends BaseClient {
             */
             if ((curGroupName.includes("gender")
             || curGroupName.includes("sex"))) {
+                let arrArgs = [];
                 for (let i = 0; i < curGroup.subQuotas.length; i++) {
                     let quota = curGroup.subQuotas[i];
-                    if(quota.rawName.toLowerCase().startsWith("m") && quota.qCodes[0] == 1) {
-                        console.log(curGroup, "Error: Gender - Male is coded as 1 instead of 2. Recoded as 2");
-                        GLOBAL_WARNINGS.push({
-                            message: "WARNING: " + quota.name + " quota coded as 1, recode to 2? (Checklist)",
-                            callback: this.genderMiscodedHandler,
-                            group: curGroup,
-                            args: {
-                                subQuotaIndex: i,
-                                correctCode: 2
-                            }
-                        });
-                    } else if (quota.rawName.toLowerCase().startsWith("f") && quota.qCodes[0] == 2) {
-                        console.log(curGroup, "Error: Gender - Female is coded as 2 instead of 1. Recoded as 1");
-                        GLOBAL_WARNINGS.push({
-                            message: "WARNING: " + quota.name + " quota coded as 2, recode to 1? (Checklist)",
-                            callback: this.genderMiscodedHandler,
-                            group: curGroup,
-                            args: {
-                                subQuotaIndex: i,
-                                correctCode: 1
-                            }
+                    // If either one is coded wrong...
+                    if((quota.rawName.toLowerCase().startsWith("m") && quota.qCodes[0] == 1) ||
+                        (quota.rawName.toLowerCase().startsWith("f") && quota.qCodes[0] == 2)) {
+                        console.log(curGroup, "Error: Gender " + quota.rawName + " is coded " + quota.qCodes[0]);
+                        // Don't know whether female shows up first or male, push a flipped qcode
+                        arrArgs.push({
+                            subQuotaIndex: i,
+                            correctCode: quota.qCodes[0] == 1 ? 2 : 1
                         });
                     }
+                }
+                if (arrArgs.length > 0) {
+                    GLOBAL_WARNINGS.push({
+                        message: "WARNING: Gender quota option codes do not match the general case. Recode female as 1 and male as 2? (Checklist)",
+                        callback: this.genderMiscodedHandler,
+                        group: curGroup,
+                        args: {
+                            array: arrArgs
+                        }
+                    });
                 }
             }
 
@@ -165,13 +162,12 @@ class DBClient extends BaseClient {
                     if(n !== curGroup.totalN / 2) {
                         console.log(curGroup, "Error: Phone Type - " + quota.name + " limit is not half of total N size");
                         GLOBAL_WARNINGS.push({
-                            message: "WARNING: " + quota.name + " quota not 50% of total N size. Changed to 50% of total N size? (Checklist)",
+                            message: "WARNING: Phone type quotas are not 50% of total N size. Change to 50% of total N size? (Checklist)",
                             callback: this.phoneTypeDefaultLimitHandler,
                             group: curGroup,
-                            args: {
-                                subQuotaIndex: i
-                            }
+                            args: {}
                         });
+                        break;
                     }
                 }
             }
@@ -197,33 +193,28 @@ class DBClient extends BaseClient {
 
     appendEthnicityOtherHandler(group, args) {
         console.log("Ethnicity Other added!");
-        if (args) {
-            group.subQuotas.push(args.newQuota);
-        } else {
-            throw "Error: No quota object provided to add!";
-        }
+        group.subQuotas.push(args);
     }
 
     splitQuotasBySplitHandler(group, args) {
-        for (let i = 0; i < args.splits.length; i++) {
-            group.splits.push(args.splits[i]);
-        }
+        args.forEach(split => group.splits.push(split));
         group.hasSplits = true;
     }
 
     genderMiscodedHandler(group, args) {
-        group.subQuotas[args.subQuotaIndex].qCodes[0] = args.correctCode;
+        args.array.forEach(obj => group.subQuotas[obj.subQuotaIndex].qCodes[0] = obj.correctCode);
+        //for (let i = 0; i < args.array.length; i++) {
+        //    group.subQuotas[args.array[i].subQuotaIndex].qCodes[0] = args.array[i].correctCode;
+        //}
     }
 
-    phoneTypeDefaultLimitHandler(group, args) {
-        group.subQuotas[args.subQuotaIndex].valLimit = "50";
+    phoneTypeDefaultLimitHandler(group) {
+        group.subQuotas.forEach(sq => sq.valLimit = "50");
     }
 
     // We can just set all of them to false
     presVoteActiveHandler(group) {
-        for (var i = 0; i < group.subQuotas.length; i++) {
-            group.subQuotas[i].active = false;
-        }
+        group.subQuotas.forEach(sq => sq.active = false);
     }
 
 }
@@ -291,23 +282,17 @@ class RNClient extends BaseClient {
 
     // Quotas should be inactive; just deactivate the whole thing
     activeQuotasHandler(group) {
-        for (var i = 0; i < group.subQuotas.length; i++) {
-            group.subQuotas[i].active = false;
-        }
+        group.subQuotas.forEach(sq => sq.active = false);
     }
 
     // Phonetype should be counters
     phonetypeCounterHandler(group) {
-        for (var i = 0; i < group.subQuotas.length; i++) {
-            group.subQuotas[i].counter = true;
-        }
+        group.subQuotas.forEach(sq => sq.counter = false);
     }
 
     // Splits should be active
     inactiveSplitsHandler(group) {
-        for (var i = 0; i < group.subQuotas.length; i++) {
-            group.subQuotas[i].active = true;
-        }
+        group.subQuotas.forEach(sq => sq.active = true);
     }
 
     finalName(quota, qname, limit) {
@@ -363,11 +348,9 @@ class EMClient extends BaseClient {
                                     precodeName + "? (Checklist)",
                                 callback: this.pullingFromWrongPlaceHandler,
                                 group: curGroup,
-                                args: {
-                                    subQuotaIndex: i,
-                                    qName: precodeName
-                                }
+                                args: precodeName
                             });
+                            break;
                         }
                     }
                 }
@@ -384,16 +367,18 @@ class EMClient extends BaseClient {
                                     " quotas are not pulling from a coded question. Pull from QXCoded? (Checklist)",
                                 callback: this.pullingFromWrongPlaceHandler,
                                 group: curGroup,
-                                args: {
-                                    subQuotaIndex: i,
-                                    qName: "QXCoded"
-                                }
+                                args: "QXCoded"
                             });
+                            break;
                         }
                     }
                 }
 
-                if (curGroupName.includes("gender") || curGroupName.includes("sex")) {
+                if (curGroupName.includes("gender") ||
+                    curGroupName.includes("sex") ||
+                    curGroupName.includes("party") ||
+                    curGroupName.includes("ethnic") ||
+                    curGroupName.includes("race")) {
                     for (let i = 0; i < curGroup.subQuotas.length; i++) {
                         let quota = curGroup.subQuotas[i];
                         // The gender should be pulling from the qst
@@ -404,11 +389,9 @@ class EMClient extends BaseClient {
                                     " quotas are pulling from a precode (" + quota.qName + "). Pull from QX? (Checklist)",
                                 callback: this.pullingFromWrongPlaceHandler,
                                 group: curGroup,
-                                args: {
-                                    subQuotaIndex: i,
-                                    qName: "QX"
-                                }
+                                args: "QX"
                             });
+                            break;
                         }
                     }
                 }
@@ -423,7 +406,7 @@ class EMClient extends BaseClient {
     }
 
     pullingFromWrongPlaceHandler(group, args) {
-        group.subQuotas[args.subQuotaIndex].qName = args.qName;
+        group.subQuotas.forEach(sq => sq.qName = args);
     }
 
     finalName(quota, qname, limit) {
@@ -469,11 +452,9 @@ class NRClient extends BaseClient {
                                 " quota is pulling from a precode (" + quota.qName + "). Pull from PartyCoded? (Checklist)",
                             callback: this.pullingFromWrongPlaceHandler,
                             group: curGroup,
-                            args: {
-                                subQuotaIndex: i,
-                                qName: "PartyCoded"
-                            }
+                            args: "PartyCoded"
                         });
+                        break;
                     }
                 }
             }
@@ -491,6 +472,7 @@ class NRClient extends BaseClient {
                             group: curGroup,
                             args: {}
                         });
+                        break;
                     }
                 }
             }
@@ -498,14 +480,12 @@ class NRClient extends BaseClient {
     }
 
     pullingFromWrongPlaceHandler(group, args) {
-        group.subQuotas[args.subQuotaIndex].qName = args.qName;
+        group.subQuotas.forEach(sq => sq.qName = args);
     }
 
     // We can just set all of them to false
     countyActiveHandler(group) {
-        for (var i = 0; i < group.subQuotas.length; i++) {
-            group.subQuotas[i].active = false;
-        }
+        group.subQuotas.forEach(sq => sq.active = false);
     }
 }
 
