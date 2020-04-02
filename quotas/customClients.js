@@ -90,7 +90,6 @@ class DBClient extends BaseClient {
 
             let showErrors = false;
             let splitsToAdd = [];
-            debugger;
             for (let i = 0; i < QUOTA_HEADERS.length; i++) {
                 let quotaHeader = "(" + QUOTA_HEADERS[i].toLowerCase() + ")";
                 if (!group.splits.includes(quotaHeader) &&
