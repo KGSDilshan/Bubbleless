@@ -30,6 +30,8 @@ function CreateClient(id) {
             return new SXClient();
         case 16: // GSG
             return new GSGClient(); // done
+        case 17: // TN
+            return new TNClient();
         // fall through
         case 1: // McL
         default:
@@ -116,8 +118,8 @@ class BaseClient {
         let ageGrp = getQuotaByNames(["age"]);
         let partyGrp = getQuotaByNames(["party"]);
         let regionGrp = getQuotaByNames(["region", "geo", "district"]);
-        let ethnicityGrp = getQuotaByNames(["ethnicity", "race"]);
-        let phoneTypeGrp = getQuotaByNames(["phonetype"]);
+        let ethnicityGrp = getQuotaByNames(["ethnic", "race"]);
+        let phoneTypeGrp = getQuotaByNames(["phone"]);
         let modeGrp = getQuotaByNames(["mode"]);
 
         if (genderGrp == undefined) {

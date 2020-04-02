@@ -20,7 +20,6 @@ class QuotaGroup {
         this.isStandard = true; // placeholder property for client specific and tabled quotas
         this.hasSplits = config.hasSplits;
         this.splits = config.splits;
-        this.id = config.id;
         this.splitQuotas = [];
         this.hasCounters = false;
         this.trailingNameStr = "";

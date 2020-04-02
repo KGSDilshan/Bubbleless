@@ -167,7 +167,6 @@ function getRawSizes() {
 
 function getBaseConfigTemplate() {
     return {
-        id: generateId(),
         nSizes: getRawSizes().slice(),
         isTri: false,
         isDual: false,
@@ -187,7 +186,6 @@ function CreateQuotaGroup(QGname, quotaObj, rawSizes) {
     }
 
     let configTemplate = {
-        id: generateId(),
         nSizes: rawSizes.slice(),
         isTri: false,
         isDual: false,
@@ -290,7 +288,7 @@ function ReadQuotaArr() {
 
     // global warnings
     CLIENT.checkMissingQuotas();
-    alertMsg = displayWarnings(GLOBAL_WARNINGS) + "\n" + alertMsg
+    alertMsg = displayWarnings(GLOBAL_WARNINGS) + "\n" + alertMsg;
 
     if (GLOBAL_WARNINGS.length == 0) {
         // no errors
@@ -299,7 +297,7 @@ function ReadQuotaArr() {
 
     } else {
         alert(alertMsg);
-        document.getElementById("QuotaWarningsBuffer").innerHTML += '<button type="submit" class="btn btn-danger mb-2" onClick=downloadQuotas() >Awknowledge Warnings and Download Quotas</button>';
+        document.getElementById("QuotaWarningsBuffer").innerHTML += '<button type="submit" class="btn btn-danger mb-2" onClick=downloadQuotas() >Acknowledge Warnings and Download Quotas</button>';
     }
 
     // create split quotas after validation
@@ -336,7 +334,7 @@ function displayWarnings(warnings) {
 }
 
 function execWarningCB(i) {
-    GLOBAL_WARNINGS[i].callback(GLOBAL_WARNINGS[i].group);
+    GLOBAL_WARNINGS[i].callback(GLOBAL_WARNINGS[i].group, GLOBAL_WARNINGS[i].args);
     // reload UI with changes
     ClearQuotaTables();
     StrToQuotaTable(SerializeTableFromObjects());
@@ -420,13 +418,4 @@ function downloadQuotas() {
     downloadLink.style.display = "none";
     document.body.appendChild(downloadLink);
     downloadLink.click();
-}
-
-function generateId() {
-    let newId = QUOTA_GROUPS.length;
-
-    while (QUOTA_GROUPS.find(x => x.id === newId)) {
-        newId++;
-    }
-    return newId;
 }
