@@ -8,6 +8,9 @@ class QuotaGroup {
         this.nSizes = config.nSizes.slice();
         // total N is all nsizes totaled together
         this.totalN = this.nSizes.reduce((a, b) => a + b, 0);
+        if (config.nOverride) {
+            this.totalN = config.nOverrideVal;
+        }
         this.flexAmount = parseFloat(config.flexAmount);
         this.includesPhone = IncludesPhone;
         this.includesEmail = IncludesEmail;
