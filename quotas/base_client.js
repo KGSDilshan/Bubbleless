@@ -198,6 +198,10 @@ class BaseClient {
         quota.active = false;
         // get min value
         let minVal = quota.valLimit;
+        if (quota.group.group_name.toLowerCase().includes("phonetype")) {
+            quota.limits.phone = counterLim;
+            return;
+        }
         switch (quota.group.mode) {
             case 1:
                 // phone only/single mode
@@ -318,7 +322,7 @@ class BaseClient {
                             quota.limits.text = round05Ciel((quota.group.nSizes[2] * lim)/100) + flexAddition;
                         }
                     } else {
-                        quota.limits.normLim = round05Ciel((quota.group.nSizes[0] * lim)/100) + flexAddition;
+                        quota.limits.normLim = round05Ciel((quota.group.totalN * lim)/100) + flexAddition;
                     }
                     break;
                 case 3:
@@ -328,7 +332,7 @@ class BaseClient {
                         quota.limits.email = round05Ciel((quota.group.nSizes[1] * lim)/100) + flexAddition;
                         quota.limits.text = round05Ciel((quota.group.nSizes[2] * lim)/100) + flexAddition;
                     } else {
-                        quota.limits.normLim = round05Ciel((quota.group.nSizes[0] * lim)/100) + flexAddition;;
+                        quota.limits.normLim = round05Ciel((quota.group.totalN * lim)/100) + flexAddition;;
                     }
                     break;
             }

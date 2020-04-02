@@ -518,6 +518,13 @@ class TNClient extends BaseClient {
         }
     }
 
+    clientSpecificQuotaTransformations(group) {
+        // make PT quotas out of phone N
+        if (group.group_name.toLowerCase().includes("phone") && IncludesPhone) {
+            group.totalN = getRawSizes()[0];
+        }
+    }
+
 
     clientSpecificWarnings() {
         if (RAN_CSWARNINGS)
@@ -527,23 +534,20 @@ class TNClient extends BaseClient {
         // mode limits are off
         let modeGrp = getQuotaByNames(["mode"]);
         let idealN = round05Ciel(TotalNSize / SurveyMode).toString();
-        if (modeGrp.group_name.toLowerCase().includes("mode")) {
-            for (let i = 0; i < modeGrp.rawSubQuotas.length; i++) {
-                console.log(modeGrp.rawSubQuotas[i][1]);
-                if (!(modeGrp.rawSubQuotas[i][1].includes(idealN))) {
-                    GLOBAL_WARNINGS.push({
-                        message: "WARNING: " + modeGrp.group_name + " Quota limits not exactly even. (Checklist)",
-                        callback : this.modifyModeQuotaTN,
-                        group: modeGrp,
-                    });
-                    break;
+        if (modeGrp != undefined) {
+            if (modeGrp.group_name.toLowerCase().includes("mode")) {
+                for (let i = 0; i < modeGrp.rawSubQuotas.length; i++) {
+                    console.log(modeGrp.rawSubQuotas[i][1]);
+                    if (!(modeGrp.rawSubQuotas[i][1].includes(idealN))) {
+                        GLOBAL_WARNINGS.push({
+                            message: "WARNING: " + modeGrp.group_name + " Quota limits not exactly even. (Checklist)",
+                            callback : this.modifyModeQuotaTN,
+                            group: modeGrp,
+                        });
+                        break;
+                    }
                 }
             }
-        }
-        // make tulchin PT quotas out of phone N
-        let phoneTypeGrp = getQuotaByNames(["phone"]);
-        if (phoneTypeGrp != undefined && IncludesPhone) {
-            phoneTypeGrp.totalN = getRawSizes[0];
         }
     }
 }
@@ -811,6 +815,14 @@ class PBClient extends BaseClient {
                     break;
                 }
             }
+        }
+
+        clientSpecificWarnings() {
+            // passive warning, always show.
+            GLOBAL_WARNINGS.push({
+                message: "WARNING: Quotas should pull from the same place the cross-tabs mention (QST or sample). (Checklist)",
+                callback : undefined,
+            });
         }
     }
 

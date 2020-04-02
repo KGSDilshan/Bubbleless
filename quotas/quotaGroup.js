@@ -9,6 +9,7 @@ class QuotaGroup {
         // total N is all nsizes totaled together
         this.totalN = this.nSizes.reduce((a, b) => a + b, 0);
         if (config.nOverride) {
+            console.log(config.nOverride, name);
             this.totalN = config.nOverrideVal;
         }
         this.flexAmount = parseFloat(config.flexAmount);
