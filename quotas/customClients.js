@@ -178,20 +178,17 @@ class DBClient extends BaseClient {
 
             // Presidential vote quota is inactive (??? - perhaps have the programmer add this in?)
             if ((curGroupName.includes("pres") || curGroupName.includes("vote 20"))) {
-                let warningDisplayed = false;
                 for (let i = 0; i < curGroup.subQuotas.length; i++) {
                     let quota = curGroup.subQuotas[i];
                     if (quota.active) {
-                        if (!warningDisplayed) {
-                            console.log(curGroup, "Error: Presidential Vote quota is active");
-                            GLOBAL_WARNINGS.push({
-                                message: "WARNING: Presidential Vote quota is active. Deactivate? (Checklist)",
-                                callback: this.presVoteActiveHandler,
-                                group: curGroup,
-                                args: {}
-                            });
-                            warningDisplayed = true;
-                        }
+                        console.log(curGroup, "Error: Presidential Vote quota is active");
+                        GLOBAL_WARNINGS.push({
+                            message: "WARNING: A presidential vote quota is active. Deactivate? (Checklist)",
+                            callback: this.presVoteActiveHandler,
+                            group: curGroup,
+                            args: {}
+                        });
+                        break;
                     }
                 }
             }
@@ -249,10 +246,13 @@ class RNClient extends BaseClient {
                 for (let i = 0; i < curGroup.subQuotas.length; i++) {
                     let quota = curGroup.subQuotas[i];
                     if (quota.active) {
-                        quota.active = false;
                         console.log(curGroup, "Error: A non-split/control message quota is active");
-                        //curGroup.warnings.push("WARNING: A non-split/control message quota is active. Deactivating " +
-                                    //quota.name + " (Checklist)");
+                        GLOBAL_WARNINGS.push({
+                            message: "WARNING: A non-split/control message quota is active. Deactivate " + quota.name + "? (Checklist)",
+                            callback: this.activeQuotasHandler,
+                            group: curGroup
+                        });
+                        break;
                     }
                 }
             } else {
@@ -261,8 +261,12 @@ class RNClient extends BaseClient {
                     if (!quota.active) {
                         quota.active = true;
                         console.log(curGroup, "Error: A split/control message quota is inactive");
-                        //curGroup.warnings.push("WARNING: A split/control message quota is inactive. Activating " +
-                                    //quota.name + " (Checklist)");
+                        GLOBAL_WARNINGS.push({
+                            message: "WARNING: A split/control message quota is inactive. Activating " + quota.name + " (Checklist)",
+                            callback: this.inactiveSplitsHandler,
+                            group: curGroup
+                        });
+                        break;
                     }
                 }
             }
@@ -272,13 +276,37 @@ class RNClient extends BaseClient {
                 for (let i = 0; i < curGroup.subQuotas.length; i++) {
                     let quota = curGroup.subQuotas[i];
                     if (!quota.counter) {
-                        quota.counter = true;
                         console.log("Error: Phone type " + quota.rawName + "quota is not a counter.");
-                        //curGroup.warnings.push("WARNING: Phone type " + quota.rawName +
-                                        //" quota is not a counter. Changed to a counter. (Checklist)");
+                        GLOBAL_WARNINGS.push({
+                            message: "WARNING: Phone type " + quota.rawName + " quota is not a counter. Changed to a counter. (Checklist)",
+                            callback: this.phonetypeCounterHandler,
+                            group: curGroup
+                        });
                     }
+                    break;
                 }
             }
+        }
+    }
+
+    // Quotas should be inactive; just deactivate the whole thing
+    activeQuotasHandler(group) {
+        for (var i = 0; i < group.subQuotas.length; i++) {
+            group.subQuotas[i].active = false;
+        }
+    }
+
+    // Phonetype should be counters
+    phonetypeCounterHandler(group) {
+        for (var i = 0; i < group.subQuotas.length; i++) {
+            group.subQuotas[i].counter = true;
+        }
+    }
+
+    // Splits should be active
+    inactiveSplitsHandler(group) {
+        for (var i = 0; i < group.subQuotas.length; i++) {
+            group.subQuotas[i].active = true;
         }
     }
 
@@ -310,17 +338,17 @@ class EMClient extends BaseClient {
             if (curGroup.includesCounters()) {
                 if (!curGroup.isFlex) {
                     console.log("Error: " + curGroupName + " quotas have counters but no flex.");
-                    //curGroup.warnings.push("WARNING: " + curGroup.getName() + " quotas have counters but no flex. Default 5% flex added (Checklist)");
-
-                    curGroup.isFlex = true;
-                    curGroup.isRawFlex = true;
-                    curGroup.flexAmount = 5;
+                    GLOBAL_WARNINGS.push({
+                        message: "WARNING: " + curGroup.getName() + " quotas have counters but no flex. Add default 5% flex? (Checklist)",
+                        callback: this.counterWithNoFlexHandler,
+                        group: curGroup,
+                        args: {}
+                    });
                 }
             }
 
             // Check for listed specific stuff
             if (isNOL()) {
-                let showListedWarning = false;
                 // Everything should be pulling from sample
                 if (!curGroupName.includes("split")) {
                     for (let i = 0; i < curGroup.subQuotas.length; i++) {
@@ -328,54 +356,74 @@ class EMClient extends BaseClient {
                         // Everything should be pulling from sample
                         if (!quota.qName.startsWith("p")) {
                             let precodeName = "p" + curGroup.getName().split(" ").join("");
-                            if (!showListedWarning) {
-                                console.log("Error: " + curGroupName + " quotas are not pulling from a precode.");
-                                //curGroup.warnings.push("WARNING: NOL - " + curGroup.getName() +
-                                                //" quotas are pulling from a question (" + quota.qName + "). Changed to pull from " +
-                                                //precodeName + " (Checklist)");
-                                showListedWarning = true;
-                            }
-                            quota.qName = precodeName;
+                            console.log("Error: " + curGroupName + " quotas are not pulling from a precode.");
+                            GLOBAL_WARNINGS.push({
+                                message: "WARNING: NOL - " + curGroup.getName() +
+                                    " quotas are pulling from a question (" + quota.qName + "). Pull from " +
+                                    precodeName + "? (Checklist)",
+                                callback: this.pullingFromWrongPlaceHandler,
+                                group: curGroup,
+                                args: {
+                                    subQuotaIndex: i,
+                                    qName: precodeName
+                                }
+                            });
                         }
                     }
                 }
             } else {
                 // Check for unlisted specific stuff
                 if (curGroupName.includes("age")) {
-                    let showAgeWarning = false;
                     for (let i = 0; i < curGroup.subQuotas.length; i++) {
                         let quota = curGroup.subQuotas[i];
                         // The age should be coded in some form
                         if (!quota.qName.toLowerCase().includes("coded")) {
-                            if (!showAgeWarning) {
-                                console.log("Error: " + curGroupName + " quotas are not pulling from a coded question.");
-                                //curGroup.warnings.push("WARNING: Unlisted - " + curGroup.getName() +
-                                    //" quotas are not pulling from a coded question. Changed to pull from QXCoded (Checklist)");
-                                showAgeWarning = true;
-                            }
-                            quota.qName = "QXCoded";
+                            console.log("Error: " + curGroupName + " quotas are not pulling from a coded question.");
+                            GLOBAL_WARNINGS.push({
+                                message: "WARNING: Unlisted - " + curGroup.getName() +
+                                    " quotas are not pulling from a coded question. Pull from QXCoded? (Checklist)",
+                                callback: this.pullingFromWrongPlaceHandler,
+                                group: curGroup,
+                                args: {
+                                    subQuotaIndex: i,
+                                    qName: "QXCoded"
+                                }
+                            });
                         }
                     }
                 }
 
                 if (curGroupName.includes("gender") || curGroupName.includes("sex")) {
-                    let showGenderWarning = false;
                     for (let i = 0; i < curGroup.subQuotas.length; i++) {
                         let quota = curGroup.subQuotas[i];
                         // The gender should be pulling from the qst
                         if (!quota.qName.toLowerCase().startsWith("q")) {
-                            if (!showGenderWarning) {
-                                console.log("Error: " + curGroupName + " quotas are not pulling from a question.");
-                                //curGroup.warnings.push("WARNING: Unlisted - " + curGroup.getName() +
-                                    //" quotas are pulling from a precode (" + quota.qName + "). Changed to pull from QX (Checklist)");
-                                showGenderWarning = true;
-                            }
-                            quota.qName = "QX";
+                            console.log("Error: " + curGroupName + " quotas are not pulling from a question.");
+                            GLOBAL_WARNINGS.push({
+                                message: "WARNING: Unlisted - " + curGroup.getName() +
+                                    " quotas are pulling from a precode (" + quota.qName + "). Pull from QX? (Checklist)",
+                                callback: this.pullingFromWrongPlaceHandler,
+                                group: curGroup,
+                                args: {
+                                    subQuotaIndex: i,
+                                    qName: "QX"
+                                }
+                            });
                         }
                     }
                 }
             }
         }
+    }
+
+    counterWithNoFlexHandler(group) {
+        group.isFlex = true;
+        group.isRawFlex = true;
+        group.flexAmount = 5;
+    }
+
+    pullingFromWrongPlaceHandler(group, args) {
+        group.subQuotas[args.subQuotaIndex].qName = args.qName;
     }
 
     finalName(quota, qname, limit) {
@@ -416,29 +464,47 @@ class NRClient extends BaseClient {
                     let quota = curGroup.subQuotas[i];
                     if (!quota.qName.toLowerCase().includes("coded")) {
                         console.log("Error: Party " + quota.rawName + "quota looks like it's pulling from a precode.");
-                        //curGroup.warnings.push("WARNING: Party " + quota.rawName +
-                        //" quota is pulling from a precode (" + quota.qName + "). Changed to pull from PartyCoded (Checklist)");
-                        quota.qName = "PartyCoded";
+                        GLOBAL_WARNINGS.push({
+                            message: "WARNING: Party " + quota.rawName +
+                                " quota is pulling from a precode (" + quota.qName + "). Pull from PartyCoded? (Checklist)",
+                            callback: this.pullingFromWrongPlaceHandler,
+                            group: curGroup,
+                            args: {
+                                subQuotaIndex: i,
+                                qName: "PartyCoded"
+                            }
+                        });
                     }
                 }
             }
 
             // County quota (if not raw), should be inactive
             if (curGroupName.includes("county")) {
-                let showCountyWarning = false;
                 for (let i = 0; i < curGroup.subQuotas.length; i++) {
                     let quota = curGroup.subQuotas[i];
                     if (quota.active) {
-                        if (!showCountyWarning) {
-                            console.log("Error: Active " + curGroupName + " quota found.");
-                            //curGroup.warnings.push("WARNING: One or more " + curGroup.getName() +
-                                            //" quotas are active. Deactivated quotas (Checklist)");
-                        }
-                        quota.active = false;
-                        showCountyWarning = true;
+                        console.log("Error: Active " + curGroupName + " quota found.");
+                        GLOBAL_WARNINGS.push({
+                            message: "WARNING: One or more " + curGroup.getName() +
+                                " quotas are active. Deactivate? (Checklist)",
+                            callback: this.countyActiveHandler,
+                            group: curGroup,
+                            args: {}
+                        });
                     }
                 }
             }
+        }
+    }
+
+    pullingFromWrongPlaceHandler(group, args) {
+        group.subQuotas[args.subQuotaIndex].qName = args.qName;
+    }
+
+    // We can just set all of them to false
+    countyActiveHandler(group) {
+        for (var i = 0; i < group.subQuotas.length; i++) {
+            group.subQuotas[i].active = false;
         }
     }
 }
