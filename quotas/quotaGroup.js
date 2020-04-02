@@ -101,7 +101,7 @@ class QuotaGroup {
             });
         } else if (raw && limitTotal != this.totalN && !containsCounter) {
             GLOBAL_WARNINGS.push({
-                message : "WARNING: In group: " + this.getName() + ", sum of raw limits don't match Nsize " + this.totalN + "currently at: " + limitTotal,
+                message : "WARNING: In group: " + this.getName() + ", sum of raw limits don't match Nsize " + this.totalN + " currently at: " + limitTotal,
                 callback : undefined,
             });
         }
