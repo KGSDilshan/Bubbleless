@@ -5,6 +5,7 @@ ERRORS TO CHECK
 
 
 */
+var IMPORTED_HEADER = "";
 var SAMPLE_HEADER = "";
 var TOTAL_RECORDS_IN_SAMPLE = 0;
 var VALID_PHONENUMBERS = 0;
@@ -567,6 +568,18 @@ class Sample {
     	}
         console.log("fdata", fullData);
         this.DownloadCSV(fullData, "deletedRecords.csv");
+    }
+
+    ExportHeader() {
+        let fBlob = new Blob([SAMPLE_HEADER.join(",")], {type:"text/csv"});
+        let downloadLink = document.createElement("a");
+        downloadLink.download = "headers.csv";
+        downloadLink.href = window.URL.createObjectURL(fBlob);
+        downloadLink.style.display = "none";
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        $("div#loadingStatusMsg").remove();
+        $("div#sampleuploadtimer").remove();
     }
 
 
