@@ -27,7 +27,6 @@
     <script src="quotas/subQuota.js"></script>
     <script src="quotas/base_client.js"></script>
     <script src="quotas/customClients.js"></script>
-    <script src="quotas/customClientTemp.js"></script>
     <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
     <script src="worker.js"></script>
@@ -126,9 +125,15 @@
                 </div>
                 <br>
                 <div class="form-group row">
-                    <label for="bubbless-cluster-col" class="col-2 col-form-label">Cluster column:</label>
+                    <label for="bubbless-cluster-col" class="col-2 col-form-label">Cluster POS column:</label>
                     <div class="col-10">
-                        <input class="form-control"  value="" placeholder="leave empty if non-clustered" id="bubbless-cluster-col">
+                        <input class="form-control"  value="" placeholder="Leave empty if non-clustered" id="bubbless-cluster-col">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="bubbless-cell-col" class="col-2 col-form-label">Cell column:</label>
+                    <div class="col-10">
+                        <input class="form-control"  value="" placeholder="Used for counting unique cell clusters" id="bubbless-cell-col">
                     </div>
                 </div>
                 <br>

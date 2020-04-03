@@ -173,8 +173,8 @@ function ProcessInput() {
 	for (let i = 0; i < SAMPLE.flagged_additions.length; i++) {
 		if (!SAMPLE.flagged_additions[i].isCopied) {
 			let grph = new DataVisual(SAMPLE.flagged_additions[i].breakdown,
-				SAMPLE.flagged_additions[i].breakdownNames, SAMPLE.flagged_additions[i].parentName,
-				 SAMPLE.flagged_additions[i].originalValue);
+									SAMPLE.flagged_additions[i].breakdownNames, SAMPLE.flagged_additions[i].parentName,
+									SAMPLE.flagged_additions[i].originalValue, SAMPLE.flagged_additions[i]);
 			grph.RenderGraph();
 			//let quotaGrp = new QuotaGroup(SAMPLE.flagged_additions[i].parentName);
 			if (grph.percentages && grph.name != "EMAIL_Flagged from EMAIL" && !grph.name.includes("Clusters in sample")) {

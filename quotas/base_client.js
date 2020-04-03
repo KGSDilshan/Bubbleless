@@ -101,14 +101,15 @@ class BaseClient {
     missingMode() {
         let configTemplate = getBaseConfigTemplate();
         let rawQuotas = [];
+        let nSizes = getRawNSize();
         if (IncludesPhone) {
-            rawQuotas.push(["Phone(counter)", "0%", "pMode", "1"]);
+            rawQuotas.push(["Phone(inactive)", nSizes[0].toString(), "pMode", "1"]);
         }
         if (IncludesEmail) {
-            rawQuotas.push(["Email(counter)", "0%", "pMode", "2"]);
+            rawQuotas.push(["Email(inactive)", nSizes[1].toString(), "pMode", "2"]);
         }
         if (IncludesText) {
-            rawQuotas.push(["Text(counter)", "0%", "pMode", "3"]);
+            rawQuotas.push(["Text(inactive)", nSizes[2].toString(), "pMode", "3"]);
         }
         QUOTA_GROUPS.push(new QuotaGroup("Mode", configTemplate, rawQuotas));
     }

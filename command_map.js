@@ -220,6 +220,9 @@ function DefaultCallback(contents, index) {
             let replacement = line[1];
             //console.log(original, replacement);
             for (let j = 0; j < original.length; j++) {
+                if (original[j].toUpperCase() == "BLANK") {
+                    original[j] = "";
+                }
                 if (original[j].includes("-")) {
                     // this is a range
                     SAMPLE.FindAndReplaceRange(currentCol, original[j].split("-"), replacement);

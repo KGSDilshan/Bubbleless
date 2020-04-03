@@ -21,7 +21,7 @@ var PALETTE = [
 
 
 class DataVisual {
-    constructor(datamap, dataName, parentName, dataTransformation) {
+    constructor(datamap, dataName, parentName, dataTransformation, flaggedCol=undefined) {
         this.name = (dataName == parentName || parentName === undefined) ? dataName : dataName + " from " + parentName;
         this.percentages = [];
         this.data = [];
@@ -31,6 +31,7 @@ class DataVisual {
         this.total = 0;
         this.dataTransformation = dataTransformation;
         this.uniqueClusters = 0;
+        this.flag = flaggedCol;
 
         for (const [key, value] of datamap.entries()) {
             this.data.push(value);
@@ -162,6 +163,27 @@ class DataVisual {
             data_table += '<th scope="col" colspan="1">Unique clusters:</th>';
             data_table += '<th scope="col" colspan="2">' + this.uniqueClusters + '</th>';
             data_table += '</tr>';
+            if (this.flag.cellRecords.length > 0) {
+                data_table += '<tr>';
+                data_table += '<th scope="col" colspan="1">Total Records in Sample:</th>';
+                data_table += '<th scope="col" colspan="2">' + TOTAL_RECORDS_IN_SAMPLE + '</th>';
+                data_table += '</tr>';
+
+                data_table += '<tr>';
+                data_table += '<th scope="col" colspan="1">Valid Phone numbers:</th>';
+                data_table += '<th scope="col" colspan="2">' + VALID_PHONENUMBERS + '</th>';
+                data_table += '</tr>';
+
+                data_table += '<tr>';
+                data_table += '<th scope="col" colspan="1">Invalid Phone numbers:</th>';
+                data_table += '<th scope="col" colspan="2">' + INVALID_PHONENUMBERS + '</th>';
+                data_table += '</tr>';
+
+                data_table += '<tr>';
+                data_table += '<th scope="col" colspan="1">Unique Cell clusters:</th>';
+                data_table += '<th scope="col" colspan="2">' + this.flag.cellRecords.length + '</th>';
+                data_table += '</tr>';
+            }
         }
         data_table += '</thead>';
         data_table += '</tbody>';

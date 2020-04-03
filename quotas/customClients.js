@@ -75,7 +75,7 @@ class DBClient extends BaseClient {
                 newQuota.active = false;
 
                 GLOBAL_WARNINGS.push({
-                    message: "WARNING: " + group.getName() + " - Other quota does not exist. Created. (Checklist)",
+                    message: "WARNING: " + group.getName() + " - Other quota does not exist.(Checklist)",
                     callback: this.appendEthnicityOtherHandler,
                     group: group,
                     args: newQuota
@@ -90,7 +90,6 @@ class DBClient extends BaseClient {
 
             let showErrors = false;
             let splitsToAdd = [];
-            debugger;
             for (let i = 0; i < QUOTA_HEADERS.length; i++) {
                 let quotaHeader = "(" + QUOTA_HEADERS[i].toLowerCase() + ")";
                 if (!group.splits.includes(quotaHeader) &&
@@ -104,7 +103,7 @@ class DBClient extends BaseClient {
             if (showErrors) {
                 console.log(group, "Error: Splits exist but quotas are not split");
                 GLOBAL_WARNINGS.push({
-                    message: "WARNING: " + group.getName() + " quotas missing split quotas. Add split quotas for " + curGroupName + "? (Checklist)",
+                    message: "WARNING: " + group.getName() + " quotas missing split quotas. (Checklist)",
                     callback: this.splitQuotasBySplitHandler,
                     group: group,
                     args: splitsToAdd
@@ -144,7 +143,7 @@ class DBClient extends BaseClient {
                 }
                 if (arrArgs.length > 0) {
                     GLOBAL_WARNINGS.push({
-                        message: "WARNING: Gender quota option codes do not match the general case. Recode female as 1 and male as 2? (Checklist)",
+                        message: "WARNING: Gender quota option codes do not match the general case. (Checklist)",
                         callback: this.genderMiscodedHandler,
                         group: curGroup,
                         args: {
@@ -162,7 +161,7 @@ class DBClient extends BaseClient {
                     if(n !== curGroup.totalN / 2) {
                         console.log(curGroup, "Error: Phone Type - " + quota.name + " limit is not half of total N size");
                         GLOBAL_WARNINGS.push({
-                            message: "WARNING: Phone type quotas are not 50% of total N size. Change to 50% of total N size? (Checklist)",
+                            message: "WARNING: Phone type quotas are not 50% of total N size. (Checklist)",
                             callback: this.phoneTypeDefaultLimitHandler,
                             group: curGroup,
                             args: {}
@@ -816,14 +815,14 @@ class PBClient extends BaseClient {
                 }
             }
         }
+    }
 
-        clientSpecificWarnings() {
-            // passive warning, always show.
-            GLOBAL_WARNINGS.push({
-                message: "WARNING: Quotas should pull from the same place the cross-tabs mention (QST or sample). (Checklist)",
-                callback : undefined,
-            });
-        }
+    clientSpecificWarnings() {
+        // passive warning, always show.
+        GLOBAL_WARNINGS.push({
+            message: "WARNING: Quotas should pull from the same place the cross-tabs mention (QST or sample). (Checklist)",
+            callback : undefined,
+        });
     }
 
     finalName(quota, qname, limit) {
