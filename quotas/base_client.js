@@ -101,7 +101,7 @@ class BaseClient {
     missingMode() {
         let configTemplate = getBaseConfigTemplate();
         let rawQuotas = [];
-        let nSizes = getRawNSize();
+        let nSizes = getRawSizes();
         if (IncludesPhone) {
             rawQuotas.push(["Phone(inactive)", nSizes[0].toString(), "pMode", "1"]);
         }
