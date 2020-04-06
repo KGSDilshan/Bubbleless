@@ -11,6 +11,7 @@ var TOTAL_RECORDS_IN_SAMPLE = 0;
 var VALID_PHONENUMBERS = 0;
 var INVALID_PHONENUMBERS = 0;
 var PHONE_RATIO = 0;
+var DELETESMAP = undefined;
 const invalidDomains = [".gov"];
 
 class FlaggedColumn {
@@ -42,18 +43,6 @@ class FlaggedColumn {
         this.isCopied = true;
     }
 
-
-    UniqueCellClusters(cellColName) {
-        console.log(cellColName);
-        const cellCol = CalcIndexColumn(cellColName) - 1;
-        for (let i = 0; i < this.additions.length; i++) {
-            if (SAMPLE.records[i][cellCol] != "" && SAMPLE.records[i][cellCol] != undefined && parseInt(SAMPLE.records[i][cellCol]) >  0) {
-                this.cellRecords.push(this.additions[i]);
-            }
-        }
-        this.cellRecords = [...new Set(this.cellRecords)];
-        console.log(this.cellRecords);
-    }
 
     InsertIntoSample() {
         let parentColName = "";
@@ -233,8 +222,6 @@ class Sample {
     CheckClusters() {
         let clusterCol = document.getElementById("bubbless-cluster-col");
         if (clusterCol == undefined || clusterCol.value == "") {
-            WARNINGS.push("<b>WARNING:</b> Cluster column not defined or invalid'");
-            TEXTWARNINGS.push("WARNING: Cluster column not defined or invalid'");
             return;
         }
 
@@ -249,9 +236,8 @@ class Sample {
             visualFlag.name = name;
         }
         const cellCol = document.getElementById("bubbless-cell-col");
-        if (cellCol == undefined || cellCol.value =="") {
-            WARNINGS.push("<b>WARNING:</b> Cell column not defined or invalid'");
-            TEXTWARNINGS.push("WARNING: Cell column not defined or invalid'");
+        if (cellCol = undefined || cellCol.value =="") {
+            return;
         }
         visualFlag.UniqueCellClusters(cellCol.value);
         this.flagged_additions.push(visualFlag);
@@ -396,6 +382,7 @@ class Sample {
                     this.deletedRecords.set(col, this.records.splice(i, 1));
                 }
                 // delete row from flagged column
+                DELETESMAP.set(name, (DELETESMAP.get(name) + 1 || 1));
                 for (let j = 0; j < this.flagged_additions.length; j++) {
                     this.flagged_additions[j].additions.splice(i, 1);
                 }

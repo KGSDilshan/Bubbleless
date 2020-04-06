@@ -146,7 +146,7 @@ class DataVisual {
         data_table += '<tbody>';
         for (let i = 0; i < this.percentages.length; i++) {
             data_table += '<tr>';
-            data_table += '<td>' + this.percentages[i].label + '</td>';
+            data_table += '<td>' + ((this.percentages[i].transformation) ? (this.percentages[i].transformation + " (" + this.percentages[i].label + ")") : this.percentages[i].label) + '</td>';
             data_table += '<td>' + this.percentages[i].data + '</td>';
             data_table += '<td>' + this.percentages[i].rounded + '%</td>';
             data_table += '</tr>';

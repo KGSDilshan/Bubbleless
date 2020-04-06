@@ -265,7 +265,6 @@ function ProcessInput() {
 		i = RunCommand(contents, i);
 	}
 	SAMPLE.CheckClusters();
-
 	SAMPLE.PrepareExport();
 	console.log("filetype: ", INITIAL_FILETYPE);
 	let good = false;
@@ -318,7 +317,50 @@ function ProcessInput() {
 		}
 	}
 
-
+	// render deletes chart
+	console.log(DELETESMAP);
+	if (DELETESMAP != undefined) {
+		let data_table = '<table class="table table-bordered">';
+        data_table += '<thead>';
+        data_table += '<tr>';
+        data_table += '<th scope="col" colspan="4">First and Lastname deletes</th>';
+        data_table += '</tr>';
+        data_table += '<tr>';
+        data_table += '<th scope="col">Name</th>';
+        data_table += '<th scope="col">Counts</th>';
+        data_table += '<th scope="col">Deletes Breakdown</th>';
+        data_table += '<th scope="col">Sample Breakdown</th>';
+        data_table += '</tr>';
+        data_table += '</thead>';
+        data_table += '<tbody>';
+		let delCount = 0;
+		let delPercentage = 0;
+		let delPercentageFull = 0;
+		for (let [key, value] of DELETESMAP) {
+			data_table += '<tr>';
+			data_table += '<td>' + key + '</td>';
+			data_table += '<td>' + value + '</td>';
+			let delPerc = ((parseFloat(value) / (TOTAL_RECORDS_IN_SAMPLE - SAMPLE.records.length)) * 100);
+			let delPercFull = ((parseFloat(value) / (TOTAL_RECORDS_IN_SAMPLE)) * 100);
+			data_table += '<td>' + delPerc + '%</td>';
+			data_table += '<td>' + delPercFull +'%</td>';
+			data_table += '</tr>';
+			delCount += value;
+			delPercentage += delPerc;
+			delPercentageFull += delPercFull;
+		}
+        data_table += '<thead>';
+        data_table += '<tr>';
+        data_table += '<th scope="col" colspan="1">Delete Counts total:</th>';
+        data_table += '<th scope="col" colspan="1">' + delCount + '</th>';
+        data_table += '<th scope="col" colspan="1">' + delPercentage + '%</th>';
+        data_table += '<th scope="col" colspan="1">' + delPercentageFull + '%</th>';
+        data_table += '</tr>';
+        data_table += '</thead>';
+        data_table += '</tbody>';
+        data_table += '</table><br><br>';
+		$("div#dataChartArea").append(data_table);
+	}
 }
 
 
