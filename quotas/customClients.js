@@ -3,6 +3,13 @@ class ALClient extends BaseClient {
         super("AL");
     }
 
+    makeInActiveAL(group) {
+        for (let i = 0; i < group.subQuotas.length; i++) {
+            let q = group.subQuotas[i];
+            q.active = false;
+        }
+    }
+
     clientSpecificWarnings() {
         if (RAN_CSWARNINGS)
             return;
@@ -13,8 +20,12 @@ class ALClient extends BaseClient {
                 let q = QUOTA_GROUPS[i].subQuotas[j];
                 if (q.active == true && !q.name.toLowerCase().includes("split")) {
                     // warn quota is active
-                    QUOTA_GROUPS[i].warnings.push("WARNING: " + q.name + ", quota is active. Made inactive (Checklist)");
-                    q.active = false;
+                    GLOBAL_WARNINGS.push({
+                        message: "WARNING: " + QUOTA_GROUPS[i].getName() + ", quota is active. Must be inactive. (Checklist)",
+                        callback: this.makeInActiveAL,
+                        group: QUOTA_GROUPS[i],
+                    });
+                    break;
                 }
             }
         }
@@ -24,14 +35,14 @@ class ALClient extends BaseClient {
             if (QUOTA_GROUPS[i].getName().toLowerCase().includes("gender") || QUOTA_GROUPS[i].getName().toLowerCase().includes("sex")) {
                 checked = true;
                 if (!QUOTA_GROUPS[i].hasSplits) {
-                    console.log(QUOTA_GROUPS[i], "missing gender split");
-                    QUOTA_GROUPS[i].warnings.push("WARNING: Gender Quota missing split quota");
+                    GLOBAL_WARNINGS.push({
+                        message: "WARNING: Gender Quota missing split quota",
+                        callback: undefined,
+                        group: undefined,
+                    });
                     break;
                 }
             }
-        }
-        if (checked == false && QUOTA_GROUPS.length > 0) {
-            QUOTA_GROUPS[0].warnings.push("WARNING: Gender Quota not defined");
         }
     }
 }

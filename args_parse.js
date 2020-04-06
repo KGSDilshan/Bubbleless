@@ -45,8 +45,8 @@ function OpenHeaderFile(event) {
 				end.push(i);
 			}
 		}
-		indexMap.concat(end);
-		console.log(indexMap);
+		indexMap = indexMap.concat(end);
+		console.log(indexMap, end);
 
 		// rearrange sample based on map
 		const records = [];
