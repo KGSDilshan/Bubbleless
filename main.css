@@ -74,3 +74,17 @@ div.scrollhorizontal {
 #dataChartArea {
 	height: 40%;
 }
+
+th.table_header {
+	font-size: larger;
+}
+
+/* Example text inline styles */
+span.syntax {
+	font-style: italic;
+	color: rgb(135,135,135);
+}
+
+span.emphasis {
+	font-style: italic;
+}

@@ -393,6 +393,63 @@
       </table>
       <br>
       <br>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th colspan="5" class="table_header">Quota Generator Commands</th>
+          </tr>
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Syntax</th>
+            <th scope="col">Functionality</th>
+            <th scope="col">Example</th>
+            <th scope="col">Output</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>Splits/Split Quotas</th>
+            <th>(<span class="syntax">quota_name</span>)</th>
+            <td>Splits the quota with the named quota. Can be used multiple times on a single quota.</td>
+            <td style="width:max-content">
+              <pre>Gender(<span class="emphasis">region</span>)
+Region(<span class="emphasis">splitab</span>)(<span class="emphasis">party</span>)</pre>
+            </td>
+            <td></td>
+          </tr>
+          <tr>
+            <th>Split by Mode</th>
+            <th>
+              (dual)<br />
+              (tri)
+            </th>
+            <td>
+              Marks the quota to be split by Mode (Phone, Email, Texting).<br />
+              N-sizes must include multiple numbers matching the Mode type (e.g. Dual mode requires 2 n-sizes, tri mode requires 3).<br />
+              <span class="emphasis">Note: Mode quotas are implicitly split by mode so this command should not be used for mode.</span>
+            </td>
+            <td>
+              Region(dual)<br />
+              Region(tri)
+            </td>
+            <td></td>
+          </tr>          
+          <tr>
+            <th>Flex</th>
+            <th>
+              (flex <span class="syntax">X%</span>)<br />
+              <span class="emphasis">or</span><br />
+              (flex <span class="syntax">X</span>)
+            </th>
+            <td>Adds a flex amount to the quota. Percentage based on total n-size or a flat value.</td>
+            <td>
+              Gender(flex <span class="emphasis">3%</span>)<br />
+              Party(flex <span class="emphasis">20</span>)
+            </td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
       <center>
   <br>
   <br>
