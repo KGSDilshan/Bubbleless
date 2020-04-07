@@ -257,14 +257,14 @@
               <div>The first row in each table is the quota name. This is where you will put in most of the commands for the program to read <b>(Flex, splits, mode)</b>.</div>
               <img src="imgs/quota_name_example.PNG" class="img-fluid" alt="A gender quota with commands to split by SplitAB, add 5% flex, and is split by mode.">
               <div>The <i>Custom N-size</i> field is for calculating a quota using a different N-size. These apply individually to the quota it is attached to.</div>
-              <div>The following rows represent the actual quotas that are used for fielding and keeping track of completes. The first column is the name of the value that is being tracked- this is where you can mark a value to be a counter by adding "<b>(counter)</b>" to the name.</div>
+              <div>The following rows represent the actual quotas that are used for fielding and keeping track of completes. The first column is the name of the quota value that is being tracked- this is where you can mark a row as a counter or inactive by adding "<b>(counter)</b>" or "<b>(inactive)</b>" to the name.</div>
               <img src="imgs/subquota_rows.PNG" class="img-fluid" alt="Gender quota values, with M set as a counter quota.">
-              <div>Check the quota sheet and make sure the values in the second column match up with the percents in the quota sheet. If they don't match, you can change it manually by clicking and typing in the correct value.</div>
+              <div>Check the quota sheet and make sure the values in the second column match up with the values in the quota sheet. If they don't match, you can change it manually by clicking and typing in the correct value.</div>
               <div>You will want to check that the codes in the fourth column match with your coding as well. The third column is auto-generated based on the name of the quota. This can usually be left alone.</div>
               <div>If there is a <i>redundant or unnecessary</i> quota, you can delete it by clicking the big red "<b>Delete</b>" button located above each quota.</div>
-              <div>If there is anything missing, you can add new quotas using the "<b>Create New Quota</b>" button. You'll want to enter the number of rows/values for the quota before you click the button. The following setting will add a quota with 7 values in it:</div>
+              <div>If there is anything missing, you can add new quotas using the "<b>Create New Quota</b>" button. You'll want to enter the number of quota values for the quota before you click the button. The following setting will add a quota with 7 values in it:</div>
               <img src="imgs/create_new_quota.PNG" class="img-fluid" alt="Create New Quota example, with 7 in the entry field.">
-              <div class="aside">Note that you will have to change every value manually when you insert a new quota. In this case, the third column will be a generic value, so you can either:<br />Contact the programming team to get the name of the precode that they created to track this value<br />OR<br />Add in a question code yourself, by prepending a "p" to the quota name and filling in each cell with that value</div>
+              <div class="aside">Note that you will have to change every value manually when you insert a new quota. In this case, the third column will be a generic value, so you can either:<br />Contact the programming team to get the name of the precode that they created to track this quota<br />OR<br />Add in a question code yourself, by prepending a "p" to the quota name and filling in each cell with it</div>
               <img src="imgs/create_new_quota2.PNG" class="img-fluid" alt="A newly created quota with 7 rows, being filled in with values.">
               <div>When everything is done and the table values are correct, you can save the table for later use by clicking the "<b>Export Quotas</b>" button. This file can be uploaded at a later time using the "<b>Import Quotas</b>" button to retrieve the values you have now, without needing to reupload the sample.</div>
             </div>
@@ -491,7 +491,7 @@ Region(<i>splitab</i>)(<i>party</i>)</pre>
               <i>or</i><br />
               (flex <span class="syntax">X</span>)
             </th>
-            <td>Adds a flex amount to the entire quota and appends related text to the output. Either a percentage based on total n-size or a flat value.</td>
+            <td>Adds a flex amount to the entire quota and appends related text to the output. Either a percentage based on total n-size or a flat value. Must be separated</td>
             <td>
               Gender(flex <i>3%</i>)<br />
               Party(flex <i>20</i>)
@@ -502,7 +502,7 @@ Region(<i>splitab</i>)(<i>party</i>)</pre>
             <th>
               (counter)
             </th>
-            <td>Marks a quota value as a counter.</td>
+            <td>Marks a quota row/value as a counter (set as inactive and a default cap limit).</td>
             <td>
               <table>
                 <tr>
@@ -514,6 +514,28 @@ Region(<i>splitab</i>)(<i>party</i>)</pre>
                 </tr>
                 <tr>
                   <td>Female</td>
+                  <td>X%</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Inactive</th>
+            <th>
+              (inactive)
+            </th>
+            <td>Marks a quota row/value as inactive (does not terminate when quota full).</td>
+            <td>
+              <table>
+                <tr>
+                  <th colspan="2">Gender</th>
+                </tr>
+                <tr>
+                  <td>Male</td>
+                  <td>X%</td>
+                </tr>
+                <tr>
+                  <td>Female(inactive)</td>
                   <td>X%</td>
                 </tr>
               </table>
