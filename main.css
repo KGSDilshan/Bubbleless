@@ -74,3 +74,45 @@ div.scrollhorizontal {
 #dataChartArea {
 	height: 40%;
 }
+
+/* Example text inline styles */
+span.syntax {
+	font-style: italic;
+	color: rgb(140,140,140);
+}
+
+/* Quota Styles */
+th.table_header {
+	font-size: larger;
+}
+
+.quota_table td {
+	text-align: left;
+}
+
+/* Spacing for cards */
+.card {
+	margin-top: 0.5em;
+}
+
+/* Quota generator documentation-specific */
+div.quota_docs>div {
+	margin-top: 0.75em;
+}
+
+div.quota_docs>img {
+	margin-top: 0.5em;
+	border: 1px solid lightgray;
+}
+
+div.quota_docs>div.section_intro {
+	border-top: 2px dashed rgba(0,0,0,0.3);
+	padding-top: 1em;
+}
+
+div.quota_docs div.aside {
+	font-style: italic;
+	color: rgb(125,125,125);
+	padding-right: 1em;
+	padding-left: 1em;
+}

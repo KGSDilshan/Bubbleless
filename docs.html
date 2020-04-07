@@ -206,6 +206,7 @@
                     </tbody>
                 </table>
                 <br>
+                <br>
             </div>
             <br>
             <div align="left">
@@ -220,7 +221,7 @@
                 <br>
                 Copy the contents, once made into the Text input field. Then, when a csv sample is uploaded, you should see a preview of the sample sheet's first 5 elements.
                 <br>
-                You can use this to verify if your sample was loaded properly and to double check what you paste in the text field, if necissary.
+                You can use this to verify if your sample was loaded properly and to double check what you paste in the text field, if necessary.
                 <img src="imgs/sample_preview.png" class="img-fluid" alt="pasteing">
                 <br>
                 Next, hit the "Process" button and scroll down to the results section. You'll be able to see some errors/warnings there if any were present.
@@ -229,6 +230,58 @@
                 Upon reading the warning, you can click the continue button if everything is intended. This will proceed to create a CSV sheet.
             </div>
             <br>
+            <div align="left">
+              <button class="btn btn-outline-info" type="button" data-toggle="collapse" data-target="#quotasPartOne" aria-expanded="false" aria-controls="collapseExample" align="left">
+                  <h3>Quotas 1: Survey Level Quota Properties</h3>
+              </button>
+            </div>
+            <div class="card card-body collapse quota_docs" id="quotasPartOne">
+              <div>After you process a sample, Bubbleless can take that data and arrange it into quotas for use on LS.<br />If you scroll down through the data visualizations, you'll end up at the Survey Level Quota Properties section.</div>
+              <img src="imgs/quota_mode_nsize.PNG" class="img-fluid" alt="The survey level quota properties section with a value of 400-0-600 being entered into the N Sizes field.">
+              <div>The N Sizes value is required. This is used to calculate raw n-sizes out of the percentages for the quotas.</div>
+              <div><i>If there is only one mode, you only need to enter one number, regardless of mode.</i> The format if there are multiple modes is a raw number for each mode separated by a dash: <span class="syntax">Phone-Email-Text</span></div>
+              <div>In this case, irrelevant modes should be 0. The image above describes a project of <u>1000n</u> with a phone mode of n=<u>400</u> and a texting mode of n=<u>600</u>.</div>
+              <div class="aside">Note: Keep in mind whether the projects will be on the same link or not. In the above example, if the project were separated into two surveys, the generated csv would be incorrect. You would need to generate two quota files in this case, one for each mode; with corresponding n-sizes.</div>
+              <div>Everything else should be set according to the project specifications, usually on Trello.</div>
+            </div>
+            <br>
+            <div align="left">
+              <button class="btn btn-outline-info" type="button" data-toggle="collapse" data-target="#quotasPartTwo" aria-expanded="false" aria-controls="collapseExample" align="left">
+                  <h3>Quotas 2: Quota Properties</h3>
+              </button>
+            </div>
+            <div class="card card-body collapse quota_docs" id="quotasPartTwo">
+              <div>The next section, Quota Properties, is an overview of the flags that were generated from the sample.</div>
+              <img src="imgs/quota_properties_intro.PNG" class="img-fluid" alt="Default quota properties after a sample processing.">
+              <div>At this point, every value in the table is either defaulted or pulled from the sample values that were pasted in earlier.</div>
+              <div>The first row in each table is the quota name. This is where you will put in most of the commands for the program to read <b>(Flex, splits, mode)</b>.</div>
+              <img src="imgs/quota_name_example.PNG" class="img-fluid" alt="A gender quota with commands to split by SplitAB, add 5% flex, and is split by mode.">
+              <div>The <i>Custom N-size</i> field is for calculating a quota using a different N-size. These apply individually to the quota it is attached to.</div>
+              <div>The following rows represent the actual quotas that are used for fielding and keeping track of completes. The first column is the name of the quota value that is being tracked- this is where you can mark a row as a counter or inactive by adding "<b>(counter)</b>" or "<b>(inactive)</b>" to the name.</div>
+              <img src="imgs/subquota_rows.PNG" class="img-fluid" alt="Gender quota values, with M set as a counter quota.">
+              <div>Check the quota sheet and make sure the values in the second column match up with the values in the quota sheet. If they don't match, you can change it manually by clicking and typing in the correct value.</div>
+              <div>You will want to check that the codes in the fourth column match with your coding as well. The third column is auto-generated based on the name of the quota. This can usually be left alone.</div>
+              <div>If there is a <i>redundant or unnecessary</i> quota, you can delete it by clicking the big red "<b>Delete</b>" button located above each quota.</div>
+              <div>If there is anything missing, you can add new quotas using the "<b>Create New Quota</b>" button. You'll want to enter the number of quota values for the quota before you click the button. The following setting will add a quota with 7 values in it:</div>
+              <img src="imgs/create_new_quota.PNG" class="img-fluid" alt="Create New Quota example, with 7 in the entry field.">
+              <div class="aside">Note that you will have to change every value manually when you insert a new quota. In this case, the third column will be a generic value, so you can either:<br />Contact the programming team to get the name of the precode that they created to track this quota<br />OR<br />Add in a question code yourself, by prepending a "p" to the quota name and filling in each cell with it</div>
+              <img src="imgs/create_new_quota2.PNG" class="img-fluid" alt="A newly created quota with 7 rows, being filled in with values.">
+              <div>When everything is done and the table values are correct, you can save the table for later use by clicking the "<b>Export Quotas</b>" button. This file can be uploaded at a later time using the "<b>Import Quotas</b>" button to retrieve the values you have now, without needing to reupload the sample.</div>
+            </div>
+            <br>
+            <div align="left">
+              <button class="btn btn-outline-info" type="button" data-toggle="collapse" data-target="#quotasPartThree" aria-expanded="false" aria-controls="collapseExample" align="left">
+                  <h3>Quotas 3: Quota Processing</h3>
+              </button>
+            </div>
+            <div class="card card-body collapse quota_docs" id="quotasPartThree">
+              <div>The next step is processing the quotas. When you click the "<b>Process Quotas</b>" button, Bubbleless will check every quota against client-specific rules.</div>
+              <div>You will be alerted to issues that Bubbleless finds and given an option to apply suggested changes.</div>
+              <img src="imgs/process_quotas.PNG" class="img-fluid" alt="Alerts after processing the quotas.">
+              <div class="aside">Make sure the suggested changes are in line with project requirements. If we have no way of tracking party for example (both in survey and in sample), adding a party quota to the generated file cause an error when uploading to LS.</div>
+              <div>When all the checks are done and required changes are applied, clicking "<b>Acknowledge Warnings and Download Quotas</b>" will download a csv file that can be uploaded to LS.</div>
+
+          </div>
         </div>
         <br>
         <br>
@@ -393,6 +446,103 @@
       </table>
       <br>
       <br>
+      <table class="table table-bordered quota_table">
+        <thead>
+          <tr>
+            <th colspan="4" class="table_header">Quota Generator Commands</th>
+          </tr>
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Syntax</th>
+            <th scope="col">Functionality</th>
+            <th scope="col">Example</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Splits/Split Quotas</th>
+            <th >(<span class="syntax">quota_name</span>)</th>
+            <td>Splits the entire quota with the named quota. Can be used multiple times on a single quota.</td>
+            <td style="width:max-content">
+              <pre>Gender(<i>region</i>)
+Region(<i>splitab</i>)(<i>party</i>)</pre>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Split by Mode</th>
+            <th>
+              (dual)<br />
+              (tri)
+            </th>
+            <td>
+              Marks the entire quota to be split by Mode (Phone, Email, Texting).<br />
+              N-sizes must include multiple numbers matching the Mode type (e.g. Dual mode requires 2 n-sizes, tri mode requires 3).<br />
+              <i>Note: Mode quotas are implicitly split by mode so this command should not be used for mode.</i>
+            </td>
+            <td>
+              Region(dual)<br />
+              Region(tri)
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Flex</th>
+            <th>
+              (flex <span class="syntax">X%</span>)<br />
+              <i>or</i><br />
+              (flex <span class="syntax">X</span>)
+            </th>
+            <td>Adds a flex amount to the entire quota and appends related text to the output. Either a percentage based on total n-size or a flat value.</td>
+            <td>
+              Gender(flex <i>3%</i>)<br />
+              Party(flex <i>20</i>)
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Counters</th>
+            <th>
+              (counter)
+            </th>
+            <td>Marks a quota row/value as a counter (set as inactive and a default cap limit).</td>
+            <td>
+              <table>
+                <tr>
+                  <th colspan="2">Gender</th>
+                </tr>
+                <tr>
+                  <td>Male(counter)</td>
+                  <td>X%</td>
+                </tr>
+                <tr>
+                  <td>Female</td>
+                  <td>X%</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Inactive</th>
+            <th>
+              (inactive)
+            </th>
+            <td>Marks a quota row/value as inactive (does not terminate when quota full).</td>
+            <td>
+              <table>
+                <tr>
+                  <th colspan="2">Gender</th>
+                </tr>
+                <tr>
+                  <td>Male</td>
+                  <td>X%</td>
+                </tr>
+                <tr>
+                  <td>Female(inactive)</td>
+                  <td>X%</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
       <center>
   <br>
   <br>
