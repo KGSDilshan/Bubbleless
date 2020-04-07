@@ -117,14 +117,6 @@
                     </div>
                 </div>
                 <br>
-                <div class="form-group" align=center>
-                    <div class="custom-file">
-                        <input type="file" class="custom-file-input" accept='*csv' onchange='OpenHeaderFile(event)' id="headerFile" required>
-                        <label class="custom-file-label" for="headerFile">Choose header file...</label>
-                        <div class="invalid-feedback">A Sample is Required</div>
-                    </div>
-                    <div class="scrollhorizontal" id="headerPreview"></div>
-                </div>
                 <div class="form-group row">
                     <label for="bubbless-flagstart-input" class="col-2 col-form-label">Flags start:</label>
                     <div class="col-10">
@@ -132,19 +124,48 @@
                     </div>
                 </div>
                 <br>
-                <div class="form-group row">
-                    <label for="bubbless-cluster-col" class="col-2 col-form-label">Cluster POS column:</label>
-                    <div class="col-10">
-                        <input class="form-control"  value="" placeholder="Leave empty if non-clustered." id="bubbless-cluster-col">
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label for="bubbless-cell-col" class="col-2 col-form-label">Cell column:</label>
-                    <div class="col-10">
-                        <input class="form-control"  value="" placeholder="Leave empty if non-clustered. Used for counting unique cell clusters" id="bubbless-cell-col">
+                <div class="border border-primary">
+                    <b>For Additional Samples</b>
+                    <div class="form-group" align=center>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" accept='*csv' onchange='OpenHeaderFile(event)' id="headerFile" required>
+                            <label class="custom-file-label" for="headerFile">Choose header file...</label>
+                            <div class="invalid-feedback">A Sample is Required</div>
+                        </div>
+                        <div class="scrollhorizontal" id="headerPreview"></div>
                     </div>
                 </div>
                 <br>
+                <div class="border border-primary">
+                    <b>For Clustered Projects:</b>
+                    <div class="form-group row">
+                        <label for="bubbless-cluster-col" class="col-2 col-form-label">Cluster POS column:</label>
+                        <div class="col-10">
+                            <input class="form-control"  value="" placeholder="Leave empty if non-clustered." id="bubbless-cluster-col">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="bubbless-cell-col" class="col-2 col-form-label">Cell column:</label>
+                        <div class="col-10">
+                            <input class="form-control"  value="" placeholder="Leave empty if non-clustered. Used for counting unique cell clusters" id="bubbless-cell-col">
+                        </div>
+                    </div>
+                </div>
+                <br>
+
+                <div class="border border-primary">
+                    <b>For Multimode Projects:</b>
+                    <div class="form-group row">
+                        <div class="col-10" align="left">
+                            <br>
+                            - Always use MERGEPHONENUM command for phone numbers
+                            <br>
+                            - Always use EVALEMAILS command for emails
+                        </div>
+                    </div>
+                </div>
+                <br>
+
                 <div class="form-group">
                     <label for="bubblelessScrubNamesInput">Paste Scrubbing data here</label>
                     <textarea class="form-control" id="bubblelessScrubNamesInput" rows="6" placeholder="Names of people, deletes, scrubs in here">
