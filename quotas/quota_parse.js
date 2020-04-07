@@ -351,7 +351,7 @@ function SerializeTableFromObjects() {
         let header = qGrp.group_name;
         // flex text
         if (qGrp.isFlex) {
-            header += "(flex " + qGrp.flexAmount.toString() + (qGrp.isRawFlex ? "%)" : ")");
+            header += "(flex " + qGrp.flexAmount.toString() + (qGrp.isRawFlex ? ")" : "%)");
         }
         // split text
         for (let j = 0; j < qGrp.splits.length; j++) {

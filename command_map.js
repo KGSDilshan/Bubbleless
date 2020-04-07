@@ -143,10 +143,16 @@ function NamesListCallback(contents, index) {
     }
     let i = index + 1;
     let comparisons = [];
+    if (DELETESMAP == undefined) {
+        DELETESMAP = new Map();
+    }
     while (!contents[i].toUpperCase().includes("STOP NAMES")) {
-        comparisons.push(contents[i].toUpperCase().split(" ").join("").trim());
+        let cmpVal = contents[i].toUpperCase().split(" ").join("").trim();
+        comparisons.push(cmpVal);
+        DELETESMAP.set(cmpVal, 0);
         i++;
     }
+
     for (let j = SAMPLE.records.length - 1; j >= 0; j--) {
         // build comparison string
         result = "";
@@ -157,11 +163,13 @@ function NamesListCallback(contents, index) {
         for (let k = 0; k < comparisons.length; k++) {
             // compare
             if (comparisons[k] == result) {
+                DELETESMAP.set(comparisons[k], (DELETESMAP.get(comparisons[k]) + 1) || 1);
                 SAMPLE.DeleteRecordByIndex(combinedCols[0], j);
                 break;
             }
         }
     }
+    console.log("DELETES MAP:", DELETESMAP);
     return i;
 }
 
@@ -220,6 +228,9 @@ function DefaultCallback(contents, index) {
             let replacement = line[1];
             //console.log(original, replacement);
             for (let j = 0; j < original.length; j++) {
+                if (original[j].toUpperCase() == "BLANK") {
+                    original[j] = "";
+                }
                 if (original[j].includes("-")) {
                     // this is a range
                     SAMPLE.FindAndReplaceRange(currentCol, original[j].split("-"), replacement);
@@ -236,6 +247,9 @@ function DeleteCallback(contents, index) {
     // get column to delete from
     let currentCol = contents[index].toUpperCase().split("\t").join("").split("DELETE").join("").trim();
     // delete every column
+    if (DELETESMAP == undefined) {
+        DELETESMAP = new Map();
+    }
     for (let i = index + 1; i < contents.length; i++) {
         let line = contents[i].trim().split("\t");
         let deleteVal = line[0].toUpperCase();
@@ -244,6 +258,7 @@ function DeleteCallback(contents, index) {
             // list
             deleteVal = deleteVal.split(",");
             for (let j = 0; j < deleteVal.length; j++) {
+                DELETESMAP.set(deleteVal[j], (DELETESMAP.get(deleteVal[j]) | 0));
                 SAMPLE.DeleteRecords(currentCol, deleteVal[j]);
             }
         } else if (deleteVal.includes("STOP DELETE")) {
@@ -251,6 +266,8 @@ function DeleteCallback(contents, index) {
             return i;
         } else {
             // single delete
+            console.log()
+            //DELETESMAP.set(deleteVal, (DELETESMAP.get(deleteVal) ? 0 : DELETESMAP.get(deleteVal)));
             SAMPLE.DeleteRecords(currentCol, deleteVal);
         }
     }

@@ -8,6 +8,75 @@ var FileWorker;
 var FileState = 0;
 var INITIAL_FILETYPE = "csv";
 
+function OpenHeaderFile(event) {
+	let files = document.getElementById("headerFile").files;
+	let input = event.target;
+	let reader = new FileReader();
+	reader.readAsText(input.files[0]);
+	reader.onload = function(e) {
+		IMPORTED_HEADER = $csv.toArray(e.target.result);
+		PreviewHeader();
+		// compare sample header and imported headers
+		let indexMap = [];
+		// [1, 2, 3, 4, 5] - imported
+		// [1, 2, 3, 4, 5, 7] - sample
+		// [0, 1, 2, 3, 4, 5]
+
+		for (let i = 0; i < IMPORTED_HEADER.length; i++) {
+			let found = false;
+			for (let j = 0; j < SAMPLE_HEADER.length; j++) {
+				if (SAMPLE_HEADER[j] == IMPORTED_HEADER[i]) {
+					indexMap.push(j);
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				indexMap.push(-1);
+			}
+		}
+
+		// // build
+		let end = [];
+		for (let i = 0; i < SAMPLE_HEADER.length; i++) {
+			if (!indexMap.includes(i)) {
+				WARNINGS.push("<b>WARNING: </b>" + SAMPLE_HEADER[i] + "(" + CalcColumnID(i) + ") in original sample moved to end.");
+				TEXTWARNINGS.push("WARNING: " + SAMPLE_HEADER[i] + "(" + CalcColumnID(i) + ") in original sample moved to end.\n");
+				end.push(i);
+			}
+		}
+		indexMap = indexMap.concat(end);
+		console.log(indexMap, end);
+
+		// rearrange sample based on map
+		const records = [];
+		for (let i = 0; i < SAMPLE.records.length; i++) {
+			let newRec = [];
+			let record = SAMPLE.records[i];
+			for (let j = 0; j < indexMap.length; j++) {
+				let index = indexMap[j];
+				if (index >= 0 && index < record.length) {
+					newRec.push(record[index]);
+				} else if (index == -1) {
+					if (i == 0) {
+						newRec.push(IMPORTED_HEADER[j]);
+						WARNINGS.push("<b>WARNING: </b>" + IMPORTED_HEADER[j] + "(" + CalcColumnID(j) + ") cannot be mapped, blanks inserted");
+						TEXTWARNINGS.push("WARNING: " + IMPORTED_HEADER[j] + "(" + CalcColumnID(j) + ") cannot be mapped, blanks inserted\n");
+					} else {
+						newRec.push("");
+					}
+				}
+
+			}
+			records.push(newRec);
+		}
+		SAMPLE.records = records.slice();
+		PreviewSampleFromArrs(SAMPLE.records);
+		DisplayWarnings(WARNINGS.length == 0);
+	}
+}
+
+
 function OpenFile(event) {
 	AltLoadBar();
 	let files = document.getElementById("sampleFile").files;
@@ -68,18 +137,63 @@ function LoadBarSetValue(id, value) {
 	document.getElementById(id).style.width = value.toString() + "%";
 }
 
+function PreviewHeader() {
+	// header
+	let thtml = '<table class="table table-dark" id="dtHorizontal" "scrollX": true>';
+	let trow = [];
+	let htmlHeader = "";
+	for (let i = 0; i < IMPORTED_HEADER.length; i++) {
+		htmlHeader += '<th scope="col">' + CalcColumnID(i+1) + "</th>";
+		trow.push("<td>" + IMPORTED_HEADER[i] + "</td>");
+	}
+	console.log(trow);
+	thtml += "<tbody>" + htmlHeader + "<tr>" + trow.join("") + "</tr>" + "</tbody></table>";
+	document.getElementById("headerPreview").innerHTML = "";
+	document.getElementById("headerPreview").innerText = "";
+	$("div#headerPreview").append(thtml);
+	$('.dataTables_length').addClass('bs-select');
+}
+
+function PreviewSampleFromArrs(arrs) {
+	// header
+	let thtml = '<table class="table table-dark" id="dtHorizontal" "scrollX": true>';
+	let data = arrs;
+	console.log(data);
+	let row1to6 = [data[0],data[1],data[2],data[3],data[4],data[5]];
+	let htmlHeader = '<thead class="thead-dark"><tr>';
+	let trow = "";
+	trows = ["<tr>","<tr>","<tr>","<tr>","<tr>","<tr>"];
+	DATA_LENGTH = row1to6[0].length;
+	for (let i = 0; i < DATA_LENGTH; i++) {
+		htmlHeader += '<th scope="col">' + CalcColumnID(i+1) + "</th>";
+		for (let j = 0; j < row1to6.length; j++) {
+			trows[j] += "<td>" + row1to6[j][i] + "</td>";
+		}
+	}
+	let rowsFinal = "<tbody>";
+	for (let i = 0; i < row1to6.length; i++) {
+		rowsFinal += trows[i] + "</tr>"
+	}
+	rowsFinal += "</tbody>"
+	htmlHeader += "</tr></thead>"
+	thtml += htmlHeader + rowsFinal + '</table>';
+	document.getElementById("samplePreview").innerHTML = "";
+	document.getElementById("samplePreview").innerText = "";
+	$("div#samplePreview").append(thtml);
+	$('.dataTables_length').addClass('bs-select');
+}
 
 function PreviewSample(fdata) {
 	// header
 	let thtml = '<table class="table table-dark" id="dtHorizontal" "scrollX": true>';
 	let data = fdata.split("\n");
 	let row1to6 = [data[0].split(","),data[1].split(","),data[2].split(","),data[3].split(","),data[4].split(","),data[5].split(",")];
-	let htmlHeader = '<thead class="thead-dark"><tr>'
-	let trow = ""
-	trows = ["<tr>","<tr>","<tr>","<tr>","<tr>","<tr>"]
+	let htmlHeader = '<thead class="thead-dark"><tr>';
+	let trow = "";
+	trows = ["<tr>","<tr>","<tr>","<tr>","<tr>","<tr>"];
 	DATA_LENGTH = row1to6[0].length;
 	for (let i = 0; i < DATA_LENGTH; i++) {
-		htmlHeader += '<th scope="col">' + CalcColumnID(i+1) + "</th>"
+		htmlHeader += '<th scope="col">' + CalcColumnID(i+1) + "</th>";
 		for (let j = 0; j < row1to6.length; j++) {
 			trows[j] += "<td>" + row1to6[j][i] + "</td>";
 		}
@@ -151,7 +265,6 @@ function ProcessInput() {
 		i = RunCommand(contents, i);
 	}
 	SAMPLE.CheckClusters();
-
 	SAMPLE.PrepareExport();
 	console.log("filetype: ", INITIAL_FILETYPE);
 	let good = false;
@@ -173,8 +286,8 @@ function ProcessInput() {
 	for (let i = 0; i < SAMPLE.flagged_additions.length; i++) {
 		if (!SAMPLE.flagged_additions[i].isCopied) {
 			let grph = new DataVisual(SAMPLE.flagged_additions[i].breakdown,
-				SAMPLE.flagged_additions[i].breakdownNames, SAMPLE.flagged_additions[i].parentName,
-				 SAMPLE.flagged_additions[i].originalValue);
+									SAMPLE.flagged_additions[i].breakdownNames, SAMPLE.flagged_additions[i].parentName,
+									SAMPLE.flagged_additions[i].originalValue, SAMPLE.flagged_additions[i]);
 			grph.RenderGraph();
 			//let quotaGrp = new QuotaGroup(SAMPLE.flagged_additions[i].parentName);
 			if (grph.percentages && grph.name != "EMAIL_Flagged from EMAIL" && !grph.name.includes("Clusters in sample")) {
@@ -204,7 +317,50 @@ function ProcessInput() {
 		}
 	}
 
-
+	// render deletes chart
+	console.log(DELETESMAP);
+	if (DELETESMAP != undefined) {
+		let data_table = '<table class="table table-bordered">';
+        data_table += '<thead>';
+        data_table += '<tr>';
+        data_table += '<th scope="col" colspan="4">First and Lastname deletes</th>';
+        data_table += '</tr>';
+        data_table += '<tr>';
+        data_table += '<th scope="col">Name</th>';
+        data_table += '<th scope="col">Counts</th>';
+        data_table += '<th scope="col">Deletes Breakdown</th>';
+        data_table += '<th scope="col">Sample Breakdown</th>';
+        data_table += '</tr>';
+        data_table += '</thead>';
+        data_table += '<tbody>';
+		let delCount = 0;
+		let delPercentage = 0;
+		let delPercentageFull = 0;
+		for (let [key, value] of DELETESMAP) {
+			data_table += '<tr>';
+			data_table += '<td>' + key + '</td>';
+			data_table += '<td>' + value + '</td>';
+			let delPerc = ((parseFloat(value) / (TOTAL_RECORDS_IN_SAMPLE - SAMPLE.records.length)) * 100);
+			let delPercFull = ((parseFloat(value) / (TOTAL_RECORDS_IN_SAMPLE)) * 100);
+			data_table += '<td>' + delPerc + '%</td>';
+			data_table += '<td>' + delPercFull +'%</td>';
+			data_table += '</tr>';
+			delCount += value;
+			delPercentage += delPerc;
+			delPercentageFull += delPercFull;
+		}
+        data_table += '<thead>';
+        data_table += '<tr>';
+        data_table += '<th scope="col" colspan="1">Delete Counts total:</th>';
+        data_table += '<th scope="col" colspan="1">' + delCount + '</th>';
+        data_table += '<th scope="col" colspan="1">' + delPercentage + '%</th>';
+        data_table += '<th scope="col" colspan="1">' + delPercentageFull + '%</th>';
+        data_table += '</tr>';
+        data_table += '</thead>';
+        data_table += '</tbody>';
+        data_table += '</table><br><br>';
+		$("div#dataChartArea").append(data_table);
+	}
 }
 
 
@@ -216,6 +372,11 @@ function ViewRawData() {
             count += value.length;
     	}
 		let buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-primary mb-2" id="continue3" onClick=SAMPLE.ExportDeleted()>Download Deletes (' + count + ')</button>'
+		$("div#ButtonBuffer").append(buttonHTML);
+	}
+
+	if (SAMPLE_HEADER.length > 0) {
+		let buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-primary mb-2" id="continue3" onClick=SAMPLE.ExportHeader()>Download Headers</button>'
 		$("div#ButtonBuffer").append(buttonHTML);
 	}
 }

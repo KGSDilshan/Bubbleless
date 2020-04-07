@@ -14,7 +14,7 @@
     <link rel="stylesheet" type="text/css" href="main.css">
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
     <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-    <script src="jquery_csv.min.js"></script>
+    <script src="jqcsv.js"></script>
     <!-- <script src="WorkerConsole.js"></script> -->
     <script src="sample.js"></script>
     <script src="command_map.js"></script>
@@ -27,7 +27,6 @@
     <script src="quotas/subQuota.js"></script>
     <script src="quotas/base_client.js"></script>
     <script src="quotas/customClients.js"></script>
-    <script src="quotas/customClientTemp.js"></script>
     <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
     <script src="worker.js"></script>
@@ -107,7 +106,7 @@
                 <div class="form-group" align=center>
                     <div class="custom-file">
                         <input type="file" class="custom-file-input" accept='*csv' onchange='OpenFile(event)' id="sampleFile" required>
-                        <label class="custom-file-label" for="sampleFile">Choose file...</label>
+                        <label class="custom-file-label" for="sampleFile">Choose sample file...</label>
                         <div class="invalid-feedback">A Sample is Required</div>
                     </div>
                 </div>
@@ -118,6 +117,14 @@
                     </div>
                 </div>
                 <br>
+                <div class="form-group" align=center>
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" accept='*csv' onchange='OpenHeaderFile(event)' id="headerFile" required>
+                        <label class="custom-file-label" for="headerFile">Choose header file...</label>
+                        <div class="invalid-feedback">A Sample is Required</div>
+                    </div>
+                    <div class="scrollhorizontal" id="headerPreview"></div>
+                </div>
                 <div class="form-group row">
                     <label for="bubbless-flagstart-input" class="col-2 col-form-label">Flags start:</label>
                     <div class="col-10">
@@ -126,9 +133,15 @@
                 </div>
                 <br>
                 <div class="form-group row">
-                    <label for="bubbless-cluster-col" class="col-2 col-form-label">Cluster column:</label>
+                    <label for="bubbless-cluster-col" class="col-2 col-form-label">Cluster POS column:</label>
                     <div class="col-10">
-                        <input class="form-control"  value="" placeholder="leave empty if non-clustered" id="bubbless-cluster-col">
+                        <input class="form-control"  value="" placeholder="Leave empty if non-clustered." id="bubbless-cluster-col">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="bubbless-cell-col" class="col-2 col-form-label">Cell column:</label>
+                    <div class="col-10">
+                        <input class="form-control"  value="" placeholder="Leave empty if non-clustered. Used for counting unique cell clusters" id="bubbless-cell-col">
                     </div>
                 </div>
                 <br>
@@ -139,8 +152,8 @@
                 </div>
                 <br>
                 <div class="form-group">
-                    <label for="bubblelessInput">Paste your conversions here</label>
-                    <textarea class="form-control" id="bubblelessInput" rows="10" placeholder="Paste your conversions here.">
+                    <label for="bubblelessInput">Paste your flagging conversions here</label>
+                    <textarea class="form-control" id="bubblelessInput" rows="10" placeholder="Paste your flagging conversions here.">
             </textarea>
                 </div>
                 <br>
@@ -197,23 +210,23 @@
                         <div class="form-group" align="left">
                             <select class="form-control" id="clientSelect">
                                 <option value="0">Default Client</option>
-                                <option value="1">McL</option>
+                                <option value="1">MCL</option>
                                 <option value="2">AL</option>
                                 <option value="3">DB</option>
                                 <option value="4">FM</option>
-                                <option value="5">RN</option>
+                                <option value="5">RAG</option>
                                 <option value="6">EM</option>
-                                <option value="7">PB</option>
-                                <option value="8">WL</option>
-                                <option value="9">KT</option>
-                                <option value="10">LR</option>
-                                <option value="11">LP</option>
-                                <option value="12">NRC</option>
-                                <option value="13">FB</option>
-                                <option value="14">NR</option>
-                                <option value="15">SX</option>
+                                <option value="7">PBO</option>
+                                <option value="8">WAL</option>
+                                <option value="9">KEA</option>
+                                <option value="10">LAK</option>
+                                <option value="11">LINC</option>
+                                <option value="12">NCC</option>
+                                <option value="13">FAB</option>
+                                <option value="14">NRI</option>
+                                <option value="15">SXT</option>
                                 <option value="16">GSG</option>
-                                <option value="17">TN</option>
+                                <option value="17">TUL</option>
                             </select>
                         </div>
                     </div>
@@ -233,9 +246,15 @@
                         <div class="form-check" align="left">
                             <input class="form-check-input" type="checkbox" value="" id="OnlineQActivity">
                             <label class="form-check-label" for="OnlineQActivity">
-                                Online Quotas active <b>(inactive by default)</b>
+                                Make Online/Text Quotas active <b>(inactive by default)</b>
                             </label>
                         </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col" align="left">
+                        <br>
+                        <b>Note:</b> When defining quota percentages, if the "%" is omitted, then it will be considered a raw N.
                     </div>
                 </div>
             </form>

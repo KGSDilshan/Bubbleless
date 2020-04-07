@@ -5,7 +5,13 @@ ERRORS TO CHECK
 
 
 */
+var IMPORTED_HEADER = "";
 var SAMPLE_HEADER = "";
+var TOTAL_RECORDS_IN_SAMPLE = 0;
+var VALID_PHONENUMBERS = 0;
+var INVALID_PHONENUMBERS = 0;
+var PHONE_RATIO = 0;
+var DELETESMAP = undefined;
 const invalidDomains = [".gov"];
 
 class FlaggedColumn {
@@ -19,6 +25,8 @@ class FlaggedColumn {
         this.breakdownNames = "";
         this.isCopied = false;
         this.createCol = true;
+        this.invalids = [];
+        this.cellRecords = [];
         // from column name, populate additions column
         let colID = CalcIndexColumn(columnName) - 1;
         for (let i = 0; i < SAMPLE.records.length; i++) {
@@ -199,6 +207,7 @@ class Sample {
             $("div#loadingStatusMsg").remove();
             $("div#sampleuploadtimer").remove();
             SAMPLE_HEADER = SAMPLE.records[0].slice();
+            TOTAL_RECORDS_IN_SAMPLE = SAMPLE.records.length;
 		};
 		sampleWorker.postMessage(data);
         document.getElementById("loadingStatusMsg").innerText = "Working on converting Sample";
@@ -213,8 +222,6 @@ class Sample {
     CheckClusters() {
         let clusterCol = document.getElementById("bubbless-cluster-col");
         if (clusterCol == undefined || clusterCol.value == "") {
-            WARNINGS.push("<b>WARNING:</b> Cluster column not defined or invalid'");
-            TEXTWARNINGS.push("WARNING: Cluster column not defined or invalid'");
             return;
         }
 
@@ -225,8 +232,14 @@ class Sample {
         // create a flag for the column
         const visualFlag = new FlaggedColumn(cname, 0);
         visualFlag.createCol = false;
-        if (name !== undefined)
+        if (name !== undefined) {
             visualFlag.name = name;
+        }
+        const cellCol = document.getElementById("bubbless-cell-col");
+        if (cellCol = undefined || cellCol.value =="") {
+            return;
+        }
+        visualFlag.UniqueCellClusters(cellCol.value);
         this.flagged_additions.push(visualFlag);
         // Mark the flag as DO NOT ADD
     }
@@ -269,7 +282,6 @@ class Sample {
         // read in priority col
         let colID_prio = CalcIndexColumn(cols[0]) - 1;
         let colID_secd = CalcIndexColumn(cols[1]) - 1;
-        let invalids = [];
         for (let i = 1; i < SAMPLE.records.length; i++) {
             let prio = SAMPLE.records[i][colID_prio];
             let secnd = SAMPLE.records[i][colID_secd];
@@ -285,13 +297,25 @@ class Sample {
                 if (prio === undefined && secnd == undefined)
                     continue;
                 phoneFlag.additions[i] = "invalid";
-                invalids.push(i + 1);
+                phoneFlag.invalids.push(i + 1);
 
             }
         }
-        for (let i = 0; i < invalids.length; i++) {
-            WARNINGS.push("<b>WARNING:</b> In lines '" + invalids[i] + " no valid phone number was found");
-            TEXTWARNINGS.push("WARNING: In lines '" + invalids[i] + " no valid phone number was found");
+        VALID_PHONENUMBERS = SAMPLE.records.length - phoneFlag.invalids.length;
+        INVALID_PHONENUMBERS = phoneFlag.invalids.length;
+        PHONE_RATIO = VALID_PHONENUMBERS / TOTAL_RECORDS_IN_SAMPLE;
+
+
+        if (phoneFlag.invalids.length > 50) {
+            WARNINGS.push("<b>WARNING:</b> " + phoneFlag.invalids.length + " records with no valid phone numbers found");
+            for (let i = 0; i < phoneFlag.invalids.length; i++) {
+                TEXTWARNINGS.push("WARNING: In lines '" + phoneFlag.invalids[i] + " no valid phone number was found");
+            }
+        } else {
+            for (let i = 0; i < phoneFlag.invalids.length; i++) {
+                WARNINGS.push("WARNING: In lines '" + phoneFlag.invalids[i] + " no valid phone number was found");
+                TEXTWARNINGS.push("WARNING: In lines '" + phoneFlag.invalids[i] + " no valid phone number was found");
+            }
         }
         this.flagged_start++;
         this.flagged_additions.push(phoneFlag);
@@ -358,6 +382,7 @@ class Sample {
                     this.deletedRecords.set(col, this.records.splice(i, 1));
                 }
                 // delete row from flagged column
+                DELETESMAP.set(name, (DELETESMAP.get(name) + 1 || 1));
                 for (let j = 0; j < this.flagged_additions.length; j++) {
                     this.flagged_additions[j].additions.splice(i, 1);
                 }
@@ -443,10 +468,11 @@ class Sample {
         let replaced = false;
         for (let k = 0; k < SAMPLE.records.length; k++) {
             let setRecord = true;
+            let min, max;
             for (let j = 0; j < conds.length; j++) {
                 let colID = conds[j].col;
-                let min = conds[j].min;
-                let max = conds[j].max;
+                min = conds[j].min;
+                max = conds[j].max;
                 if (max != min) {
                     if (!(parseInt(SAMPLE.records[k][colID]) >= min && parseInt(SAMPLE.records[k][colID]) <= max)) {
                         setRecord = false;
@@ -529,6 +555,18 @@ class Sample {
     	}
         console.log("fdata", fullData);
         this.DownloadCSV(fullData, "deletedRecords.csv");
+    }
+
+    ExportHeader() {
+        let fBlob = new Blob([SAMPLE_HEADER.join(",")], {type:"text/csv"});
+        let downloadLink = document.createElement("a");
+        downloadLink.download = "headers.csv";
+        downloadLink.href = window.URL.createObjectURL(fBlob);
+        downloadLink.style.display = "none";
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        $("div#loadingStatusMsg").remove();
+        $("div#sampleuploadtimer").remove();
     }
 
 
