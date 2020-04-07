@@ -81,10 +81,6 @@ span.syntax {
 	color: rgb(140,140,140);
 }
 
-span.emphasis {
-	font-style: italic;
-}
-
 /* Quota Styles */
 th.table_header {
 	font-size: larger;
@@ -94,20 +90,29 @@ th.table_header {
 	text-align: left;
 }
 
-/* ContentEditable styles */
-div#QuotasBuffer table {
-	border-collapse: separate;
-	border-spacing: 2px;
+/* Spacing for cards */
+.card {
+	margin-top: 0.5em;
 }
 
-div#QuotasBuffer [contenteditable="true"] {
-	background-image: url(imgs/pencil_icon.png);
-	background-repeat: no-repeat;
-	background-position: right;
-	background-origin: content-box;
+/* Quota generator documentation-specific */
+div.quota_docs>div {
+	margin-top: 0.75em;
 }
 
-div#QuotasBuffer td[contenteditable="true"]:focus {
-	background-image: none;
-	border: 2px dashed rgba(0,0,0,0.2);
+div.quota_docs>img {
+	margin-top: 0.5em;
+	border: 1px solid lightgray;
+}
+
+div.quota_docs>div.section_intro {
+	border-top: 2px dashed rgba(0,0,0,0.3);
+	padding-top: 1em;
+}
+
+div.quota_docs div.aside {
+	font-style: italic;
+	color: rgb(125,125,125);
+	padding-right: 1em;
+	padding-left: 1em;
 }
