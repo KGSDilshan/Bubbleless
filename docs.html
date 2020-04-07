@@ -206,6 +206,7 @@
                     </tbody>
                 </table>
                 <br>
+                <br>
             </div>
             <br>
             <div align="left">
@@ -220,7 +221,7 @@
                 <br>
                 Copy the contents, once made into the Text input field. Then, when a csv sample is uploaded, you should see a preview of the sample sheet's first 5 elements.
                 <br>
-                You can use this to verify if your sample was loaded properly and to double check what you paste in the text field, if necissary.
+                You can use this to verify if your sample was loaded properly and to double check what you paste in the text field, if necessary.
                 <img src="imgs/sample_preview.png" class="img-fluid" alt="pasteing">
                 <br>
                 Next, hit the "Process" button and scroll down to the results section. You'll be able to see some errors/warnings there if any were present.
@@ -229,6 +230,15 @@
                 Upon reading the warning, you can click the continue button if everything is intended. This will proceed to create a CSV sheet.
             </div>
             <br>
+            <div align="left">
+              <button class="btn btn-outline-info" type="button" data-toggle="collapse" data-target="#quotasPartOne" aria-expanded="false" aria-controls="collapseExample" align="left">
+                  <h3>Generating Quotas:</h3>
+              </button>
+            </div>
+            <div class="card card-body collapse" id="quotasPartOne">
+              With the sample flagged, Bubbless can take that data and arrange it into quotas for use on LS.<br />If you scroll down through the data visualizations, you'll end up at the Survey Level Quota Properties section.
+              <img src="imgs/suervey_level_quota_properties.PNG" class="img-fluid" alt="The survey level quota properties.">
+          </div>
         </div>
         <br>
         <br>
@@ -393,29 +403,27 @@
       </table>
       <br>
       <br>
-      <table class="table table-bordered">
+      <table class="table table-bordered quota_table">
         <thead>
           <tr>
-            <th colspan="5" class="table_header">Quota Generator Commands</th>
+            <th colspan="4" class="table_header">Quota Generator Commands</th>
           </tr>
           <tr>
             <th scope="col">Name</th>
             <th scope="col">Syntax</th>
             <th scope="col">Functionality</th>
             <th scope="col">Example</th>
-            <th scope="col">Output</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <th>Splits/Split Quotas</th>
             <th>(<span class="syntax">quota_name</span>)</th>
-            <td>Splits the quota with the named quota. Can be used multiple times on a single quota.</td>
+            <td>Splits the entire quota with the named quota. Can be used multiple times on a single quota.</td>
             <td style="width:max-content">
               <pre>Gender(<span class="emphasis">region</span>)
 Region(<span class="emphasis">splitab</span>)(<span class="emphasis">party</span>)</pre>
             </td>
-            <td></td>
           </tr>
           <tr>
             <th>Split by Mode</th>
@@ -424,7 +432,7 @@ Region(<span class="emphasis">splitab</span>)(<span class="emphasis">party</span
               (tri)
             </th>
             <td>
-              Marks the quota to be split by Mode (Phone, Email, Texting).<br />
+              Marks the entire quota to be split by Mode (Phone, Email, Texting).<br />
               N-sizes must include multiple numbers matching the Mode type (e.g. Dual mode requires 2 n-sizes, tri mode requires 3).<br />
               <span class="emphasis">Note: Mode quotas are implicitly split by mode so this command should not be used for mode.</span>
             </td>
@@ -432,8 +440,7 @@ Region(<span class="emphasis">splitab</span>)(<span class="emphasis">party</span
               Region(dual)<br />
               Region(tri)
             </td>
-            <td></td>
-          </tr>          
+          </tr>
           <tr>
             <th>Flex</th>
             <th>
@@ -441,12 +448,33 @@ Region(<span class="emphasis">splitab</span>)(<span class="emphasis">party</span
               <span class="emphasis">or</span><br />
               (flex <span class="syntax">X</span>)
             </th>
-            <td>Adds a flex amount to the quota. Percentage based on total n-size or a flat value.</td>
+            <td>Adds a flex amount to the entire quota and appends related text to the output. Either a percentage based on total n-size or a flat value.</td>
             <td>
               Gender(flex <span class="emphasis">3%</span>)<br />
               Party(flex <span class="emphasis">20</span>)
             </td>
-            <td></td>
+          </tr>
+          <tr>
+            <th>Counters</th>
+            <th>
+              (counter)
+            </th>
+            <td>Marks a quota value as a counter.</td>
+            <td>
+              <table>
+                <tr>
+                  <th colspan="2">Gender</th>
+                </tr>
+                <tr>
+                  <td>Male(counter)</td>
+                  <td>X%</td>
+                </tr>
+                <tr>
+                  <td>Female</td>
+                  <td>X%</td>
+                </tr>
+              </table>
+            </td>
           </tr>
         </tbody>
       </table>

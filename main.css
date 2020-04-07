@@ -75,16 +75,39 @@ div.scrollhorizontal {
 	height: 40%;
 }
 
-th.table_header {
-	font-size: larger;
-}
-
 /* Example text inline styles */
 span.syntax {
 	font-style: italic;
-	color: rgb(135,135,135);
+	color: rgb(140,140,140);
 }
 
 span.emphasis {
 	font-style: italic;
+}
+
+/* Quota Styles */
+th.table_header {
+	font-size: larger;
+}
+
+.quota_table td {
+	text-align: left;
+}
+
+/* ContentEditable styles */
+div#QuotasBuffer table {
+	border-collapse: separate;
+	border-spacing: 2px;
+}
+
+div#QuotasBuffer [contenteditable="true"] {
+	background-image: url(imgs/pencil_icon.png);
+	background-repeat: no-repeat;
+	background-position: right;
+	background-origin: content-box;
+}
+
+div#QuotasBuffer td[contenteditable="true"]:focus {
+	background-image: none;
+	border: 2px dashed rgba(0,0,0,0.2);
 }
