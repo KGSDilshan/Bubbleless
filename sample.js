@@ -13,6 +13,10 @@ var INVALID_PHONENUMBERS = 0;
 var PHONE_RATIO = 0;
 var DELETESMAP = undefined;
 const invalidDomains = [".gov"];
+var PHONE_SAMPLE = [];
+var EMAIL_SAMPLE = [];
+var TEXT_PHONES_SAMPLE = [];
+var TEXT_EMAIL_SAMPLE = [];
 
 class FlaggedColumn {
     constructor(columnName, index) {
@@ -131,7 +135,6 @@ class FlaggedColumn {
         let replaced = false;
         this.changes.push("ReplacementString" + replace);
         this.originalValue.push({f: find, r: replace});
-        console.log("normal str find, ", find, replace);
         for (let i = 0; i < this.additions.length; i++) {
             if (this.additions[i] !== undefined && this.additions[i].split(" ").join("").toUpperCase() == find) {
                 this.additions[i] = "ReplacementString" + replace;
@@ -175,7 +178,6 @@ class FlaggedColumn {
         let replaced = false;
         this.changes.push("ReplacementString" + replace);
         this.originalValue.push({f : min.toString() + "-" + max.toString(), r: replace});
-        console.log("ranged replace of:", replace, min, max);
         for (let i = 0; i < this.additions.length; i++) {
             if (parseInt(this.additions[i]) <= max && parseInt(this.additions[i]) >= min) {
                 this.additions[i] = "ReplacementString" + replace;
@@ -236,10 +238,10 @@ class Sample {
             visualFlag.name = name;
         }
         const cellCol = document.getElementById("bubbless-cell-col");
-        if (cellCol = undefined || cellCol.value =="") {
+        if (cellCol == undefined || cellCol.value =="") {
             return;
         }
-        visualFlag.UniqueCellClusters(cellCol.value);
+        // visualFlag.UniqueCellClusters(cellCol.value);
         this.flagged_additions.push(visualFlag);
         // Mark the flag as DO NOT ADD
     }
@@ -252,6 +254,10 @@ class Sample {
         tokenFlag.changes = ["token_flagged"].concat(TOKENHASHES.slice(startIndex, startIndex + this.records.length - 1));
         tokenFlag.additions = ["token_flagged"].concat(TOKENHASHES.slice(startIndex, startIndex + this.records.length - 1));
         this.flagged_start++;
+        for (let i = 0; i < tokenFlag.additions.length; i++) {
+            tokenFlag.changes[i] = "STRTOKENPREFIX" + tokenFlag.changes[i];
+            tokenFlag.additions[i] = "STRTOKENPREFIX" + tokenFlag.additions[i];
+        }
         tokenFlag.isCopied = true;
         this.flagged_additions.push(tokenFlag);
     }
@@ -276,7 +282,6 @@ class Sample {
 
     MergePhone(cols) {
         // make a flag object
-        console.log("merging phones");
         let phoneFlag = new FlaggedColumn("PHONE_NUMBERS", this.flagged_start);
         phoneFlag.isCopied = true;
         // read in priority col
@@ -288,14 +293,18 @@ class Sample {
             if (prio != undefined && prio.trim() !== '' && parseInt(prio) != 0 && prio.length > 1) {
                 phoneFlag.additions[i] = "ReplacementString" + prio;
                 phoneFlag.changes.push(phoneFlag.additions[i]);
+                PHONE_SAMPLE.push(i);
+                TEXT_PHONES_SAMPLE.push(i);
             } else if (secnd != undefined && secnd.trim() !== '' && parseInt(secnd) != 0 && secnd.length > 1) {
                 // anything that priority col has empty, check second col
                 phoneFlag.additions[i] = "ReplacementString" + secnd;
+                PHONE_SAMPLE.push(i);
                 phoneFlag.changes.push(phoneFlag.additions[i]);
             } else {
                 // if data is invalid in second col, do warning, otherwise set as blank
-                if (prio === undefined && secnd == undefined)
+                if (prio === undefined && secnd == undefined) {
                     continue;
+                }
                 phoneFlag.additions[i] = "invalid";
                 phoneFlag.invalids.push(i + 1);
 
@@ -325,7 +334,6 @@ class Sample {
     CreateEmails(cname, cols) {
         let emailFlag = new FlaggedColumn(cname, this.flagged_start);
         emailFlag.changes.push("ReplacementStringrf@rf.com");
-        console.log("start emails", SAMPLE.records.length, cols.length);
         for (let j = SAMPLE.records.length-1; j >= 1; j--) {
             // check each record at specified column
             for (let i = 0; i < cols.length; i++) {
@@ -338,6 +346,7 @@ class Sample {
                         // valid email, don't delete
                         emailFlag.additions[j] = "ReplacementString" + recordEmail;
                         emailFlag.changes.push(emailFlag.additions[j]);
+                        EMAIL_SAMPLE.push(j);
                         emStatus = true;
                         break;
                     case 1:
@@ -356,7 +365,6 @@ class Sample {
                 emailFlag.additions[j] = "ReplacementStringrf@rf.com";
             }
         }
-        console.log("fin eval");
         this.flagged_start++;
         this.flagged_additions.push(emailFlag);
     }
@@ -523,6 +531,17 @@ class Sample {
 
 
     PrepareExport() {
+        if (document.getElementById("IncludePhoneSample").checked ||
+            document.getElementById("IncludeEmailSample").checked ||
+            document.getElementById("IncludeTextSample").checked) {
+                let flag = new FlaggedColumn("Mode Internal", SAMPLE.flagged_start);
+                SAMPLE.flagged_start++;
+                flag.isCopied = true;
+                SAMPLE.flagged_additions.push(flag);
+                for (let i = 0; i < flag.additions.length; i++) {
+                    flag.additions[i] = "STRPREFIXModeInternalFill";
+                }
+        }
         for (let i = 0; i <this.flagged_additions.length; i++) {
             this.flagged_additions[i].InsertIntoSample();
         }
@@ -535,11 +554,30 @@ class Sample {
     		sampleWorker.onmessage = function(event) {
                 SAMPLE.records = event.data.slice();
                 sampleWorker.terminate();
+                SetTextRecords();
+                SetPhoneRecords();
+                SetEmailRecords();
     		};
     		sampleWorker.postMessage(this.records);
         }
     }
 
+    DownloadTextingSamples() {
+        this.DownloadTextChunks(TEXT_PHONES_SAMPLE, "PhoneToText");
+        this.DownloadTextChunks(TEXT_EMAIL_SAMPLE, "EmailToText");
+    }
+
+    DownloadTextChunks(sample, name) {
+        let counter = 1;
+        while (sample.length > 1) {
+            let chunk = [SAMPLE.records[0]];
+            for (let i = sample.length - 1, j = 0; i >= 1 && j < 10000; i--, j++) {
+                chunk.push(sample.splice(i, 1)[0]);
+            }
+            this.DownloadCSV(chunk, name + "_" + counter + "_." + INITIAL_FILETYPE);
+            counter++;
+        }
+    }
 
     ExportDeleted() {
         let fullData = [];
@@ -580,7 +618,7 @@ class Sample {
         if (INITIAL_FILETYPE == "csv" || fname.includes(".csv")) {
             fBlob = new Blob(csvVar, {type:"text/csv"});
             let downloadLink = document.createElement("a");
-            downloadLink.download = "RENAME_ME" + (fname.includes(".csv") ? "_deletes.csv" : "." + INITIAL_FILETYPE);
+            downloadLink.download = (fname.includes(".csv") ? fname + ".csv" : "RENAME_ME.csv");
             downloadLink.href = window.URL.createObjectURL(fBlob);
             downloadLink.style.display = "none";
             document.body.appendChild(downloadLink);

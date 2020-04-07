@@ -81,6 +81,7 @@ function OpenFile(event) {
 	AltLoadBar();
 	let files = document.getElementById("sampleFile").files;
 	if (files[0].name.includes(".csv")) {
+		INITIAL_FILETYPE = "csv";
 		let input = event.target;
 		let reader = new FileReader();
 		reader.readAsText(input.files[0]);
@@ -234,6 +235,58 @@ function CalcIndexColumn(s) {
 	return n;
 }
 
+function SetPhoneRecords() {
+	// Post sample processing
+	let records = [SAMPLE.records[0]];
+	var rec;
+	for (let i = 0; i < PHONE_SAMPLE.length; i++) {
+		rec = SAMPLE.records[PHONE_SAMPLE[i]].split("STRTOKENPREFIX").join("").split("STRPREFIXModeInternalFill").join("1");
+		records.push(rec);
+	}
+	PHONE_SAMPLE = records.slice();
+}
+
+function SetEmailRecords() {
+	// Post sample processing
+	let records = [SAMPLE.records[0]];
+	var rec;
+	for (let i = 0; i < EMAIL_SAMPLE.length; i++) {
+		rec = SAMPLE.records[EMAIL_SAMPLE[i]].split("STRTOKENPREFIX").join("").split("STRPREFIXModeInternalFill").join("2");
+		records.push(rec);
+	}
+	EMAIL_SAMPLE = records.slice();
+}
+
+function SetTextRecords() {
+	// Email Text, everything from TEXT_PHONES_SAMPLE where indexes are shared in EMAIL_SAMPLE
+	// Phone Text sample, everything remaining is phones
+	let emailTextSample = [];
+	for (let i = 0; i < EMAIL_SAMPLE.length; i++) {
+		for (let j = TEXT_PHONES_SAMPLE.length - 1; j >= 1; j--) {
+			if (EMAIL_SAMPLE[i] == TEXT_PHONES_SAMPLE[j]) {
+				emailTextSample.push(TEXT_PHONES_SAMPLE[j]);
+				TEXT_PHONES_SAMPLE.splice(j, 1);
+			}
+		}
+	}
+	// phones text
+	let records = [SAMPLE.records[0]];
+	var rec;
+	for (let i = 0; i < TEXT_PHONES_SAMPLE.length; i++) {
+		rec = SAMPLE.records[TEXT_PHONES_SAMPLE[i]].split("STRTOKENPREFIX").join("T").split("STRPREFIXModeInternalFill").join("3");
+		records.push(rec);
+	}
+	TEXT_PHONES_SAMPLE = records.slice();
+
+	// email Text
+	records = [SAMPLE.records[0]];
+	for (let i = 0; i < emailTextSample.length; i++) {
+		rec = SAMPLE.records[emailTextSample[i]].split("STRTOKENPREFIX").join("T").split("STRPREFIXModeInternalFill").join("3");
+		records.push(rec);
+	}
+	TEXT_EMAIL_SAMPLE = records.slice();
+}
+
 
 function ProcessInput() {
 	if (SAMPLE == undefined) {
@@ -254,6 +307,10 @@ function ProcessInput() {
 	TEXTWARNINGS = [];
 	$("button#continue2").remove();
 	$("button#continue3").remove();
+	$("button#continue4").remove();
+	$("button#continue5").remove();
+	$("button#continue6").remove();
+	$("button#continue7").remove();
 	// reparse all arguments
 	let contents = document.getElementById("bubblelessInput").value;
 	let scrubs = document.getElementById("bubblelessScrubNamesInput").value;
@@ -266,17 +323,42 @@ function ProcessInput() {
 	}
 	SAMPLE.CheckClusters();
 	SAMPLE.PrepareExport();
-	console.log("filetype: ", INITIAL_FILETYPE);
 	let good = false;
 	if (WARNINGS.length == 0) {
 		WARNINGS.push("<b>ALL OK.</b>");
 		TEXTWARNINGS.push("ALL OK\n");
-		let buttonHTML = '<button type="submit" class="btn btn-primary mb-2" id="continue2" onClick=SAMPLE.DownloadCSV(SAMPLE.records)>Download CSV</button>'
+		let buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-primary mb-2" id="continue2" onClick=SAMPLE.DownloadCSV(SAMPLE.records)>DL Master CSV &nbsp;&nbsp;</button><br>'
 		$("div#ButtonBuffer").append(buttonHTML);
+		if (document.getElementById("IncludePhoneSample").checked) {
+			buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-primary mb-2" id="continue4" onClick=SAMPLE.DownloadCSV(PHONE_SAMPLE, "phones")>DL Phones CSV &nbsp;&nbsp;</button>'
+			$("div#ButtonBuffer").append(buttonHTML);
+		}
+		if (document.getElementById("IncludeEmailSample").checked) {
+			buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-primary mb-2" id="continue5" onClick=SAMPLE.DownloadCSV(EMAIL_SAMPLE, "emails")>DL Emails CSV &nbsp;&nbsp;</button>'
+			$("div#ButtonBuffer").append(buttonHTML);
+		}
+		if (document.getElementById("IncludeTextSample").checked) {
+			buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-primary mb-2" id="continue6" onClick=SAMPLE.DownloadTextingSamples()>DL Texting CSVs &nbsp;&nbsp;</button>'
+			$("div#ButtonBuffer").append(buttonHTML);
+		}
+		$("div#ButtonBuffer").append("<br>");
 		good = true;
 	} else {
-		let buttonHTML = '<button type="submit" class="btn btn-danger mb-2" id="continue2" onClick=SAMPLE.DownloadCSV(SAMPLE.records) >Acknowledged Warnings & Download CSV</button>'
+		let buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-danger mb-2" id="continue2" onClick=SAMPLE.DownloadCSV(SAMPLE.records) >Acknowledged Warnings & DL Master CSV &nbsp;&nbsp;</button><br>'
 		$("div#ButtonBuffer").append(buttonHTML);
+		if (document.getElementById("IncludePhoneSample").checked) {
+			buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-danger mb-2" id="continue4" onClick=SAMPLE.DownloadCSV(PHONE_SAMPLE, "phones") >DL Phones CSV &nbsp;&nbsp;</button>'
+			$("div#ButtonBuffer").append(buttonHTML);
+		}
+		if (document.getElementById("IncludeEmailSample").checked) {
+			buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-danger mb-2" id="continue5" onClick=SAMPLE.DownloadCSV(EMAIL_SAMPLE, "emails") >DL Emails CSV &nbsp;&nbsp;</button>'
+			$("div#ButtonBuffer").append(buttonHTML);
+		}
+		if (document.getElementById("IncludeTextSample").checked) {
+			buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-danger mb-2" id="continue6" onClick=SAMPLE.DownloadTextingSamples() >DL Texting CSVs &nbsp;&nbsp;</button>'
+			$("div#ButtonBuffer").append(buttonHTML);
+		}
+		$("div#ButtonBuffer").append("<br>");
 	}
 	DisplayWarnings(good);
 	ViewRawData();
