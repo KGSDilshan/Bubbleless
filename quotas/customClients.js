@@ -202,13 +202,13 @@ class DBClient extends BaseClient {
 
     genderMiscodedHandler(group, args) {
         args.array.forEach(obj => group.subQuotas[obj.subQuotaIndex].qCodes[0] = obj.correctCode);
-        //for (let i = 0; i < args.array.length; i++) {
-        //    group.subQuotas[args.array[i].subQuotaIndex].qCodes[0] = args.array[i].correctCode;
-        //}
     }
 
     phoneTypeDefaultLimitHandler(group) {
-        group.subQuotas.forEach(sq => sq.valLimit = "50");
+        group.subQuotas.forEach(sq => {
+            sq.valLimit = "50";
+            sq.isRaw = false;
+        });
     }
 
     // We can just set all of them to false
