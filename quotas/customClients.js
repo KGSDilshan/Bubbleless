@@ -18,7 +18,7 @@ class ALClient extends BaseClient {
         for (let i = 0; i < QUOTA_GROUPS.length; i++) {
             for (let j = 0; j < QUOTA_GROUPS[i].subQuotas.length; j++) {
                 let q = QUOTA_GROUPS[i].subQuotas[j];
-                if (q.active == true && !q.name.toLowerCase().includes("split")) {
+                if (q.active == true && !q.name.toLowerCase().includes("split") && q.counter == false) {
                     // warn quota is active
                     GLOBAL_WARNINGS.push({
                         message: "WARNING: " + QUOTA_GROUPS[i].getName() + ", quota is active. Must be inactive. (Checklist)",
