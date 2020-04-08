@@ -288,6 +288,7 @@ function ReadQuotaArr(showAlert=true) {
 
     // global warnings
     CLIENT.checkMissingQuotas();
+    CLIENT.checkActiveLimits();
     alertMsg = displayWarnings(GLOBAL_WARNINGS) + "\n" + alertMsg;
 
     if (GLOBAL_WARNINGS.length == 0) {

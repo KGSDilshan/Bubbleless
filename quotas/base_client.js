@@ -114,8 +114,8 @@ class BaseClient {
         QUOTA_GROUPS.push(new QuotaGroup("Mode", configTemplate, rawQuotas));
     }
 
-    limitUnderFiveHandler(group, quota) {
-        quota.active = false;
+    limitUnderFiveHandler(group, quotas) {
+        quotas.forEach(quota => quota.active = false);
     }
 
     activeMultiQuestionQuotaHandler(group, quotaIndices) {
@@ -174,6 +174,31 @@ class BaseClient {
             });
         }
         return;
+    }
+
+    checkActiveLimits() {
+        let activeLTfiveQuotas = [];
+        for (let x = 0; x < QUOTA_GROUPS.length; x++) {
+            let group = QUOTA_GROUPS[x];
+            for (let y = 0; y < group.subQuotas.length; y++) {
+                let quota = group.subQuotas[y];
+                if (quota.active) {
+                    debugger;
+                    for (const prop in quota.limits) {
+                        if (quota.limits[prop] <= 5) {
+                            activeLTfiveQuotas.push(quota);
+                        }
+                    }
+                }
+            }
+        }
+        if (activeLTfiveQuotas.length > 0) {
+            GLOBAL_WARNINGS.push({
+                message : "WARNING: Active quotas with limits less than or equal to 5 found.",
+                callback : this.limitUnderFiveHandler,
+                args:activeLTfiveQuotas
+            });
+        }
     }
 
     getSuffix(quota) {
@@ -315,7 +340,7 @@ class BaseClient {
                     if (quota.group.includesEmail) {
                         quota.limits.phone = round05Ciel((quota.group.nSizes[1] * lim)/100) + flexAddition;
                     }
-                    if (quota.group.includesTest) {
+                    if (quota.group.includesText) {
                         quota.limits.phone = round05Ciel((quota.group.nSizes[2] * lim)/100) + flexAddition;
                     }
                     break;
@@ -346,15 +371,6 @@ class BaseClient {
                     }
                     break;
             }
-        }
-        // Automatically deactivate quota if its limit is less than or equal to 5
-        if (lim <= 5 && quota.active) {
-            console.log("Warning: " + quota.name + " limit is <= 5 and active. (" + lim + ")");
-            GLOBAL_WARNINGS.push({
-                message: "Warning: " + quota.name + " limit is <= 5 and active. (" + lim + ")",
-                callback: this.limitUnderFiveHandler,
-                args: quota
-            });
         }
     }
 }
