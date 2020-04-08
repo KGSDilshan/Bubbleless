@@ -86,7 +86,7 @@ class QuotaGroup {
                 if (j == i)
                     continue;
                 if ((this.subQuotas[i].name == this.subQuotas[j].name) &&
-                    (this.subQuotas[i].qCodes == this.subQuotas[j].qCodes)) {
+                    (JSON.stringify(this.subQuotas[i].qCodes) == JSON.stringify(this.subQuotas[j].qCodes))) {
                         dupeQs.push(i);
                     }
             }

@@ -114,7 +114,6 @@ function StrToQuotaTable(str) {
 }
 
 function ImportQuotas(event) {
-    ClearQuotaTables();
     let qFileInput = document.getElementById("quotaImportFile");
     qFileInput.click();
     qFileInput.onchange = function () {
@@ -123,6 +122,7 @@ function ImportQuotas(event) {
         if (qFile.length === 0) {
             alert("This action requires a valid .dat file to be uploaded.");
         } else {
+            ClearQuotaTables();
             reader.addEventListener("loadend", function (event) {
                 StrToQuotaTable(event.target.result);
             });
