@@ -142,7 +142,7 @@ function CountIfCmdCallback(contents, index) {
     let line = contents[index].split(" ").join("").split("\t");
     line.splice(0, 1);
     for (let i = 0; i < line.length; i++) {
-        line[i] = [CalcIndexColumn(line[i].split(",")[0]) - 1,line[i].split(",")[1]]
+        line[i] = [CalcIndexColumn(line[i].split(",")[0]) - 1,(line[i].split(",")[1]).toUpperCase()]
     }
     // create a new flag
     let flag = new FlaggedColumn("CountIfSeries", SAMPLE.flagged_start);
@@ -157,11 +157,11 @@ function CountIfCmdCallback(contents, index) {
             let col = line[i][0];
             let value = line[i][1];
         // loop through each record and check each
-            if (SAMPLE.records[j][col] == value) {
+            if ((SAMPLE.records[j][col]).toUpperCase() == value) {
                 counter++;
             }
         }
-        flag.additions[j] = "ReplacementStringcounter";
+        flag.additions[j] = "ReplacementString" + counter;
     }
     SAMPLE.flagged_start++;
     SAMPLE.flagged_additions.push(flag);
@@ -252,6 +252,13 @@ function DefaultCallback(contents, index) {
     // do default command behaviour
     let currentCol = undefined;
     for (let i = index; i < contents.length; i++) {
+        // other command
+        for (let s = 0; s < Syntax.length - 1; s++) {
+            if (Syntax[s].validation(contents[i])) {
+                return i - 1;
+            }
+        }
+
         // we need to know if this is a column or a find and replacement
         let line = contents[i].trim().split("\t");
         if (line.length == 1) {
