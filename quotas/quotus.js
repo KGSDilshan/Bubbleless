@@ -11,17 +11,18 @@ function DeleteTable(id) {
 
 function UITableHTML(unbracketed_name) {
     let tableHeader = '<div id="tableIndex' + TABLE_COUNTER +'">';
-    tableHeader += '<form"><div class="row">'
+    tableHeader += '<form><div class="row">'
 
     tableHeader += '<div class="col">';
     tableHeader += '<button type="button" class="btn btn-danger btn-sm" onClick=DeleteTable("tableIndex' + TABLE_COUNTER + '")>Delete ' +  unbracketed_name + '</button>';
     tableHeader += '</div>';
     tableHeader += '<div class="col"><div class="form-group">';
-    tableHeader += '<input type="text" class="form-control form-control-sm"" id="customN' + TABLE_COUNTER +'" placeholder="Custom N-size">';
+    tableHeader += '<input type="text" class="form-control form-control-sm" id="customN' + TABLE_COUNTER +'" placeholder="Custom N-size">';
     tableHeader += '</div></div>';
     tableHeader += '</div>';
     tableHeader += '</form>';
-    tableHeader += '<table class="table table-light table-bordered table-hover" id="quotaTable">'
+    tableHeader += '<table class="table table-light table-bordered table-hover" id="quotaTable">';
+    TABLE_COUNTER++;
     return tableHeader;
 }
 
@@ -37,7 +38,7 @@ function CreateNewQuota_DOM(len) {
     for (let i = 0; i < len; i++) {
         data_table += '<tr>';
         data_table += '<td contenteditable="true">QUOTA_NAME</td>';
-        data_table += '<td contenteditable="true">X%</td>';
+        data_table += '<td contenteditable="true">0%</td>';
         data_table += '<td contenteditable="true">pPrecodeName</td>';
         data_table += '<td contenteditable="true">' + (i + 1) + '</td>';
         data_table += '</tr>';
@@ -46,7 +47,6 @@ function CreateNewQuota_DOM(len) {
     data_table += '</table>';
     let unbracketed_name = "QUOTA_GROUP_NAME";
     qBuff.innerHTML += UITableHTML(unbracketed_name) + data_table + "<br><br></div>";
-    TABLE_COUNTER++;
 }
 
 
@@ -89,7 +89,6 @@ function StrToQuotaTable(str) {
             if (a > 0) {
                 data_table += '</tbody>';
                 data_table += '</table><br><br></div>';
-                TABLE_COUNTER++;
             }
             let unbracketed_name = data[a][0].replace(/\([a-zA-Z0-9 %]*\)/gi,"");
             data_table += UITableHTML(unbracketed_name);
@@ -110,11 +109,9 @@ function StrToQuotaTable(str) {
     data_table += '</tbody>';
     data_table += '</table>';
     qBuff.innerHTML += data_table + "<br><br>";
-    TABLE_COUNTER++;
 }
 
 function ImportQuotas(event) {
-    ClearQuotaTables();
     let qFileInput = document.getElementById("quotaImportFile");
     qFileInput.click();
     qFileInput.onchange = function () {
@@ -123,6 +120,7 @@ function ImportQuotas(event) {
         if (qFile.length === 0) {
             alert("This action requires a valid .dat file to be uploaded.");
         } else {
+            ClearQuotaTables();
             reader.addEventListener("loadend", function (event) {
                 StrToQuotaTable(event.target.result);
             });
