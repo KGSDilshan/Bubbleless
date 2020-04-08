@@ -37,7 +37,7 @@ function CreateNewQuota_DOM(len) {
     for (let i = 0; i < len; i++) {
         data_table += '<tr>';
         data_table += '<td contenteditable="true">QUOTA_NAME</td>';
-        data_table += '<td contenteditable="true">X%</td>';
+        data_table += '<td contenteditable="true">0%</td>';
         data_table += '<td contenteditable="true">pPrecodeName</td>';
         data_table += '<td contenteditable="true">' + (i + 1) + '</td>';
         data_table += '</tr>';
