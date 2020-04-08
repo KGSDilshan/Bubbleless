@@ -235,6 +235,12 @@ function CalcIndexColumn(s) {
 	return n;
 }
 
+function RemovePrefixesInRecords() {
+	for (let i = 0; i < SAMPLE.records.length; i++) {
+		SAMPLE.records[i] = SAMPLE.records[i].split("STRTOKENPREFIX").join("").split("STRPREFIXModeInternalFill").join("");
+	}
+}
+
 function SetPhoneRecords() {
 	// clean the phone records, should not contain any email records in this sample
 	for (let i = PHONE_SAMPLE.length - 1; i >= 0; i--) {

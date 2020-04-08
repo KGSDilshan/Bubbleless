@@ -557,6 +557,7 @@ class Sample {
                 SetTextRecords();
                 SetPhoneRecords();
                 SetEmailRecords();
+                RemovePrefixesInRecords();
     		};
     		sampleWorker.postMessage(this.records);
         }
