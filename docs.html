@@ -239,8 +239,8 @@
               <div>After you process a sample, Bubbleless can take that data and arrange it into quotas for use on LS.<br />If you scroll down through the data visualizations, you'll end up at the Survey Level Quota Properties section.</div>
               <img src="imgs/quota_mode_nsize.PNG" class="img-fluid" alt="The survey level quota properties section with a value of 400-0-600 being entered into the N Sizes field.">
               <div>The N Sizes value is required. This is used to calculate raw n-sizes out of the percentages for the quotas.</div>
-              <div><i>If there is only one mode, you only need to enter one number, regardless of mode.</i> The format if there are multiple modes is a raw number for each mode separated by a dash: <span class="syntax">Phone-Email-Text</span></div>
-              <div>In this case, irrelevant modes should be 0. The image above describes a project of <u>1000n</u> with a phone mode of n=<u>400</u> and a texting mode of n=<u>600</u>.</div>
+              <div><i>If there is only one mode, you only need to enter one number, regardless of mode.</i> For multiple modes, the format is a raw number for each mode separated by a dash: <span class="syntax">Phone-Email-Text</span></div>
+              <div>Modes that appear later don't need to be included (e.g. phone and email surveys only need 2 n-sizes). In any other case, irrelevant modes should be 0. The image above describes a project of <u>1000n</u> with a phone mode of n=<u>400</u> and a texting mode of n=<u>600</u>.</div>
               <div class="aside">Note: Keep in mind whether the projects will be on the same link or not. In the above example, if the project were separated into two surveys, the generated csv would be incorrect. You would need to generate two quota files in this case, one for each mode; with corresponding n-sizes.</div>
               <div>Everything else should be set according to the project specifications, usually on Trello.</div>
             </div>
