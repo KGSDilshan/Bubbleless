@@ -49,6 +49,12 @@ var Syntax = [
         callback: GraphCmdCallback,
     },
     {
+        name: "COUNTIF",
+        length: 1,
+        validation: IsCountIfCmd,
+        callback: CountIfCmdCallback,
+    },
+    {
         name: "FindAndReplace",
         length: 1,
         validation: IsDefault,
@@ -59,6 +65,12 @@ var Syntax = [
 
 function IsGraphCmd(line) {
     return line.toUpperCase().includes("GRAPH");
+}
+
+
+function IsCountIfCmd(line) {
+    // COUNTIF\tX,1\tY,2\tN,5...
+    return line.toUpperCase().includes("COUNTIF");
 }
 
 
@@ -122,6 +134,37 @@ function GraphCmdCallback(contents, index) {
     } else {
         SAMPLE.VisualizationQueueCol(line[1].trim().toString());
     }
+    return index;
+}
+
+function CountIfCmdCallback(contents, index) {
+    // COUNTIF\tX,1\tY,2\tN,5...
+    let line = contents[index].split(" ").join("").split("\t");
+    line.splice(0, 1);
+    for (let i = 0; i < line.length; i++) {
+        line[i] = [CalcIndexColumn(line[i].split(",")[0]) - 1,line[i].split(",")[1]]
+    }
+    // create a new flag
+    let flag = new FlaggedColumn("CountIfSeries", SAMPLE.flagged_start);
+    for (let i = 0; i <= line.length; i++) {
+        flag.changes.push("ReplacementString" + i);
+
+    }
+    for (let j = 0; j < SAMPLE.records.length; j++) {
+        let counter = 0;
+        for (let i = 0; i < line.length; i++) {
+            // get what we're looking for
+            let col = line[i][0];
+            let value = line[i][1];
+        // loop through each record and check each
+            if (SAMPLE.records[j][col] == value) {
+                counter++;
+            }
+        }
+        flag.additions[j] = "ReplacementStringcounter";
+    }
+    SAMPLE.flagged_start++;
+    SAMPLE.flagged_additions.push(flag);
     return index;
 }
 

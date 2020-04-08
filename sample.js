@@ -618,7 +618,7 @@ class Sample {
         if (INITIAL_FILETYPE == "csv" || fname.includes(".csv")) {
             fBlob = new Blob(csvVar, {type:"text/csv"});
             let downloadLink = document.createElement("a");
-            downloadLink.download = (fname.includes(".csv") ? fname + ".csv" : "RENAME_ME.csv");
+            downloadLink.download = (fname.includes(".csv") ? fname : "RENAME_ME.csv");
             downloadLink.href = window.URL.createObjectURL(fBlob);
             downloadLink.style.display = "none";
             document.body.appendChild(downloadLink);

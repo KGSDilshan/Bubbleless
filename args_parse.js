@@ -236,6 +236,13 @@ function CalcIndexColumn(s) {
 }
 
 function SetPhoneRecords() {
+	// clean the phone records, should not contain any email records in this sample
+	for (let i = PHONE_SAMPLE.length - 1; i >= 0; i--) {
+		if (EMAIL_SAMPLE.includes(PHONE_SAMPLE[i])) {
+			PHONE_SAMPLE.splice(i, 1);
+		}
+	}
+
 	// Post sample processing
 	let records = [SAMPLE.records[0]];
 	var rec;
@@ -330,11 +337,11 @@ function ProcessInput() {
 		let buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-primary mb-2" id="continue2" onClick=SAMPLE.DownloadCSV(SAMPLE.records)>DL Master CSV &nbsp;&nbsp;</button><br>'
 		$("div#ButtonBuffer").append(buttonHTML);
 		if (document.getElementById("IncludePhoneSample").checked) {
-			buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-primary mb-2" id="continue4" onClick=SAMPLE.DownloadCSV(PHONE_SAMPLE, "phones")>DL Phones CSV &nbsp;&nbsp;</button>'
+			buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-primary mb-2" id="continue4" onClick=SAMPLE.DownloadCSV(PHONE_SAMPLE,' + '"phones.csv"' + ')>DL Phones CSV &nbsp;&nbsp;</button>'
 			$("div#ButtonBuffer").append(buttonHTML);
 		}
 		if (document.getElementById("IncludeEmailSample").checked) {
-			buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-primary mb-2" id="continue5" onClick=SAMPLE.DownloadCSV(EMAIL_SAMPLE, "emails")>DL Emails CSV &nbsp;&nbsp;</button>'
+			buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-primary mb-2" id="continue5" onClick=SAMPLE.DownloadCSV(EMAIL_SAMPLE,' + '"emails.csv"' + ')>DL Emails CSV &nbsp;&nbsp;</button>'
 			$("div#ButtonBuffer").append(buttonHTML);
 		}
 		if (document.getElementById("IncludeTextSample").checked) {
@@ -347,11 +354,11 @@ function ProcessInput() {
 		let buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-danger mb-2" id="continue2" onClick=SAMPLE.DownloadCSV(SAMPLE.records) >Acknowledged Warnings & DL Master CSV &nbsp;&nbsp;</button><br>'
 		$("div#ButtonBuffer").append(buttonHTML);
 		if (document.getElementById("IncludePhoneSample").checked) {
-			buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-danger mb-2" id="continue4" onClick=SAMPLE.DownloadCSV(PHONE_SAMPLE, "phones") >DL Phones CSV &nbsp;&nbsp;</button>'
+			buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-danger mb-2" id="continue4" onClick=SAMPLE.DownloadCSV(PHONE_SAMPLE,' + '"phones.csv"' + ') >DL Phones CSV &nbsp;&nbsp;</button>'
 			$("div#ButtonBuffer").append(buttonHTML);
 		}
 		if (document.getElementById("IncludeEmailSample").checked) {
-			buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-danger mb-2" id="continue5" onClick=SAMPLE.DownloadCSV(EMAIL_SAMPLE, "emails") >DL Emails CSV &nbsp;&nbsp;</button>'
+			buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-danger mb-2" id="continue5" onClick=SAMPLE.DownloadCSV(EMAIL_SAMPLE,' + '"emails.csv"' + ') >DL Emails CSV &nbsp;&nbsp;</button>'
 			$("div#ButtonBuffer").append(buttonHTML);
 		}
 		if (document.getElementById("IncludeTextSample").checked) {
