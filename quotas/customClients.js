@@ -30,13 +30,35 @@ class ALClient extends BaseClient {
             }
         }
         // check if Gender has split quotas
-        let checked = false;
-        for (let i = 0; i < QUOTA_GROUPS.length; i++) {
-            if (QUOTA_GROUPS[i].getName().toLowerCase().includes("gender") || QUOTA_GROUPS[i].getName().toLowerCase().includes("sex")) {
-                checked = true;
-                if (!QUOTA_GROUPS[i].hasSplits) {
+        let genderGrp = getQuotaByNames(["gender", "sex"]);
+        if (genderGrp != undefined && !genderGrp.hasSplits) {
+            GLOBAL_WARNINGS.push({
+                message: "WARNING: Gender Quota missing split quota",
+                callback: undefined,
+                group: undefined,
+            });
+        }
+        // check that gender is pulling from insurvey
+        if (genderGrp && !isNOL()) {
+            for (let i = 0; i < genderGrp.subQuotas.length; i++) {
+                let qName = genderGrp.subQuotas[i].qName;
+                if (qName.startsWith("p")) {
                     GLOBAL_WARNINGS.push({
-                        message: "WARNING: Gender Quota missing split quota",
+                        message: "WARNING: Gender Quota should pull from survey when Non-listed",
+                        callback: undefined,
+                        group: undefined,
+                    });
+                    break;
+                }
+            }
+        }
+        let ageGrp = getQuotaByNames(["age"]);
+        if (ageGrp && !isNOL()) {
+            for (let i = 0; i < ageGrp.subQuotas.length; i++) {
+                let qName = ageGrp.subQuotas[i].qName;
+                if (qName.startsWith("p")) {
+                    GLOBAL_WARNINGS.push({
+                        message: "WARNING: Age Quota should pull from survey when Non-listed",
                         callback: undefined,
                         group: undefined,
                     });
