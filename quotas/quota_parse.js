@@ -224,6 +224,7 @@ function ReadQuotaArr(showAlert=true) {
 
     // Initialize quota groups/headers
     QUOTA_GROUPS = [];
+    TABLE_COUNTER = 0;
     QUOTA_HEADERS = [];
     GLOBAL_WARNINGS = [];
     RAN_CSWARNINGS = false;
@@ -257,7 +258,6 @@ function ReadQuotaArr(showAlert=true) {
     }
     ModePhone = ModeOnline ? false : true;
     SurveyMode = (IncludesPhone + IncludesEmail + IncludesText);
-
     while (i < content.length) {
         let line = content[i].trim().split("\t");
         if (line == undefined) {
@@ -288,6 +288,7 @@ function ReadQuotaArr(showAlert=true) {
 
     // global warnings
     CLIENT.checkMissingQuotas();
+    CLIENT.checkActiveLimits();
     alertMsg = displayWarnings(GLOBAL_WARNINGS) + "\n" + alertMsg;
 
     if (GLOBAL_WARNINGS.length == 0) {
