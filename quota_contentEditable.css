@@ -4,14 +4,19 @@ div#QuotasBuffer table {
 	border-spacing: 2px;
 }
 
-div#QuotasBuffer [contenteditable="true"] {
-	background-image: url(imgs/pencil_icon.png);
+div#QuotasBuffer [contenteditable="true"]::after {
+	content: url(imgs/pencil_icon.png);
+	float: right;
 	background-repeat: no-repeat;
 	background-position: right;
 	background-origin: content-box;
+	opacity: 0.2;
+}
+
+div#QuotasBuffer td[contenteditable="true"]:focus::after {
+	content: none;
 }
 
 div#QuotasBuffer td[contenteditable="true"]:focus {
-	background-image: none;
 	border: 2px dashed rgba(0,0,0,0.2);
 }

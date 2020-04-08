@@ -114,6 +114,10 @@ class BaseClient {
         QUOTA_GROUPS.push(new QuotaGroup("Mode", configTemplate, rawQuotas));
     }
 
+    limitUnderFiveHandler(group, quota) {
+        quota.active = false;
+    }
+
     checkMissingQuotas() {
         let genderGrp = getQuotaByNames(["gender", "sex"]);
         let ageGrp = getQuotaByNames(["age"]);
@@ -242,9 +246,10 @@ class BaseClient {
         let flex = quota.group.isFlex;
         let flexRaw = quota.group.isRawFlex;
         let flexAmount = quota.group.flexAmount;
+        let lim = 0;
         // determine if limit is a raw limit
         if (!quota.strLimit.includes("%")) {
-            let lim = parseFloat(quota.strLimit);
+            lim = parseFloat(quota.strLimit);
             if (flexRaw) {
                 lim += flexAmount;
             } else if (flex) {
@@ -285,8 +290,8 @@ class BaseClient {
                     break;
             }
         } else {
-            let lim = parseFloat(quota.strLimit.split("%").join(""));
             let flexAddition = 0;
+            lim = parseFloat(quota.strLimit.split("%").join(""));
             if (flexRaw) {
                 flexAddition += flexAmount;
             } else if (flex) {
@@ -333,10 +338,19 @@ class BaseClient {
                         quota.limits.email = round05Ciel((quota.group.nSizes[1] * lim)/100) + flexAddition;
                         quota.limits.text = round05Ciel((quota.group.nSizes[2] * lim)/100) + flexAddition;
                     } else {
-                        quota.limits.normLim = round05Ciel((quota.group.totalN * lim)/100) + flexAddition;;
+                        quota.limits.normLim = round05Ciel((quota.group.totalN * lim)/100) + flexAddition;
                     }
                     break;
             }
+        }
+        // Automatically deactivate quota if its limit is less than or equal to 5
+        if (lim <= 5 && quota.active) {
+            console.log("Warning: " + quota.name + " limit is <= 5 and active. (" + lim + ")");
+            GLOBAL_WARNINGS.push({
+                message: "Warning: " + quota.name + " limit is <= 5 and active. (" + lim + ")",
+                callback: this.limitUnderFiveHandler,
+                args: quota
+            });
         }
     }
 }
