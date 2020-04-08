@@ -183,7 +183,6 @@ class BaseClient {
             for (let y = 0; y < group.subQuotas.length; y++) {
                 let quota = group.subQuotas[y];
                 if (quota.active) {
-                    debugger;
                     for (const prop in quota.limits) {
                         if (quota.limits[prop] <= 5) {
                             activeLTfiveQuotas.push(quota);

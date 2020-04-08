@@ -11,13 +11,13 @@ function DeleteTable(id) {
 
 function UITableHTML(unbracketed_name) {
     let tableHeader = '<div id="tableIndex' + TABLE_COUNTER +'">';
-    tableHeader += '<form"><div class="row">'
+    tableHeader += '<form><div class="row">'
 
     tableHeader += '<div class="col">';
     tableHeader += '<button type="button" class="btn btn-danger btn-sm" onClick=DeleteTable("tableIndex' + TABLE_COUNTER + '")>Delete ' +  unbracketed_name + '</button>';
     tableHeader += '</div>';
     tableHeader += '<div class="col"><div class="form-group">';
-    tableHeader += '<input type="text" class="form-control form-control-sm"" id="customN' + TABLE_COUNTER +'" placeholder="Custom N-size">';
+    tableHeader += '<input type="text" class="form-control form-control-sm" id="customN' + TABLE_COUNTER +'" placeholder="Custom N-size">';
     tableHeader += '</div></div>';
     tableHeader += '</div>';
     tableHeader += '</form>';

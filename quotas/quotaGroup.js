@@ -5,17 +5,25 @@ class QuotaGroup {
         this.isDual = config.isDual;
         this.isFlex = config.isFlex;
         this.isRawFlex = config.isRawFlex;
+        this.includesPhone = IncludesPhone;
+        this.includesEmail = IncludesEmail;
+        this.includesText = IncludesText;
         this.nSizes = config.nSizes.slice();
         // total N is all nsizes totaled together
         this.totalN = this.nSizes.reduce((a, b) => a + b, 0);
         if (config.nOverride) {
             console.log(config.nOverride, name);
             this.totalN = config.nOverrideVal;
+            this.nSizes[0] = config.nOverrideVal;
+            this.nSizes[1] = 0;
+            this.nSizes[2] = 0;
+            this.isTri = false;
+            this.isDual = false;
+            this.includesPhone = false;
+            this.includesEmail = false;
+            this.includesText = false;
         }
         this.flexAmount = parseFloat(config.flexAmount);
-        this.includesPhone = IncludesPhone;
-        this.includesEmail = IncludesEmail;
-        this.includesText = IncludesText;
         this.Online = ModeOnline;
         this.mode = SurveyMode;
         this.Phone = ModePhone;
