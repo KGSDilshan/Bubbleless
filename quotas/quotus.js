@@ -4,7 +4,6 @@ var CLIENT = undefined;
 
 
 function DeleteTable(id) {
-    debugger;
     var removeDiv = document.getElementById(id);
     var parentEl = removeDiv.parentElement;
     parentEl.removeChild(removeDiv);
@@ -90,7 +89,6 @@ function StrToQuotaTable(str) {
             if (a > 0) {
                 data_table += '</tbody>';
                 data_table += '</table><br><br></div>';
-                TABLE_COUNTER++;
             }
             let unbracketed_name = data[a][0].replace(/\([a-zA-Z0-9 %]*\)/gi,"");
             data_table += UITableHTML(unbracketed_name);
@@ -111,7 +109,6 @@ function StrToQuotaTable(str) {
     data_table += '</tbody>';
     data_table += '</table>';
     qBuff.innerHTML += data_table + "<br><br>";
-    TABLE_COUNTER++;
 }
 
 function ImportQuotas(event) {
