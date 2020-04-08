@@ -204,7 +204,7 @@ function CreateQuotaGroup(QGname, quotaObj, rawSizes) {
     QUOTA_GROUPS.push(new QuotaGroup(name, config, quotaObj));
 }
 
-function ReadQuotaArr() {
+function ReadQuotaArr(showAlert=true) {
     // clear warning area
     const warningBuffer = document.getElementById("QuotaWarningsBuffer");
     while (warningBuffer.firstChild) {
@@ -296,7 +296,9 @@ function ReadQuotaArr() {
         document.getElementById("QuotaWarningsBuffer").innerHTML += '<button type="submit" class="btn btn-success mb-2" onClick=downloadQuotas() >Download Quotas</button>';
 
     } else {
-        alert(alertMsg);
+        if (showAlert) {
+            alert(alertMsg);
+        }
         document.getElementById("QuotaWarningsBuffer").innerHTML += '<button type="submit" class="btn btn-danger mb-2" onClick=downloadQuotas() >Acknowledge Warnings and Download Quotas</button>';
     }
 
@@ -339,6 +341,7 @@ function execWarningCB(i) {
     ClearQuotaTables();
     StrToQuotaTable(SerializeTableFromObjects());
     DeleteTable("warningRow" + i);
+    ReadQuotaArr(false);
 }
 
 function SerializeTableFromObjects() {
