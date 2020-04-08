@@ -4,6 +4,7 @@ var CLIENT = undefined;
 
 
 function DeleteTable(id) {
+    debugger;
     var removeDiv = document.getElementById(id);
     var parentEl = removeDiv.parentElement;
     parentEl.removeChild(removeDiv);
@@ -21,7 +22,8 @@ function UITableHTML(unbracketed_name) {
     tableHeader += '</div></div>';
     tableHeader += '</div>';
     tableHeader += '</form>';
-    tableHeader += '<table class="table table-light table-bordered table-hover" id="quotaTable">'
+    tableHeader += '<table class="table table-light table-bordered table-hover" id="quotaTable">';
+    TABLE_COUNTER++;
     return tableHeader;
 }
 
@@ -46,7 +48,6 @@ function CreateNewQuota_DOM(len) {
     data_table += '</table>';
     let unbracketed_name = "QUOTA_GROUP_NAME";
     qBuff.innerHTML += UITableHTML(unbracketed_name) + data_table + "<br><br></div>";
-    TABLE_COUNTER++;
 }
 
 
