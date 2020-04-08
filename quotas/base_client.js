@@ -118,6 +118,10 @@ class BaseClient {
         quota.active = false;
     }
 
+    activeMultiQuestionQuotaHandler(group, quotaIndices) {
+        quotaIndices.forEach(ind => group.subQuotas[ind].active = false);
+    }
+
     checkMissingQuotas() {
         let genderGrp = getQuotaByNames(["gender", "sex"]);
         let ageGrp = getQuotaByNames(["age"]);

@@ -74,6 +74,7 @@ class QuotaGroup {
     validateQuotas() {
         let limitTotal = 0;
         let dupeQs = [];
+        let multiQuestionQuotas = [];
         let zeroLimits = [];
         let raw = this.subQuotas[0].isRaw;
         let containsCounter = false;
@@ -81,14 +82,23 @@ class QuotaGroup {
             if (this.subQuotas[i].counter)
                 containsCounter = true;
             limitTotal += this.subQuotas[i].valLimit;
-            // unique quota names
+            // unique quota names + finding quotas w/ multiple questions
             for (let j = 0; j < this.subQuotas.length; j++) {
                 if (j == i)
                     continue;
-                if ((this.subQuotas[i].name == this.subQuotas[j].name) &&
-                    (JSON.stringify(this.subQuotas[i].qCodes) == JSON.stringify(this.subQuotas[j].qCodes))) {
+                if (this.subQuotas[i].name == this.subQuotas[j].name) {
+                    if (JSON.stringify(this.subQuotas[i].qCodes) == JSON.stringify(this.subQuotas[j].qCodes)) {
                         dupeQs.push(i);
                     }
+                    if (this.subQuotas[i].qName != this.subQuotas[j].qName) {
+                        if (!multiQuestionQuotas.includes(i) && this.subQuotas[i].active) {
+                            multiQuestionQuotas.push(i);
+                        }
+                        if (!multiQuestionQuotas.includes(j) && this.subQuotas[j].active) {
+                            multiQuestionQuotas.push(j);
+                        }
+                    }
+                }
             }
             if (this.subQuotas[i].valLimit == 0 && !this.subQuotas[i].counter) {
                 zeroLimits.push(i);
@@ -114,6 +124,16 @@ class QuotaGroup {
             GLOBAL_WARNINGS.push({
                 message : "WARNING: In group: " + this.getName() + ", duplicate name found for " + this.subQuotas[dupeQs[i]].name,
                 callback : undefined,
+            });
+        }
+
+        // Quotas with multiple question codes should be inactive
+        if (multiQuestionQuotas.length > 0) {
+            GLOBAL_WARNINGS.push({
+                message : "WARNING: In group: " + this.getName() + ", active quota with multiple question codes found.",
+                callback : CLIENT.activeMultiQuestionQuotaHandler,
+                group: this,
+                args: multiQuestionQuotas
             });
         }
 
