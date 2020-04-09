@@ -546,7 +546,8 @@ class TNClient extends BaseClient {
         let idealN = round05Ciel(TotalNSize / SurveyMode);
         for (let i = 0; i < group.subQuotas.length; i++) {
             group.subQuotas[i].valLimit = idealN;
-            group.subQuotas[i].isRaw = false;
+            group.subQuotas[i].strLimit = idealN.toString();
+            group.subQuotas[i].isRaw = true;
         }
     }
 
@@ -814,7 +815,7 @@ class PBClient extends BaseClient {
         let idealN = round05Ciel(TotalNSize / SurveyMode);
         for (let i = 0; i < group.subQuotas.length; i++) {
             group.subQuotas[i].valLimit = idealN;
-            group.subQuotas[i].isRaw = false;
+            group.subQuotas[i].isRaw = true;
         }
     }
 
@@ -902,6 +903,7 @@ class WLClient extends BaseClient {
                         message: "WARNING: " + group.group_name + " should be pulling from survey. (Checklist)",
                         callback : undefined,
                     });
+                    break;
                 }
             }
         } else {
@@ -1064,7 +1066,7 @@ class NRCClient extends BaseClient {
             if (showWarn) {
                 GLOBAL_WARNINGS.push({
                     message: "WARNING: " + group.group_name + " pulls from survey. (Checklist)",
-                    callback : partyQuotaFromSurveyNRC,
+                    callback : this.partyQuotaFromSurveyNRC,
                     group: group,
                 });
             }
