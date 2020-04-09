@@ -237,7 +237,7 @@ function CalcIndexColumn(s) {
 
 function RemovePrefixesInRecords() {
 	for (let i = 0; i < SAMPLE.records.length; i++) {
-		SAMPLE.records[i] = SAMPLE.records[i].split("STRTOKENPREFIX").join("").split("STRPREFIXModeInternalFill").join("");
+		SAMPLE.records[i] = SAMPLE.records[i].split("STRTOKENPREFIX").join("A").split("STRPREFIXModeInternalFill").join("");
 	}
 }
 
@@ -253,7 +253,7 @@ function SetPhoneRecords() {
 	let records = [SAMPLE.records[0]];
 	var rec;
 	for (let i = 0; i < PHONE_SAMPLE.length; i++) {
-		rec = SAMPLE.records[PHONE_SAMPLE[i]].split("STRTOKENPREFIX").join("").split("STRPREFIXModeInternalFill").join("1");
+		rec = SAMPLE.records[PHONE_SAMPLE[i]].split("STRTOKENPREFIX").join("P").split("STRPREFIXModeInternalFill").join("1");
 		records.push(rec);
 	}
 	PHONE_SAMPLE = records.slice();
@@ -264,7 +264,7 @@ function SetEmailRecords() {
 	let records = [SAMPLE.records[0]];
 	var rec;
 	for (let i = 0; i < EMAIL_SAMPLE.length; i++) {
-		rec = SAMPLE.records[EMAIL_SAMPLE[i]].split("STRTOKENPREFIX").join("").split("STRPREFIXModeInternalFill").join("2");
+		rec = SAMPLE.records[EMAIL_SAMPLE[i]].split("STRTOKENPREFIX").join("E").split("STRPREFIXModeInternalFill").join("2");
 		records.push(rec);
 	}
 	EMAIL_SAMPLE = records.slice();
