@@ -318,7 +318,6 @@ function ProcessInput() {
 	}
 	WARNINGS = [];
 	TEXTWARNINGS = [];
-	$("button#sampleprocessingbtn").remove();
 	$("button#continue2").remove();
 	$("button#continue3").remove();
 	$("button#continue4").remove();
@@ -334,7 +333,11 @@ function ProcessInput() {
 	for (let i = 0; i < contents.length; i++) {
 		console.log(contents[i]);
 		i = RunCommand(contents, i);
+		if (i === -1) {
+			return;
+		}
 	}
+	$("button#sampleprocessingbtn").remove();
 	SAMPLE.CheckClusters();
 	SAMPLE.PrepareExport();
 	let good = false;

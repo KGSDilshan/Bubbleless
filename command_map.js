@@ -370,7 +370,13 @@ function CombineCallback(contents, index, currentCol) {
 function RunCommand(contents, index) {
     for (let i = 0; i < Syntax.length; i++) {
         if (Syntax[i].validation(contents[index])) {
-            return Syntax[i].callback(contents, index);
+            try {
+                return Syntax[i].callback(contents, index);
+            }
+            catch (e) {
+                alert("Error in executing command: " + contents[index]);
+                return -1;
+            }
         }
     }
     return index;
