@@ -341,35 +341,35 @@ function ProcessInput() {
 	if (WARNINGS.length == 0) {
 		WARNINGS.push("<b>ALL OK.</b>");
 		TEXTWARNINGS.push("ALL OK\n");
-		let buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-primary mb-2" id="continue2" onClick=SAMPLE.DownloadCSV(SAMPLE.records)>DL Master CSV &nbsp;&nbsp;</button><br>'
+		let buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-primary mb-2" id="continue2" onClick=SAMPLE.DownloadCSV(SAMPLE.records)>DL Master Sample &nbsp;&nbsp;</button><br>';
 		$("div#ButtonBuffer").append(buttonHTML);
 		if (document.getElementById("IncludePhoneSample").checked) {
-			buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-primary mb-2" id="continue4" onClick=SAMPLE.DownloadCSV(PHONE_SAMPLE,' + '"phones.csv"' + ')>DL Phones CSV &nbsp;&nbsp;</button>'
+			buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-primary mb-2" id="continue4" onClick=SAMPLE.DownloadCSV(PHONE_SAMPLE,' + '"phones"' + ')>DL Phones Sample &nbsp;&nbsp;</button>';
 			$("div#ButtonBuffer").append(buttonHTML);
 		}
 		if (document.getElementById("IncludeEmailSample").checked) {
-			buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-primary mb-2" id="continue5" onClick=SAMPLE.DownloadCSV(EMAIL_SAMPLE,' + '"emails.csv"' + ')>DL Emails CSV &nbsp;&nbsp;</button>'
+			buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-primary mb-2" id="continue5" onClick=SAMPLE.DownloadCSV(EMAIL_SAMPLE,' + '"emails"' + ')>DL Emails Sample &nbsp;&nbsp;</button>';
 			$("div#ButtonBuffer").append(buttonHTML);
 		}
 		if (document.getElementById("IncludeTextSample").checked) {
-			buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-primary mb-2" id="continue6" onClick=SAMPLE.DownloadTextingSamples()>DL Texting CSVs &nbsp;&nbsp;</button>'
+			buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-primary mb-2" id="continue6" onClick=SAMPLE.DownloadTextingSamples()>DL Texting Samples &nbsp;&nbsp;</button>';
 			$("div#ButtonBuffer").append(buttonHTML);
 		}
 		$("div#ButtonBuffer").append("<br>");
 		good = true;
 	} else {
-		let buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-danger mb-2" id="continue2" onClick=SAMPLE.DownloadCSV(SAMPLE.records) >Acknowledged Warnings & DL Master CSV &nbsp;&nbsp;</button><br>'
+		let buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-danger mb-2" id="continue2" onClick=SAMPLE.DownloadCSV(SAMPLE.records) >Acknowledged Warnings & DL Master Sample &nbsp;&nbsp;</button><br>';
 		$("div#ButtonBuffer").append(buttonHTML);
 		if (document.getElementById("IncludePhoneSample").checked) {
-			buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-danger mb-2" id="continue4" onClick=SAMPLE.DownloadCSV(PHONE_SAMPLE,' + '"phones.csv"' + ') >DL Phones CSV &nbsp;&nbsp;</button>'
+			buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-danger mb-2" id="continue4" onClick=SAMPLE.DownloadCSV(PHONE_SAMPLE,' + '"phones"' + ') >DL Phones Sample &nbsp;&nbsp;</button>';
 			$("div#ButtonBuffer").append(buttonHTML);
 		}
 		if (document.getElementById("IncludeEmailSample").checked) {
-			buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-danger mb-2" id="continue5" onClick=SAMPLE.DownloadCSV(EMAIL_SAMPLE,' + '"emails.csv"' + ') >DL Emails CSV &nbsp;&nbsp;</button>'
+			buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-danger mb-2" id="continue5" onClick=SAMPLE.DownloadCSV(EMAIL_SAMPLE,' + '"emails"' + ') >DL Emails Sample &nbsp;&nbsp;</button>';
 			$("div#ButtonBuffer").append(buttonHTML);
 		}
 		if (document.getElementById("IncludeTextSample").checked) {
-			buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-danger mb-2" id="continue6" onClick=SAMPLE.DownloadTextingSamples() >DL Texting CSVs &nbsp;&nbsp;</button>'
+			buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-danger mb-2" id="continue6" onClick=SAMPLE.DownloadTextingSamples() >DL Texting Samples &nbsp;&nbsp;</button>';
 			$("div#ButtonBuffer").append(buttonHTML);
 		}
 		$("div#ButtonBuffer").append("<br>");

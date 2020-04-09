@@ -546,7 +546,7 @@ class Sample {
             this.flagged_additions[i].InsertIntoSample();
         }
 
-        if (INITIAL_FILETYPE == "csv") {
+        //if (INITIAL_FILETYPE == "csv") {
             // for (let i = 0; i < this.records.length; i++) {
             //     this.records[i] = $.csv.fromArrays([this.records[i]]);
             // }
@@ -560,7 +560,7 @@ class Sample {
                 RemovePrefixesInRecords();
     		};
     		sampleWorker.postMessage(this.records);
-        }
+        //}
     }
 
     DownloadTextingSamples() {
@@ -619,7 +619,14 @@ class Sample {
         if (INITIAL_FILETYPE == "csv" || fname.includes(".csv")) {
             fBlob = new Blob(csvVar, {type:"text/csv"});
             let downloadLink = document.createElement("a");
-            downloadLink.download = (fname.includes(".csv") ? fname : "RENAME_ME.csv");
+            if (fname == "") {
+                fname = "RENAME_ME.csv";
+            } else {
+                if (!fname.includes(".csv")) {
+                    fname = fname + ".csv";
+                }
+            }
+            downloadLink.download = fname;
             downloadLink.href = window.URL.createObjectURL(fBlob);
             downloadLink.style.display = "none";
             document.body.appendChild(downloadLink);
@@ -634,7 +641,7 @@ class Sample {
                 if (event.data[0] == 6) {
                     fBlob = new Blob([event.data[1]], {type:"application/octet-stream"});
                     let downloadLink = document.createElement("a");
-                    downloadLink.download = "RENAME_ME.xlsx";
+                    downloadLink.download = (fname == "" ? "RENAME_ME" : fname) + ".xlsx";
                     downloadLink.href = window.URL.createObjectURL(fBlob);
                     downloadLink.style.display = "none";
                     document.body.appendChild(downloadLink);
