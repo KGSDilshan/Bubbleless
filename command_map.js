@@ -282,8 +282,13 @@ function DefaultCallback(contents, index) {
                     original[j] = "";
                 }
                 if (original[j].includes("-")) {
-                    // this is a range
-                    SAMPLE.FindAndReplaceRange(currentCol, original[j].split("-"), replacement);
+                    // this is a range maybe
+                    let val1 = original[j].split("-");
+                    if (Number.isInteger(parseInt(val1))) {
+                        SAMPLE.FindAndReplaceRange(currentCol, original[j].split("-"), replacement);
+                    } else {
+                        SAMPLE.FindAndReplace(currentCol, original[j], replacement);
+                    }
                 } else {
                     SAMPLE.FindAndReplace(currentCol, original[j], replacement);
                 }
@@ -339,7 +344,13 @@ function CombineCallback(contents, index, currentCol) {
         } else {
             let rangeVals = temp[1].split("-");
             let vmin = rangeVals[0];
-            let vmax = rangeVals.length > 1 ? rangeVals[1] : rangeVals[0];
+            let vmax;
+            if (Number.isInteger(parseInt(vmin))) {
+                vmax = rangeVals.length > 1 ? rangeVals[1] : rangeVals[0];
+            } else {
+                vmax = temp[1];
+                vmin = temp[1];
+            }
             if (vmin != vmax) {
                 // is an actual range
                 vmin = parseInt(vmin);
