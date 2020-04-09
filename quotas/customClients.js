@@ -191,7 +191,7 @@ class DBClient extends BaseClient {
                 for (let i = 0; i < curGroup.subQuotas.length; i++) {
                     let quota = curGroup.subQuotas[i];
                     let n = quota.getRawNSize();
-                    if(n !== curGroup.totalN / 2) {
+                    if(n !== curGroup.totalN / 2 && (quota.strLimit!="50%")) {
                         console.log(curGroup, "Error: Phone Type - " + quota.name + " limit is not half of total N size");
                         GLOBAL_WARNINGS.push({
                             message: "WARNING: Phone type quotas are not 50% of total N size. (Checklist)",
