@@ -271,7 +271,7 @@ class RNClient extends BaseClient {
                     if (quota.active && !quota.counter) {
                         console.log(curGroup, "Error: A non-split/control message quota is active");
                         GLOBAL_WARNINGS.push({
-                            message: "WARNING: A non-split/control message quota is active. Deactivate " + quota.name + "? (Checklist)",
+                            message: "WARNING: A non-split/control message quota is active. in " + curGroup.getName() + "? (Checklist)",
                             callback: this.activeQuotasHandler,
                             group: curGroup
                         });
@@ -285,7 +285,7 @@ class RNClient extends BaseClient {
                         quota.active = true;
                         console.log(curGroup, "Error: A split/control message quota is inactive");
                         GLOBAL_WARNINGS.push({
-                            message: "WARNING: A split/control message quota is inactive. Activating " + quota.name + " (Checklist)",
+                            message: "WARNING: A split/control message quota is inactive in " + curGroup.getName() + " (Checklist)",
                             callback: this.inactiveSplitsHandler,
                             group: curGroup
                         });

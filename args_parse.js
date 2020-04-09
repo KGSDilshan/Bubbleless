@@ -318,6 +318,7 @@ function ProcessInput() {
 	}
 	WARNINGS = [];
 	TEXTWARNINGS = [];
+	$("button#sampleprocessingbtn").remove();
 	$("button#continue2").remove();
 	$("button#continue3").remove();
 	$("button#continue4").remove();
