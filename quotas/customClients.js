@@ -241,6 +241,7 @@ class DBClient extends BaseClient {
         group.subQuotas.forEach(sq => {
             sq.valLimit = "50";
             sq.isRaw = false;
+            sq.counter = false;
         });
     }
 
