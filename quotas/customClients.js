@@ -667,9 +667,9 @@ class FMClient extends BaseClient {
     }
 
     fixPTQuotaFM(group) {
-        group.isFlex = true;
+        group.isFlex = false;
         group.isRawFlex = false;
-        group.flexAmount = 5;
+        group.flexAmount = 0;
         for (let i = 0; i < group.subQuotas.length; i++) {
             let subQ = group.subQuotas[i];
             subQ.active = false;
@@ -683,7 +683,7 @@ class FMClient extends BaseClient {
             if (subQ.rawName.toLowerCase().includes("cell")) {
                 subQ.isRaw = false;
                 subQ.valLimit = 70;
-                subQ.iscounter = false;
+                subQ.counter = false;
             }
         }
     }
@@ -1147,6 +1147,8 @@ class SXClient extends BaseClient {
                     group.subQuotas[i].valLimit = "65";
                     group.subQuotas[i].isRaw = false;
                     group.subQuotas[i].strLimit = "65%";
+                    group.subQuotas[i].counter = false;
+                    group.subQuotas[i].active = true;
                 }
             }
         }
@@ -1250,14 +1252,14 @@ class GSGClient extends BaseClient {
         let setInactive = false;
         for (let i = 0; i < QUOTA_GROUPS.length; i++) {
             for (let j = 0; j < QUOTA_GROUPS[i].subQuotas.length; j++) {
-                if (QUOTA_GROUPS[i].subQuotas[j].active) {
+                if (QUOTA_GROUPS[i].subQuotas[j].active && !QUOTA_GROUPS[i].subQuotas[j].counter) {
                     setInactive = true;
                 }
             }
         }
         if (setInactive) {
             GLOBAL_WARNINGS.push({
-                message: "WARNING: All quotas set inactive. (Checklist)",
+                message: "WARNING: All quotas must be inactive. (Checklist)",
                 callback: this.setAllQuotasInactiveGSG,
                 group: undefined,
             });
