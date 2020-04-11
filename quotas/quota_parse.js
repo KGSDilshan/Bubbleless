@@ -61,7 +61,6 @@ function IncludesNameFlex(name) {
 }
 
 function IncludesNameSplit(name) {
-    let hasSplits = false;
     let bracketedContent = name.match(/\(.*?\)/g);
     return (bracketedContent != null && bracketedContent.length > 0);
 }
@@ -224,7 +223,6 @@ function ReadQuotaArr(showAlert=true) {
 
     // Initialize quota groups/headers
     QUOTA_GROUPS = [];
-    TABLE_COUNTER = 0;
     QUOTA_HEADERS = [];
     GLOBAL_WARNINGS = [];
     RAN_CSWARNINGS = false;
@@ -307,7 +305,6 @@ function ReadQuotaArr(showAlert=true) {
     for (let i = 0; i < QUOTA_GROUPS.length; i++) {
         QUOTA_GROUPS[i].createSplitQuotas();
     }
-
 }
 
 function displayWarnings(warnings) {
