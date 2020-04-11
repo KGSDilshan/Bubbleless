@@ -55,6 +55,12 @@ var Syntax = [
         callback: CountIfCmdCallback,
     },
     {
+        name: "FilterDuplicate",
+        length: 1,
+        validation: IsFilterDuplicateCmd,
+        callback: FilterDuplicateCmdCallback,
+    },
+    {
         name: "FindAndReplace",
         length: 1,
         validation: IsDefault,
@@ -62,6 +68,10 @@ var Syntax = [
     },
 ];
 
+
+function IsFilterDuplicateCmd(line) {
+    return line.toUpperCase().includes("RMDUPE");
+}
 
 function IsGraphCmd(line) {
     return line.toUpperCase().includes("GRAPH");
@@ -136,6 +146,16 @@ function GraphCmdCallback(contents, index) {
     }
     return index;
 }
+
+
+function FilterDuplicateCmdCallback(contents, index) {
+    // RMDUPE/tcol
+    let line = contents[index].split("\t");
+    let name = line[1].split(" ").join("").trim();
+    SAMPLE.FilterDuplicate(name);
+    return index;
+}
+
 
 function CountIfCmdCallback(contents, index) {
     // COUNTIF\tX,1\tY,2\tN,5...

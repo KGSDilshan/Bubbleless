@@ -221,6 +221,19 @@ class Sample {
         this.replacements = [];
     }
 
+    FilterDuplicate(cname) {
+        let colId = CalcIndexColumn(cname) - 1;
+        let colMap = new Map();
+        for (var i = this.records.length - 1; i >= 0; i--) {
+            var rec = this.records[i][colId];
+            if (colMap.get(rec) == undefined) {
+                colMap.set(rec, 1);
+            } else {
+                this.DeleteRecordByIndex(colId, i);
+            }
+        }
+    }
+
     CheckClusters() {
         let clusterCol = document.getElementById("bubbless-cluster-col");
         if (clusterCol == undefined || clusterCol.value == "") {
