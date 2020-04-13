@@ -12,6 +12,11 @@ function DeleteTable(btn) {
     RealignCustomNSizeID();
 }
 
+function RemoveAlert(ind) {
+    let warningRow = document.querySelector("div#warningRow" + ind);
+    warningRow.parentElement.removeChild(warningRow);
+}
+
 // Sets the customN input id sequentially from top to bottom
 function RealignCustomNSizeID() {
     let customNElements = document.querySelectorAll('input[id^="customN"]');
@@ -166,6 +171,7 @@ function ExportQuotas() {
         data[0] += customNElements[i].value + "|";
     }
 
+    // Replace last pipe with ~
     data[0] = data[0].replace(/\|$/,"~");
 
     if (data[0].length > 0) {

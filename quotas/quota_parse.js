@@ -338,12 +338,13 @@ function execWarningCB(i) {
     // reload UI with changes
     ClearQuotaTables();
     StrToQuotaTable(SerializeTableFromObjects());
-    DeleteTable("warningRow" + i);
+    RemoveAlert(i);
     ReadQuotaArr(false);
 }
 
 function SerializeTableFromObjects() {
     let arrData = "";
+    let customNrow = "~";
     for (let i = 0; i < QUOTA_GROUPS.length; i++) {
         qGrp = QUOTA_GROUPS[i];
         /*
@@ -396,9 +397,11 @@ function SerializeTableFromObjects() {
             lines += "\n";
         }
         arrData += header + "\n" + lines;
+        customNrow += (qGrp.isCustomN ? qGrp.totalN : "") + "|";
     }
 
-    return arrData.trim();
+    arrData += customNrow.replace(/\|$/,"~");
+    return arrData;
 }
 
 function downloadQuotas() {
