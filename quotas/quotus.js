@@ -3,18 +3,35 @@ var RAN_CSWARNINGS = 0;
 var CLIENT = undefined;
 
 
-function DeleteTable(id) {
-    var removeDiv = document.getElementById(id);
-    var parentEl = removeDiv.parentElement;
-    parentEl.removeChild(removeDiv);
+function DeleteTable(btn) {
+    let quotaContainer = btn.closest("div.quota-container");
+    quotaContainer.parentElement.removeChild(quotaContainer);
+
+    TABLE_COUNTER--;
+
+    RealignCustomNSizeID();
+}
+
+function RemoveAlert(ind) {
+    let warningRow = document.querySelector("div#warningRow" + ind);
+    warningRow.parentElement.removeChild(warningRow);
+}
+
+// Sets the customN input id sequentially from top to bottom
+function RealignCustomNSizeID() {
+    let customNElements = document.querySelectorAll('input[id^="customN"]');
+    
+    for (let i = 0; i < customNElements.length; i++) {
+        customNElements[i].id = "customN" + i.toString();
+    }
 }
 
 function UITableHTML(unbracketed_name) {
-    let tableHeader = '<div id="tableIndex' + TABLE_COUNTER +'">';
+    let tableHeader = '<div class="quota-container">';
     tableHeader += '<form><div class="row">'
 
     tableHeader += '<div class="col">';
-    tableHeader += '<button type="button" class="btn btn-danger btn-sm" onClick=DeleteTable("tableIndex' + TABLE_COUNTER + '")>Delete ' +  unbracketed_name + '</button>';
+    tableHeader += '<button type="button" class="btn btn-danger btn-sm" onClick="DeleteTable(this)">Delete ' +  unbracketed_name + '</button>';
     tableHeader += '</div>';
     tableHeader += '<div class="col"><div class="form-group">';
     tableHeader += '<input type="text" class="form-control form-control-sm" id="customN' + TABLE_COUNTER +'" placeholder="Custom N-size">';
@@ -75,6 +92,8 @@ function ClearQuotaTables() {
         qBuff.removeChild(qBuff.firstChild);
     }
 
+    // Reset counter
+    TABLE_COUNTER = 0;
     console.log("ClearQuotaTables: Quota tables cleared.");
 }
 
@@ -83,7 +102,9 @@ function StrToQuotaTable(str) {
     let data = str.split("\n");
     let data_table = "";
     data = data.map(r => r.split("\t"));
-    for (let a = 0; a < data.length; a++) {
+
+    // Goes through the data until the last row; which stores the custom N-Sizes
+    for (let a = 0; a < data.length - 1; a++) {
         // If the length of the current row is 1, it's a header; End the current table and start a new one
         if (data[a].length == 1) {
             if (a > 0) {
@@ -106,9 +127,15 @@ function StrToQuotaTable(str) {
             data_table += '</tr>';
         }
     }
+
     data_table += '</tbody>';
     data_table += '</table>';
     qBuff.innerHTML += data_table + "<br><br>";
+
+    let customNSizes = data[data.length - 1][0].split("~").join("").split("|");
+
+    // Insert the custom n-size values into each table input from top to bottom
+    qBuff.querySelectorAll('input[id^="customN"]').forEach((input, ind) => input.value = customNSizes[ind]);
 }
 
 function ImportQuotas(event) {
@@ -135,8 +162,17 @@ function ImportQuotas(event) {
 function ExportQuotas() {
     let data = [];
     let today = new Date();
+    const customNElements = document.querySelectorAll('input[id^="customN"]');
 
-    data[0] = ReadQuotaTables().join("\n").replace(/\n\n+/, "\n").trim();
+    data[0] = ReadQuotaTables().join("\n").replace(/\n\n+/, "\n");
+    data[0] += "~";
+
+    for (let i = 0; i < customNElements.length; i++) {
+        data[0] += customNElements[i].value + "|";
+    }
+
+    // Replace last pipe with ~
+    data[0] = data[0].replace(/\|$/,"~");
 
     if (data[0].length > 0) {
         let fBlob;

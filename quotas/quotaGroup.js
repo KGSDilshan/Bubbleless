@@ -8,11 +8,13 @@ class QuotaGroup {
         this.includesPhone = IncludesPhone;
         this.includesEmail = IncludesEmail;
         this.includesText = IncludesText;
+        this.isCustomN = false;
         this.nSizes = config.nSizes.slice();
         // total N is all nsizes totaled together
         this.totalN = this.nSizes.reduce((a, b) => a + b, 0);
         if (config.nOverride) {
             console.log(config.nOverride, name);
+            this.isCustomN = true;
             this.totalN = config.nOverrideVal;
             this.nSizes[0] = config.nOverrideVal;
             this.nSizes[1] = 0;

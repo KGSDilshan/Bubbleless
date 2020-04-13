@@ -61,7 +61,6 @@ function IncludesNameFlex(name) {
 }
 
 function IncludesNameSplit(name) {
-    let hasSplits = false;
     let bracketedContent = name.match(/\(.*?\)/g);
     return (bracketedContent != null && bracketedContent.length > 0);
 }
@@ -224,7 +223,6 @@ function ReadQuotaArr(showAlert=true) {
 
     // Initialize quota groups/headers
     QUOTA_GROUPS = [];
-    TABLE_COUNTER = 0;
     QUOTA_HEADERS = [];
     GLOBAL_WARNINGS = [];
     RAN_CSWARNINGS = false;
@@ -307,7 +305,6 @@ function ReadQuotaArr(showAlert=true) {
     for (let i = 0; i < QUOTA_GROUPS.length; i++) {
         QUOTA_GROUPS[i].createSplitQuotas();
     }
-
 }
 
 function displayWarnings(warnings) {
@@ -341,12 +338,13 @@ function execWarningCB(i) {
     // reload UI with changes
     ClearQuotaTables();
     StrToQuotaTable(SerializeTableFromObjects());
-    DeleteTable("warningRow" + i);
+    RemoveAlert(i);
     ReadQuotaArr(false);
 }
 
 function SerializeTableFromObjects() {
     let arrData = "";
+    let customNrow = "~";
     for (let i = 0; i < QUOTA_GROUPS.length; i++) {
         qGrp = QUOTA_GROUPS[i];
         /*
@@ -399,9 +397,11 @@ function SerializeTableFromObjects() {
             lines += "\n";
         }
         arrData += header + "\n" + lines;
+        customNrow += (qGrp.isCustomN ? qGrp.totalN : "") + "|";
     }
 
-    return arrData.trim();
+    arrData += customNrow.replace(/\|$/,"~");
+    return arrData;
 }
 
 function downloadQuotas() {
