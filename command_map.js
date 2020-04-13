@@ -218,7 +218,7 @@ function NamesListCallback(contents, index) {
 
     for (let j = SAMPLE.records.length - 1; j >= 0; j--) {
         // build comparison string
-        result = "";
+        let result = "";
         for (let l = 0; l < combinedCols.length; l++) {
             result += SAMPLE.records[j][combinedCols[l]];
         }
@@ -227,6 +227,13 @@ function NamesListCallback(contents, index) {
             // compare
             if (comparisons[k] == result) {
                 DELETESMAP.set(comparisons[k], (DELETESMAP.get(comparisons[k]) + 1) || 1);
+                SAMPLE.DeleteRecordByIndex(combinedCols[0], j);
+                break;
+            }
+        }
+        for (var m = 0; m < BANNED_NAMES.length; m++) {
+            if (BANNED_NAMES[m] == result) {
+                DELETESMAP.set(BANNED_NAMES[m], (DELETESMAP.get(BANNED_NAMES[m]) + 1) || 1);
                 SAMPLE.DeleteRecordByIndex(combinedCols[0], j);
                 break;
             }
