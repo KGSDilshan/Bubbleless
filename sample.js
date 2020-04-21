@@ -366,6 +366,7 @@ class Sample {
                         // filtered email. Record ought to be deleted
                         this.DeleteRecordByIndex(cname, j);
                         emStatus = true;
+                        EMAIL_SAMPLE.forEach((item, index, arr) => arr[index] -= 1)
                     default:
                         // invalid email
                         break;

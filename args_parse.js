@@ -264,8 +264,13 @@ function SetEmailRecords() {
 	let records = [SAMPLE.records[0]];
 	var rec;
 	for (let i = 0; i < EMAIL_SAMPLE.length; i++) {
-		rec = SAMPLE.records[EMAIL_SAMPLE[i]].split("STRTOKENPREFIX").join("E").split("STRPREFIXModeInternalFill").join("2");
-		records.push(rec);
+		try {
+			rec = SAMPLE.records[EMAIL_SAMPLE[i]].split("STRTOKENPREFIX").join("E").split("STRPREFIXModeInternalFill").join("2");
+			records.push(rec);
+		}
+		catch (e) {
+			console.log("err", EMAIL_SAMPLE[i], SAMPLE.records[1]);
+		}
 	}
 	EMAIL_SAMPLE = records.slice();
 }
