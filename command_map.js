@@ -258,10 +258,10 @@ function EvalEmailsCallback(contents, index) {
 
 
 function MergeCallback(contents, index) {
-    // MERGEPHONENUM\ColA, ColB
+    // MERGEPHONENUM\ColA, ColB, ColC, ..
     let line = contents[index].split("\t");
     let cols = line[1].split(" ").join("").split(",");
-    //console.log(line, cols);
+    console.log(line, cols);
     SAMPLE.MergePhone(cols);
     return index;
 }
@@ -402,6 +402,7 @@ function RunCommand(contents, index) {
             }
             catch (e) {
                 alert("Error in executing command: " + contents[index]);
+                console.log(e);
                 return -1;
             }
         }

@@ -297,32 +297,55 @@ class Sample {
         // make a flag object
         let phoneFlag = new FlaggedColumn("PHONE_NUMBERS", this.flagged_start);
         phoneFlag.isCopied = true;
-        // read in priority col
-        let colID_prio = CalcIndexColumn(cols[0]) - 1;
-        let colID_secd = CalcIndexColumn(cols[1]) - 1;
+        // // read in priority col
+        // let colID_prio = CalcIndexColumn(cols[0]) - 1;
+        // let colID_secd = CalcIndexColumn(cols[1]) - 1;
+        let colData = [];
+        for (let i = 0; i < cols.length; i++) {
+            colData.push(CalcIndexColumn(cols[i]) - 1);
+        }
         for (let i = 1; i < SAMPLE.records.length; i++) {
-            let prio = SAMPLE.records[i][colID_prio];
-            let secnd = SAMPLE.records[i][colID_secd];
-            if (prio != undefined && prio.trim() !== '' && parseInt(prio) != 0 && prio.length > 1) {
-                phoneFlag.additions[i] = "ReplacementString" + prio;
-                phoneFlag.changes.push(phoneFlag.additions[i]);
-                PHONE_SAMPLE.push(i);
-                TEXT_PHONES_SAMPLE.push(i);
-            } else if (secnd != undefined && secnd.trim() !== '' && parseInt(secnd) != 0 && secnd.length > 1) {
-                // anything that priority col has empty, check second col
-                phoneFlag.additions[i] = "ReplacementString" + secnd;
-                PHONE_SAMPLE.push(i);
-                phoneFlag.changes.push(phoneFlag.additions[i]);
-            } else {
-                // if data is invalid in second col, do warning, otherwise set as blank
-                if (prio === undefined && secnd == undefined) {
-                    continue;
+            let set = false;
+            for (let j = 0; j < colData.length; j++) {
+                let current = SAMPLE.records[i][colData[j]];
+                if (current != undefined && current.trim() !== '' && parseInt(current) != 0 && current.length > 1) {
+                    set = true;
+                    phoneFlag.additions[i] = "ReplacementString" + current;
+                    phoneFlag.changes.push(phoneFlag.additions[i]);
+                    PHONE_SAMPLE.push(i);
+                    if (j == 0) {
+                        TEXT_PHONES_SAMPLE.push(i);
+                    }
+                    break;
                 }
+            }
+            if (set == false && !(SAMPLE.records[i] == undefined)) {
                 phoneFlag.additions[i] = "invalid";
                 phoneFlag.invalids.push(i + 1);
-
             }
         }
+        //     let prio = SAMPLE.records[i][colID_prio];
+        //     let secnd = SAMPLE.records[i][colID_secd];
+        //     if (prio != undefined && prio.trim() !== '' && parseInt(prio) != 0 && prio.length > 1) {
+        //         phoneFlag.additions[i] = "ReplacementString" + prio;
+        //         phoneFlag.changes.push(phoneFlag.additions[i]);
+        //         PHONE_SAMPLE.push(i);
+        //         TEXT_PHONES_SAMPLE.push(i);
+        //     } else if (secnd != undefined && secnd.trim() !== '' && parseInt(secnd) != 0 && secnd.length > 1) {
+        //         // anything that priority col has empty, check second col
+        //         phoneFlag.additions[i] = "ReplacementString" + secnd;
+        //         phoneFlag.changes.push(phoneFlag.additions[i]);
+        //         PHONE_SAMPLE.push(i);
+        //     } else {
+        //         // if data is invalid in second col, do warning, otherwise set as blank
+        //         if (prio === undefined && secnd == undefined) {
+        //             continue;
+        //         }
+        //         phoneFlag.additions[i] = "invalid";
+        //         phoneFlag.invalids.push(i + 1);
+        //
+        //     }
+        // }
         VALID_PHONENUMBERS = SAMPLE.records.length - phoneFlag.invalids.length;
         INVALID_PHONENUMBERS = phoneFlag.invalids.length;
         PHONE_RATIO = VALID_PHONENUMBERS / TOTAL_RECORDS_IN_SAMPLE;
