@@ -313,10 +313,12 @@ function ProcessInput() {
 	}
 	if (document.getElementById("bubblelessScrubNamesInput").value == "") {
 		alert("Please insert data for scrubbing.");
+		return;
 	}
 	let flagstart = document.getElementById("bubbless-flagstart-input").value;
 	if (parseInt(flagstart) < 0) {
 		alert("Invalid input for flag start field.");
+		return;
 	} else {
 		UNCHANGED_ROWS = parseInt(flagstart) - 1;
 		SAMPLE.flagged_start = UNCHANGED_ROWS;
@@ -332,6 +334,10 @@ function ProcessInput() {
 	// reparse all arguments
 	let contents = document.getElementById("bubblelessInput").value;
 	let scrubs = document.getElementById("bubblelessScrubNamesInput").value;
+	if (!scrubs.toUpperCase().includes("NAMESLIST")) {
+		alert("NAMESLIST Command is manditory!");
+		return;
+	}
 	let temp = scrubs.split("\n");
 	scrubs = contents.split("\n");
 	contents = temp.concat(scrubs);

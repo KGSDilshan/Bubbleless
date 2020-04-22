@@ -525,9 +525,12 @@ class Sample {
                     }
                 } else {
                     // normal comparison
-                    if (SAMPLE.records[k][colID].split(" ").join("") != min) {
+                    min = min.split(" ").join("").split(",");
+                    let comp = SAMPLE.records[k][colID].split(" ").join("");
+                    if (!min.includes(comp)) {
                         setRecord = false;
                         break;
+
                     }
                 }
             }
@@ -537,7 +540,7 @@ class Sample {
                 if (min == max) {
                     let fset = false;
                     for (let k = 0; k < flag.originalValue.length; k++) {
-                        if (flag.originaValue[k].f == min) {
+                        if (flag.originalValue[k].f == min) {
                             fset = true;
                             break;
                         }
@@ -549,7 +552,7 @@ class Sample {
                     let nme = min.toString() + "-" + max.toString();
                     let fset = false;
                     for (let k = 0; k < flag.originalValue.length; k++) {
-                        if (flag.originaValue[k].f == nme) {
+                        if (flag.originalValue[k].f == nme) {
                             fset = true;
                             break;
                         }
@@ -561,8 +564,8 @@ class Sample {
             }
         }
         if (replaced == false) {
-            WARNINGS.push("<b>WARNING:</b> Found nothing which matched combine condition for: '" + currentCol + "'.");
-            TEXTWARNINGS.push("WARNING: Found nothing which matched combine condition for: '" + currentCol + "'.");
+            WARNINGS.push("<b>WARNING:</b> Found nothing which matched combine condition for: '" + currentCol + "', trying to set to " + replacement);
+            TEXTWARNINGS.push("WARNING: Found nothing which matched combine condition for: '" + currentCol + "', trying to set to " + replacement);
         }
     }
 

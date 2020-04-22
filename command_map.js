@@ -301,8 +301,8 @@ function DefaultCallback(contents, index) {
             }
         } else {
             // find and replacement
-            let original = line[0].toUpperCase().split(",");
-            let replacement = line[1];
+            let original = line[0].toUpperCase().split(" ").join("").split(",");
+            let replacement = line[1].split(" ").join("");
             //console.log(original, replacement);
             for (let j = 0; j < original.length; j++) {
                 if (original[j].toUpperCase() == "BLANK") {
