@@ -158,9 +158,9 @@ function FilterDuplicateCmdCallback(contents, index) {
 
 
 function CountIfCmdCallback(contents, index) {
-    // COUNTIF\tX,1\tY,2\tN,5...
-    let line = contents[index].split(" ").join("").split("\t");
-    line.splice(0, 1);
+    // COUNTIF Max\tX,1\tY,2\tN,5...
+    let line = contents[index].toUpperCase().split(" ").join("").split("\t");
+    let max = line.splice(0, 1)[0].split("COUNTIF")[1];
     for (let i = 0; i < line.length; i++) {
         line[i] = [CalcIndexColumn(line[i].split(",")[0]) - 1,(line[i].split(",")[1]).toUpperCase()]
     }
@@ -180,6 +180,9 @@ function CountIfCmdCallback(contents, index) {
             if ((SAMPLE.records[j][col]).toUpperCase() == value) {
                 counter++;
             }
+        }
+        if (counter > max) {
+            counter = max;
         }
         flag.additions[j] = "ReplacementString" + counter;
     }
