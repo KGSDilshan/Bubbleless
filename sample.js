@@ -17,6 +17,7 @@ var PHONE_SAMPLE = [];
 var EMAIL_SAMPLE = [];
 var TEXT_PHONES_SAMPLE = [];
 var TEXT_EMAIL_SAMPLE = [];
+var NAME_OVERRIDE = undefined;
 
 class FlaggedColumn {
     constructor(columnName, index) {
@@ -31,6 +32,11 @@ class FlaggedColumn {
         this.createCol = true;
         this.invalids = [];
         this.cellRecords = [];
+        this.overrideName = undefined;
+        if (NAME_OVERRIDE != undefined) {
+            this.overrideName = NAME_OVERRIDE;
+            NAME_OVERRIDE = undefined;
+        }
         // from column name, populate additions column
         let colID = CalcIndexColumn(columnName) - 1;
         for (let i = 0; i < SAMPLE.records.length; i++) {
@@ -81,6 +87,11 @@ class FlaggedColumn {
         } else {
             this.additions[0] = this.parentName + "_Flagged_(" + parentColName + ")";
             this.breakdownNames = this.additions[0];
+        }
+
+        if (this.overrideName) {
+            this.additions[0] = this.overrideName;
+            this.breakdownNames = this.overrideName;
         }
 
 

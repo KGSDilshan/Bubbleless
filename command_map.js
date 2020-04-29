@@ -43,6 +43,12 @@ var Syntax = [
         callback: EvalEmailsCallback,
     },
     {
+        name: "ColNameSet",
+        length: 2,
+        validation: IsNameSet,
+        callback: NameSetCallback,
+    },
+    {
         name: "GRAPH",
         length: 2,
         validation: IsGraphCmd,
@@ -68,6 +74,10 @@ var Syntax = [
     },
 ];
 
+
+function IsNameSet(line) {
+    return line.toUpperCase().startsWith("**");
+}
 
 function IsFilterDuplicateCmd(line) {
     return line.toUpperCase().includes("RMDUPE");
@@ -130,6 +140,13 @@ function IsNamesList(line) {
 
 function CommentCallback(contents, index) {
     /* //comment */
+    return index;
+}
+
+
+function NameSetCallback(contents, index) {
+    NAME_OVERRIDE = contents[index].trim().replace("**", "");
+    console.log(NAME_OVERRIDE);
     return index;
 }
 
