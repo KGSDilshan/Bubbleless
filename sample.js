@@ -306,7 +306,7 @@ class Sample {
 
     MergePhone(cols) {
         // make a flag object
-        let phoneFlag = new FlaggedColumn("PHONE_NUMBERS", this.flagged_start);
+        let phoneFlag = new FlaggedColumn("PhoneNumbers", this.flagged_start);
         phoneFlag.isCopied = true;
         // // read in priority col
         // let colID_prio = CalcIndexColumn(cols[0]) - 1;

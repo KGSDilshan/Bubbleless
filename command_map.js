@@ -145,7 +145,7 @@ function CommentCallback(contents, index) {
 
 
 function NameSetCallback(contents, index) {
-    NAME_OVERRIDE = contents[index].trim().replace("**", "");
+    NAME_OVERRIDE = contents[index].replace("**", "").trim();
     console.log(NAME_OVERRIDE);
     return index;
 }
@@ -182,7 +182,11 @@ function CountIfCmdCallback(contents, index) {
         line[i] = [CalcIndexColumn(line[i].split(",")[0]) - 1,(line[i].split(",")[1]).toUpperCase()]
     }
     // create a new flag
-    let flag = new FlaggedColumn("CountIfSeries", SAMPLE.flagged_start);
+    let name = "CountIfSeries";
+    if (NAME_OVERRIDE) {
+        name = NAME_OVERRIDE;
+    }
+    let flag = new FlaggedColumn(name, SAMPLE.flagged_start);
     for (let i = 0; i <= line.length; i++) {
         flag.changes.push("ReplacementString" + i);
 
@@ -193,7 +197,7 @@ function CountIfCmdCallback(contents, index) {
             // get what we're looking for
             let col = line[i][0];
             let value = line[i][1];
-        // loop through each record and check each
+            // loop through each record and check each
             if ((SAMPLE.records[j][col]).toUpperCase() == value) {
                 counter++;
             }
