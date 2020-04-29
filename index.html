@@ -51,9 +51,18 @@
         $(document).ready(function() {
             document.getElementById("bubblelessInput").innerHTML = "";
             document.getElementById("bubblelessScrubNamesInput").innerHTML = "";
-            let placeholderText = ["COPYCOLUMN	XX_FN","COPYCOLUMN	XX_LN",
-                                    "","EVALEMAILS	XX_Col1, XX_Col2", "", "CREATETOKENS", "",
-                                    "MERGEPHONENUM	XX_Cell, XX_LL", "", "XX_Cell(Phonetype)","1-999999999999999	2","other	1"];
+            let placeholderText = ["**firstname", "COPYCOLUMN	XX_FN", "",
+                                    "**lastname", "COPYCOLUMN	XX_LN", "",
+                                    "**email", "EVALEMAILS	XX_Col1, XX_Col2", "",
+                                    "**token", "CREATETOKENS", "",
+                                    "**phonenumber", "MERGEPHONENUM	XX_Cell, XX_LL", "",
+                                    "**phonetype", "XX_Cell(Phonetype)","1-999999999999999	2","other	1", "",
+                                    "**gender", "XX_Gender", "M	1", "F	2","other	3", "",
+                                    "**age", "XX_AGE", "Min-Max	1", "",
+                                    "**region", "", "",
+                                    "**ethnicity", "", "",
+                                    "**party", "", "",
+                                    ];
             document.getElementById("bubblelessInput").value = placeholderText.join("\n");
             placeholderText = ["NAMESLIST	XX_FN, XX_LN", "DonaldTrump", "BarackObama", "STOP NAMES","", "Delete XX_FN", "aaRon,Mai", "stop delete"];
             document.getElementById("bubblelessScrubNamesInput").value = placeholderText.join("\n");
