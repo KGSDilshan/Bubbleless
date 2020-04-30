@@ -245,6 +245,7 @@ function SetPhoneRecords() {
 	// clean the phone records, should not contain any email records in this sample
 	for (let i = PHONE_SAMPLE.length - 1; i >= 0; i--) {
 		if (EMAIL_SAMPLE.includes(PHONE_SAMPLE[i])) {
+			EMAIL_TO_PHONE_SAMPLE.push(PHONE_SAMPLE[i]);
 			PHONE_SAMPLE.splice(i, 1);
 		}
 	}
@@ -257,6 +258,13 @@ function SetPhoneRecords() {
 		records.push(rec);
 	}
 	PHONE_SAMPLE = records.slice();
+
+	records = [SAMPLE.records[0]];
+	for (let i = 0; i < EMAIL_TO_PHONE_SAMPLE.length; i++) {
+		rec = SAMPLE.records[EMAIL_TO_PHONE_SAMPLE[i]].split("STRTOKENPREFIX").join("P").split("STRPREFIXModeInternalFill").join("1");
+		records.push(rec);
+	}
+	EMAIL_TO_PHONE_SAMPLE = records.slice();
 }
 
 function SetEmailRecords() {
@@ -315,6 +323,8 @@ function ProcessInput() {
 		alert("Please insert data for scrubbing.");
 		return;
 	}
+
+
 	let flagstart = document.getElementById("bubbless-flagstart-input").value;
 	if (parseInt(flagstart) < 0) {
 		alert("Invalid input for flag start field.");
@@ -338,6 +348,17 @@ function ProcessInput() {
 		alert("NAMESLIST Command is manditory!");
 		return;
 	}
+	if ((document.getElementById("IncludePhoneSample") || document.getElementById("IncludeEmailSample") || document.getElementById("IncludeTextSample"))) {
+		if (!contents.toUpperCase().includes("MERGEPHONENUM")) {
+			alert("MERGEPHONENUM is required to create mode based samples.");
+			return;
+		}
+		if (!contents.toUpperCase().includes("EVALEMAILS")) {
+			alert("EVALEMAILS is required to create mode based samples.");
+			return;
+		}
+	}
+
 	let temp = scrubs.split("\n");
 	scrubs = contents.split("\n");
 	contents = temp.concat(scrubs);
@@ -351,14 +372,18 @@ function ProcessInput() {
 	$("button#sampleprocessingbtn").remove();
 	SAMPLE.CheckClusters();
 	SAMPLE.PrepareExport();
-	let good = false;
+	AltLoadBar("LoadingMessages");
+}
+
+function ContinueExportProcess() {
+	$("div#LoadingMessages").hide();
 	if (WARNINGS.length == 0) {
 		WARNINGS.push("<b>ALL OK.</b>");
 		TEXTWARNINGS.push("ALL OK\n");
 		let buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-primary mb-2" id="continue2" onClick=SAMPLE.DownloadCSV(SAMPLE.records)>DL Master Sample &nbsp;&nbsp;</button><br>';
 		$("div#ButtonBuffer").append(buttonHTML);
 		if (document.getElementById("IncludePhoneSample").checked) {
-			buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-primary mb-2" id="continue4" onClick=SAMPLE.DownloadCSV(PHONE_SAMPLE,' + '"phones"' + ')>DL Phones Sample &nbsp;&nbsp;</button>';
+			buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-primary mb-2" id="continue4" onClick=SAMPLE.DownloadPhoneSamples()>DL Phones Sample &nbsp;&nbsp;</button>';
 			$("div#ButtonBuffer").append(buttonHTML);
 		}
 		if (document.getElementById("IncludeEmailSample").checked) {
@@ -370,12 +395,11 @@ function ProcessInput() {
 			$("div#ButtonBuffer").append(buttonHTML);
 		}
 		$("div#ButtonBuffer").append("<br>");
-		good = true;
 	} else {
 		let buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-danger mb-2" id="continue2" onClick=SAMPLE.DownloadCSV(SAMPLE.records) >Acknowledged Warnings & DL Master Sample &nbsp;&nbsp;</button><br>';
 		$("div#ButtonBuffer").append(buttonHTML);
 		if (document.getElementById("IncludePhoneSample").checked) {
-			buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-danger mb-2" id="continue4" onClick=SAMPLE.DownloadCSV(PHONE_SAMPLE,' + '"phones"' + ') >DL Phones Sample &nbsp;&nbsp;</button>';
+			buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-danger mb-2" id="continue4" onClick=SAMPLE.DownloadPhoneSamples() >DL Phones Sample &nbsp;&nbsp;</button>';
 			$("div#ButtonBuffer").append(buttonHTML);
 		}
 		if (document.getElementById("IncludeEmailSample").checked) {
@@ -388,7 +412,7 @@ function ProcessInput() {
 		}
 		$("div#ButtonBuffer").append("<br>");
 	}
-	DisplayWarnings(good);
+	DisplayWarnings(WARNINGS.length == 0);
 	ViewRawData();
 	document.getElementById("dataChartArea").innerHTML = "";
 	const qBuff = document.getElementById("QuotasBuffer");

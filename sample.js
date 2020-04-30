@@ -15,6 +15,7 @@ var DELETESMAP = undefined;
 const invalidDomains = [".gov"];
 var PHONE_SAMPLE = [];
 var EMAIL_SAMPLE = [];
+var EMAIL_TO_PHONE_SAMPLE = [];
 var TEXT_PHONES_SAMPLE = [];
 var TEXT_EMAIL_SAMPLE = [];
 var NAME_OVERRIDE = undefined;
@@ -288,6 +289,7 @@ class Sample {
 
 
     ValidateEmail(email) {
+        // returns 1 if bad domain, returns 0 if good email, returns 2 if bad email
         //return (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email));
         if (!email || email.length > 256) return false;
         var tester = /^[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~](\.?[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
@@ -398,9 +400,12 @@ class Sample {
                         break;
                     case 1:
                         // filtered email. Record ought to be deleted
+                        console.log("Domain filtered email: ", recordEmail, j);
                         this.DeleteRecordByIndex(cname, j);
+                        emailFlag.additions.splice(j, 1);
                         emStatus = true;
-                        EMAIL_SAMPLE.forEach((item, index, arr) => arr[index] -= 1)
+                        EMAIL_SAMPLE.forEach((item, index, arr) => arr[index] -= 1);
+                        break;
                     default:
                         // invalid email
                         break;
@@ -603,15 +608,33 @@ class Sample {
             // }
             sampleWorker = new Worker("samplePrepExport.js");
     		sampleWorker.onmessage = function(event) {
+                $("div#loadingStatusMsg").css("display", "block");
+                $("div#loadingStatusMsg").show();
                 SAMPLE.records = event.data.slice();
                 sampleWorker.terminate();
+                document.getElementById("loadingStatusMsg").innerText = "Step 1/5";
                 SetTextRecords();
+                document.getElementById("loadingStatusMsg").innerText = "Step 2/5";
+                console.log("step 2");
                 SetPhoneRecords();
+                document.getElementById("loadingStatusMsg").innerText = "Step 3/5";
+                console.log("step 3");
                 SetEmailRecords();
+                document.getElementById("loadingStatusMsg").innerText = "Step 4/5";
+                console.log("step 4");
                 RemovePrefixesInRecords();
+                document.getElementById("loadingStatusMsg").innerText = "Step 5/5";
+                console.log("Fin");
+                ContinueExportProcess();
+
     		};
     		sampleWorker.postMessage(this.records);
         //}
+    }
+
+    DownloadPhoneSamples() {
+        this.DownloadCSV(PHONE_SAMPLE, "phones");
+        this.DownloadCSV(EMAIL_TO_PHONE_SAMPLE, "EmailToPhone");
     }
 
     DownloadTextingSamples() {
