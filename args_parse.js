@@ -348,7 +348,7 @@ function ProcessInput() {
 		alert("NAMESLIST Command is manditory!");
 		return;
 	}
-	if ((document.getElementById("IncludePhoneSample") || document.getElementById("IncludeEmailSample") || document.getElementById("IncludeTextSample"))) {
+	if ((document.getElementById("IncludePhoneSample").checked || document.getElementById("IncludeEmailSample").checked || document.getElementById("IncludeTextSample").checked)) {
 		if (!contents.toUpperCase().includes("MERGEPHONENUM")) {
 			alert("MERGEPHONENUM is required to create mode based samples.");
 			return;
