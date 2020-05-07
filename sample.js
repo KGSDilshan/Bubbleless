@@ -743,7 +743,11 @@ class Sample {
                     $("div#loadingStatusMsg").remove();
         			$("div#sampleuploadtimer").remove();
                 } else {
-                    document.getElementById("loadingStatusMsg").innerText = event.data[1];
+                    try {
+                        document.getElementById("loadingStatusMsg").innerText = event.data[1];
+                    } catch (e) {
+                        console.log(e);
+                    }
                 }
 
     		};
