@@ -338,6 +338,8 @@ class Sample {
             let set = false;
             for (let j = 0; j < colData.length; j++) {
                 let current = SAMPLE.records[i][colData[j]];
+                // apply formatting
+                current = current.split("(").join("").split(")").join("").split("-").join("").split(" ").join("");
                 if (current != undefined && current.trim() !== '' && parseInt(current) != 0 && current.length > 1) {
                     set = true;
                     phoneFlag.additions[i] = "ReplacementString" + current;
