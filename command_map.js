@@ -55,6 +55,18 @@ var Syntax = [
         callback: GraphCmdCallback,
     },
     {
+        name: "COUNTIF+1",
+        length: 1,
+        validation: IsCountIfPlusOneCmd,
+        callback: CountIfPlusOneCmdCallback,
+    },
+    {
+        name: "COUNTIF04",
+        length: 1,
+        validation: IsCountIf04Cmd,
+        callback: CountIf04CmdCallback,
+    },
+    {
         name: "COUNTIF",
         length: 1,
         validation: IsCountIfCmd,
@@ -88,8 +100,18 @@ function IsGraphCmd(line) {
 }
 
 
+function IsCountIf04Cmd(line) {
+    // COUNTIF04 max\tX,1\tY,2\tN,5...
+    return line.toUpperCase().includes("COUNTIF04");
+}
+
+function IsCountIfPlusOneCmd(line) {
+    // COUNTIF+1 max\tX,1\tY,2\tN,5...
+    return line.toUpperCase().includes("COUNTIF+1");
+}
+
 function IsCountIfCmd(line) {
-    // COUNTIF\tX,1\tY,2\tN,5...
+    // COUNTIF max\tX,1\tY,2\tN,5...
     return line.toUpperCase().includes("COUNTIF");
 }
 
@@ -157,9 +179,9 @@ function GraphCmdCallback(contents, index) {
     if (line.length > 2) {
         let name = line[2].split(" ").join("").trim();
         if (name != "")
-            SAMPLE.VisualizationQueueCol(line[1].trim().toString(), name);
+            SAMPLE.VisualizationQueueColGraph(line[1].trim().toString(), name);
     } else {
-        SAMPLE.VisualizationQueueCol(line[1].trim().toString());
+        SAMPLE.VisualizationQueueColGraph(line[1].trim().toString());
     }
     return index;
 }
@@ -202,6 +224,86 @@ function CountIfCmdCallback(contents, index) {
                 counter++;
             }
         }
+        if (counter > max) {
+            counter = max;
+        }
+        flag.additions[j] = "ReplacementString" + counter;
+    }
+    SAMPLE.flagged_start++;
+    SAMPLE.flagged_additions.push(flag);
+    return index;
+}
+
+function CountIfPlusOneCmdCallback(contents, index) {
+    // COUNTIF+1 Max\tX,1\tY,2\tN,5...
+    let line = contents[index].toUpperCase().split(" ").join("").split("\t");
+    let max = line.splice(0, 1)[0].split("COUNTIF+1")[1];
+    for (let i = 0; i < line.length; i++) {
+        line[i] = [CalcIndexColumn(line[i].split(",")[0]) - 1,(line[i].split(",")[1]).toUpperCase()]
+    }
+    // create a new flag
+    let name = "CountIfSeries";
+    if (NAME_OVERRIDE) {
+        name = NAME_OVERRIDE;
+    }
+    let flag = new FlaggedColumn(name, SAMPLE.flagged_start);
+    for (let i = 0; i <= line.length; i++) {
+        flag.changes.push("ReplacementString" + i);
+
+    }
+    for (let j = 0; j < SAMPLE.records.length; j++) {
+        let counter = 0;
+        for (let i = 0; i < line.length; i++) {
+            // get what we're looking for
+            let col = line[i][0];
+            let value = line[i][1];
+            // loop through each record and check each
+            if ((SAMPLE.records[j][col]).toUpperCase() == value) {
+                counter++;
+            }
+        }
+        counter += 1;
+        if (counter > max) {
+            counter = max;
+        }
+        flag.additions[j] = "ReplacementString" + counter;
+    }
+    SAMPLE.flagged_start++;
+    SAMPLE.flagged_additions.push(flag);
+    return index;
+}
+
+
+function CountIf04CmdCallback(contents, index) {
+    // COUNTIF+1 Max\tX,1\tY,2\tN,5...
+    let line = contents[index].toUpperCase().split(" ").join("").split("\t");
+    let max = line.splice(0, 1)[0].split("COUNTIF04")[1];
+    for (let i = 0; i < line.length; i++) {
+        line[i] = [CalcIndexColumn(line[i].split(",")[0]) - 1,(line[i].split(",")[1]).toUpperCase()]
+    }
+    // create a new flag
+    let name = "CountIfSeries";
+    if (NAME_OVERRIDE) {
+        name = NAME_OVERRIDE;
+    }
+    let flag = new FlaggedColumn(name, SAMPLE.flagged_start);
+    for (let i = 0; i <= line.length; i++) {
+        flag.changes.push("ReplacementString" + i);
+
+    }
+    for (let j = 0; j < SAMPLE.records.length; j++) {
+        let counter = 0;
+        for (let i = 0; i < line.length; i++) {
+            // get what we're looking for
+            let col = line[i][0];
+            let value = line[i][1];
+            // loop through each record and check each
+            if ((SAMPLE.records[j][col]).toUpperCase() == value) {
+                counter++;
+            }
+        }
+        if (counter == 0)
+            counter = 4;
         if (counter > max) {
             counter = max;
         }

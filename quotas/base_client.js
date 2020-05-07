@@ -1,5 +1,7 @@
 function CreateClient(id) {
     switch (id) {
+        case 1: // McL
+            return new MCLClient();
         case 2: // AL
             return new ALClient();
         case 3: // DB
@@ -33,7 +35,6 @@ function CreateClient(id) {
         case 17: // TN
             return new TNClient();
         // fall through
-        case 1: // McL
         default:
             return new BaseClient();
     };

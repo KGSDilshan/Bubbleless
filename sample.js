@@ -240,6 +240,9 @@ class Sample {
             var rec = this.records[i][colId];
             if (colMap.get(rec) == undefined) {
                 colMap.set(rec, 1);
+            } else if (rec == "" || parseInt(rec) == "0") {
+                // don't remove empty rows
+                continue;
             } else {
                 this.DeleteRecordByIndex(colId, i);
             }
@@ -268,6 +271,20 @@ class Sample {
         }
         // visualFlag.UniqueCellClusters(cellCol.value);
         this.flagged_additions.push(visualFlag);
+        console.log(visualFlag);
+        // Mark the flag as DO NOT ADD
+    }
+
+    VisualizationQueueColGraph(cname, name=undefined) {
+        // create a flag for the column
+        const visualFlag = new FlaggedColumn(cname, 0);
+        visualFlag.createCol = false;
+        if (name !== undefined) {
+            visualFlag.name = name;
+        }
+        // visualFlag.UniqueCellClusters(cellCol.value);
+        this.flagged_additions.push(visualFlag);
+        console.log(visualFlag);
         // Mark the flag as DO NOT ADD
     }
 

@@ -1,3 +1,94 @@
+class MCLClient extends BaseClient {
+    constructor() {
+        super("MLC");
+    }
+
+    setPPhoneType(group) {
+        for (let i = 0; i < group.subQuotas.length; i++) {
+            group.subQuotas[i].qName = "pPhoneType";
+        }
+    }
+
+    setPArea(group, args) {
+        for (let i = 0; i < group.subQuotas.length; i++) {
+            group.subQuotas[i].qName = "p" + group.subQuotas[i].qName;
+        }
+    }
+
+    clientSpecificWarnings() {
+        if (RAN_CSWARNINGS)
+            return;
+        RAN_CSWARNINGS = true;
+
+        // include phonetype quotas pulling from sample
+        let PTGrp = getQuotaByNames(["phone"]);
+        if (PTGrp == undefined) {
+            GLOBAL_WARNINGS.push({
+                message: "WARNING: Phonetype quotas missing.",
+                callback: undefined,
+                group: undefined,
+            });
+        } else {
+            for (let i = 0; i < PTGrp.subQuotas.length; i++) {
+                if (!PTGrp.subQuotas[i].qName.startsWith("pP")) {
+                    GLOBAL_WARNINGS.push({
+                        message: "WARNING: Phonetype quotas must pull from sample.",
+                        callback: this.setPPhoneType,
+                        group: PTGrp,
+                    });
+                }
+            }
+        }
+
+        // include area quotas pulling from sample
+        let areaGrp = getQuotaByNames(["area", "region", "district"]);
+        if (areaGrp == undefined) {
+            GLOBAL_WARNINGS.push({
+                message: "WARNING: Area quotas missing.",
+                callback: undefined,
+                group: undefined,
+            });
+        } else {
+            for (let i = 0; i < areaGrp.subQuotas.length; i++) {
+                if (!areaGrp.subQuotas[i].qName.startsWith("p")) {
+                    GLOBAL_WARNINGS.push({
+                        message: "WARNING: Area quotas must pull from sample.",
+                        callback: this.setPArea,
+                        group: areaGrp,
+                    });
+                    break;
+                }
+            }
+        }
+
+        // all quotas should be pulling from survey, except PT and Area when non-listed
+        if (!isNOL()) {
+            for (let i = 0; i < QUOTA_GROUPS.length; i++) {
+                for (let j = 0; j < QUOTA_GROUPS[i].subQuotas.length; j++) {
+                    let subq = QUOTA_GROUPS[i].subQuotas[j];
+                    if ((subq.qName.startsWith("p") && !subq.qName.startsWith("pP"))) {
+                        // this is a precode "p" prefix
+                        // Check that Phonetype is from sample
+                        // Check Area is from sample
+                        console.log(subq.qName);
+                        if (subq.qName.toLowerCase() == "pphonetype" || subq.qName.toLowerCase() == "parea") {
+                            continue;
+                        } else {
+                            GLOBAL_WARNINGS.push({
+                                message: "WARNING: " + QUOTA_GROUPS[i].getName() + ", quota should pull from survey. (Checklist)",
+                                callback: undefined,
+                                group: QUOTA_GROUPS[i],
+                            });
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
 class ALClient extends BaseClient {
     constructor() {
         super("AL");

@@ -418,22 +418,23 @@ function ContinueExportProcess() {
 	const qBuff = document.getElementById("QuotasBuffer");
 	qBuff.innerHTML = "";
 	for (let i = 0; i < SAMPLE.flagged_additions.length; i++) {
-		if (!SAMPLE.flagged_additions[i].isCopied) {
+		if ((SAMPLE.flagged_additions[i].breakdown.size > 0 && SAMPLE.flagged_additions[i].breakdown.size < 100) ||
+			SAMPLE.flagged_additions[i].createCol == false) {
 			let grph = new DataVisual(SAMPLE.flagged_additions[i].breakdown,
 									SAMPLE.flagged_additions[i].breakdownNames, SAMPLE.flagged_additions[i].parentName,
 									SAMPLE.flagged_additions[i].originalValue, SAMPLE.flagged_additions[i]);
 			grph.RenderGraph();
 			//let quotaGrp = new QuotaGroup(SAMPLE.flagged_additions[i].parentName);
-			if (grph.percentages && grph.name != "EMAIL_Flagged from EMAIL" && !grph.name.includes("Clusters in sample")) {
+			if (grph.percentages && (grph.name != "EMAIL_Flagged from EMAIL" && grph.name != "email from EMAIL") && !grph.name.includes("Clusters in sample")) {
 				console.log(grph.name);
 				const qBuff = document.getElementById("QuotasBuffer");
 				let data_table = '<thead>';
 				data_table += '<tr>';
-				data_table += '<th scope="col" colspan="5" contenteditable="true">' + SAMPLE.flagged_additions[i].parentName + '</th>';
+				data_table += '<th scope="col" colspan="5" contenteditable="true">' + SAMPLE.flagged_additions[i].breakdownNames + '</th>';
 				data_table += '</tr>';
 				data_table += '</thead>';
 				data_table += '<tbody>';
-				let quotaName = SAMPLE.flagged_additions[i].parentName;
+				let quotaName = SAMPLE.flagged_additions[i].breakdownNames;
 				quotaName = "p" + quotaName[0].toUpperCase() + quotaName.slice(1, quotaName.length).toLowerCase();
 				for (let j = 0; j < grph.percentages.length; j++) {
 					data_table += '<tr>';
@@ -445,7 +446,7 @@ function ContinueExportProcess() {
 				}
 				data_table += '</tbody>';
 				data_table += '</table>';
-				let unbracketed_name = SAMPLE.flagged_additions[i].parentName;
+				let unbracketed_name = SAMPLE.flagged_additions[i].breakdownNames;
 				qBuff.innerHTML += UITableHTML(unbracketed_name) + data_table + "<br><br></div>";
 			}
 		}

@@ -64,7 +64,20 @@
                                     "**party", "", "",
                                     ];
             document.getElementById("bubblelessInput").value = placeholderText.join("\n");
-            placeholderText = ["NAMESLIST	XX_FN, XX_LN", "DonaldTrump", "BarackObama", "STOP NAMES","", "Delete XX_FN", "aaRon,Mai", "stop delete"];
+            placeholderText = ["// Remove FirstnameLastname pairs",
+                                "NAMESLIST	XX_FN, XX_LN",
+                                "DonaldTrump",
+                                "BarackObama",
+                                "STOP NAMES","",
+                                "// Remove duplicate email/phone numbers",
+                                "RMDUPE	XX_EMAIL1",
+                                "RMDUPE	XX_EMAIL2",
+                                "RMDUPE	XX_LANDLINE",
+                                "RMDUPE	XX_CELL","",
+                                "// Remove data for only First/Lastname",
+                                "Delete XX_FN",
+                                "aaRon,Mai",
+                                "stop delete"];
             document.getElementById("bubblelessScrubNamesInput").value = placeholderText.join("\n");
             document.getElementById("bubbless-flagstart-input").value = 1;
         });

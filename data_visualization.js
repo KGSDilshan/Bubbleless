@@ -39,6 +39,7 @@ class DataVisual {
         }
         this.total = this.data.reduce((a, b) => a + b, 0);
         console.log("DATA VISUAL NAME: ", this.name);
+        console.log("data:", datamap, dataName, parentName, dataTransformation, flaggedCol);
         if (this.name.includes("EMAIL_Flagged")) {
             this.data = [datamap.get("rf@rf.com"), this.total - datamap.get("rf@rf.com")];
             this.labels = ["rf@rf.com", "Valid emails"];
@@ -203,6 +204,10 @@ class DataVisual {
     }
 
     BalancePercentages(totalN) {
+        // copied column
+        if (this.percentages.length == 0) {
+            return;
+        }
         let totalSum = totalN;
         while (100 - totalSum > 0) {
             // get highest remainder
