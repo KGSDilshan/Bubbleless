@@ -36,7 +36,6 @@ class FlaggedColumn {
         this.overrideName = undefined;
         if (NAME_OVERRIDE != undefined) {
             this.overrideName = NAME_OVERRIDE;
-            NAME_OVERRIDE = undefined;
         }
         // from column name, populate additions column
         let colID = CalcIndexColumn(columnName) - 1;
@@ -525,6 +524,7 @@ class Sample {
 
 
     FlagExists(colName) {
+        console.log("checking found for", colName, "with NAME_OVERRIDE:", NAME_OVERRIDE);
         for (let i = 0; i < this.flagged_additions.length; i++) {
             if (this.flagged_additions[i].name == colName && this.flagged_additions[i].overrideName == NAME_OVERRIDE) {
                 return {index : i, flag : this.flagged_additions[i]};
