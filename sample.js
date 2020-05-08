@@ -526,8 +526,9 @@ class Sample {
 
     FlagExists(colName) {
         for (let i = 0; i < this.flagged_additions.length; i++) {
-            if (this.flagged_additions[i].name == colName)
+            if (this.flagged_additions[i].name == colName && this.flagged_additions[i].overrideName == NAME_OVERRIDE) {
                 return {index : i, flag : this.flagged_additions[i]};
+            }
         }
         return {index : -1, flag: undefined};
     }
