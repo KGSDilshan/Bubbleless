@@ -610,6 +610,7 @@ class Sample {
         if (document.getElementById("IncludePhoneSample").checked ||
             document.getElementById("IncludeEmailSample").checked ||
             document.getElementById("IncludeTextSample").checked) {
+                NAME_OVERRIDE = "Mode Internal";
                 let flag = new FlaggedColumn("Mode Internal", SAMPLE.flagged_start);
                 SAMPLE.flagged_start++;
                 flag.isCopied = true;
