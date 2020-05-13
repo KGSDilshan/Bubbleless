@@ -138,6 +138,12 @@ class FlaggedColumn {
                 this.breakdown.set(val, 1);
             }
         }
+        // check if duplicate flagging found
+        let nonUnique = arrayNonUniq(this.changes);
+        for (let i = 0; i < nonUnique.length; i++) {
+            WARNINGS.push("<b>WARNING:</b> In column '" + this.name + "' multiple conversions set to code '" + nonUnique[i].replace("ReplacementString", "") + "'");
+            TEXTWARNINGS.push("WARNING: In column '" + this.name + "' multiple conversions set to code '" + nonUnique[i].replace("ReplacementString", "") + "'");
+        }
         console.log("Done parsing", this.name);
     }
 
@@ -612,6 +618,7 @@ class Sample {
             document.getElementById("IncludeTextSample").checked) {
                 NAME_OVERRIDE = "Mode Internal";
                 let flag = new FlaggedColumn("Mode Internal", SAMPLE.flagged_start);
+                console.log(flag);
                 SAMPLE.flagged_start++;
                 flag.isCopied = true;
                 SAMPLE.flagged_additions.push(flag);
@@ -768,4 +775,12 @@ class Sample {
         hiddenElement.click();
     }
 
+}
+
+const arrayNonUniq = array => {
+    if (!Array.isArray(array)) {
+        throw new TypeError("An array must be provided!")
+    }
+
+    return array.filter((value, index) => array.indexOf(value) === index && array.lastIndexOf(value) !== index)
 }
