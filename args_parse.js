@@ -80,6 +80,17 @@ function OpenHeaderFile(event) {
 function OpenFile(event) {
 	AltLoadBar();
 	let files = document.getElementById("sampleFile").files;
+	let validFnames = ["csv", "xlsx", "xlsb"];
+	fileFound = false;
+	for (let i = 0; i < validFnames.length; i++) {
+		if (file[0].name.includes validFnames[i]) {
+			fileFound = true;
+			break;
+		}
+	}
+	if (!fileFound) {
+		alert("File type must be 'CSV', 'XLSX' or 'XLSB'");
+	}
 	if (files[0].name.includes(".csv")) {
 		INITIAL_FILETYPE = "csv";
 		let input = event.target;

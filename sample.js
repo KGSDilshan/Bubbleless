@@ -568,11 +568,18 @@ class Sample {
                 } else {
                     // normal comparison
                     min = min.split(" ").join("").split(",");
-                    let comp = SAMPLE.records[k][colID].split(" ").join("");
-                    if (!min.includes(comp)) {
-                        setRecord = false;
-                        break;
-
+                    if (min.toUpperCase() == "BLANK") {
+                        let comp = SAMPLE.records[k][colID].split(" ").join("");
+                        if (comp != undefined || comp != "") {
+                            setRecord = false;
+                            break;
+                        }
+                    } else {
+                        let comp = SAMPLE.records[k][colID].split(" ").join("");
+                        if (!min.includes(comp)) {
+                            setRecord = false;
+                            break;
+                        }
                     }
                 }
             }
