@@ -19,6 +19,7 @@ var EMAIL_TO_PHONE_SAMPLE = [];
 var TEXT_PHONES_SAMPLE = [];
 var TEXT_EMAIL_SAMPLE = [];
 var NAME_OVERRIDE = undefined;
+var CURRENT_COL = undefined;
 
 class FlaggedColumn {
     constructor(columnName, index) {
@@ -546,7 +547,7 @@ class Sample {
         console.log("vlookup data: ",conds, currentCol, replacement);
         if (flag === undefined) {
             // column is empty, create it
-            console.log("No flagged column exists for this vlookup!");
+            console.log("No flagged column exists for this vlookup!", currentCol);
             flag = new FlaggedColumn(currentCol, SAMPLE.flagged_start);
             SAMPLE.flagged_start++;
             SAMPLE.flagged_additions.push(flag);
@@ -568,14 +569,13 @@ class Sample {
                 } else {
                     // normal comparison
                     min = min.split(" ").join("").split(",");
-                    if (min.toUpperCase() == "BLANK") {
-                        let comp = SAMPLE.records[k][colID].split(" ").join("");
-                        if (comp != undefined || comp != "") {
+                    let comp = SAMPLE.records[k][colID].split(" ").join("");
+                    if (min[0].toUpperCase() == "BLANK") {
+                        if (comp != "") {
                             setRecord = false;
                             break;
                         }
                     } else {
-                        let comp = SAMPLE.records[k][colID].split(" ").join("");
                         if (!min.includes(comp)) {
                             setRecord = false;
                             break;

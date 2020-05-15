@@ -203,12 +203,17 @@ function CountIfCmdCallback(contents, index) {
     for (let i = 0; i < line.length; i++) {
         line[i] = [CalcIndexColumn(line[i].split(",")[0]) - 1,(line[i].split(",")[1]).toUpperCase()]
     }
+    console.log(line);
     // create a new flag
     let name = "CountIfSeries";
     if (NAME_OVERRIDE) {
         name = NAME_OVERRIDE;
     }
-    let flag = new FlaggedColumn(name, SAMPLE.flagged_start);
+    let flag = SAMPLE.FlagExists(CURRENT_COL);
+    console.log(flag, CURRENT_COL);
+    if (flag.flag === undefined) {
+        flag = new FlaggedColumn(CURRENT_COL, SAMPLE.flagged_start);
+    }
     for (let i = 0; i <= line.length; i++) {
         flag.changes.push("ReplacementString" + i);
 
@@ -246,7 +251,11 @@ function CountIfPlusOneCmdCallback(contents, index) {
     if (NAME_OVERRIDE) {
         name = NAME_OVERRIDE;
     }
-    let flag = new FlaggedColumn(name, SAMPLE.flagged_start);
+    let flag = SAMPLE.FlagExists(CURRENT_COL);
+    console.log(flag, CURRENT_COL);
+    if (flag.flag === undefined) {
+        flag = new FlaggedColumn(CURRENT_COL, SAMPLE.flagged_start);
+    }
     for (let i = 0; i <= line.length; i++) {
         flag.changes.push("ReplacementString" + i);
 
@@ -281,12 +290,15 @@ function CountIf04CmdCallback(contents, index) {
     for (let i = 0; i < line.length; i++) {
         line[i] = [CalcIndexColumn(line[i].split(",")[0]) - 1,(line[i].split(",")[1]).toUpperCase()]
     }
-    // create a new flag
+    // create a new flag if one doesn't exist
     let name = "CountIfSeries";
     if (NAME_OVERRIDE) {
         name = NAME_OVERRIDE;
     }
-    let flag = new FlaggedColumn(name, SAMPLE.flagged_start);
+    let flag = SAMPLE.FlagExists(CURRENT_COL);
+    if (flag.flag === undefined) {
+        flag = new FlaggedColumn(CURRENT_COL, SAMPLE.flagged_start);
+    }
     for (let i = 0; i <= line.length; i++) {
         flag.changes.push("ReplacementString" + i);
 
@@ -413,9 +425,10 @@ function DefaultCallback(contents, index) {
         }
 
         // we need to know if this is a column or a find and replacement
-        let line = contents[i].trim().split("\t");
+        let line = contents[i].trim().toUpperCase().split("\t");
         if (line.length == 1) {
-            if (currentCol !== undefined) {
+            if (line[0].includes("COMBINE") || (currentCol !== undefined)) {
+                currentCol = CURRENT_COL;
                 // this could be a combine
                 if (contents[i].toUpperCase().includes("COMBINE")) {
                     i = CombineCallback(contents, i, currentCol);
@@ -424,6 +437,7 @@ function DefaultCallback(contents, index) {
                 }
             } else {
                 currentCol = line[0].toUpperCase();
+                CURRENT_COL = currentCol;
             }
         } else {
             // find and replacement
@@ -474,7 +488,6 @@ function DeleteCallback(contents, index) {
             return i;
         } else {
             // single delete
-            console.log()
             //DELETESMAP.set(deleteVal, (DELETESMAP.get(deleteVal) ? 0 : DELETESMAP.get(deleteVal)));
             SAMPLE.DeleteRecords(currentCol, deleteVal);
         }
