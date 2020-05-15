@@ -83,7 +83,7 @@ function OpenFile(event) {
 	let validFnames = ["csv", "xlsx", "xlsb"];
 	fileFound = false;
 	for (let i = 0; i < validFnames.length; i++) {
-		if (file[0].name.includes validFnames[i]) {
+		if (files[0].name.includes(validFnames[i])) {
 			fileFound = true;
 			break;
 		}
