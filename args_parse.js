@@ -122,6 +122,7 @@ function OpenFile(event) {
 					break;
 			};
 		};
+
 		FileWorker.postMessage(files);
 	}
 };
@@ -199,6 +200,7 @@ function PreviewSample(fdata) {
 	// header
 	let thtml = '<table class="table table-dark" id="dtHorizontal" "scrollX": true>';
 	let data = fdata.split("\n");
+	console.log(data);
 	let row1to6 = [data[0].split(","),data[1].split(","),data[2].split(","),data[3].split(","),data[4].split(","),data[5].split(",")];
 	let htmlHeader = '<thead class="thead-dark"><tr>';
 	let trow = "";
@@ -510,6 +512,57 @@ function ContinueExportProcess() {
 }
 
 
+function DownloadConversions() {
+	let hiddenElement = document.createElement('a');
+	let formData = "// Scrubs: " + "\n";
+	formData += document.getElementById("bubblelessScrubNamesInput").value + "\n\n";
+	formData += "// Flags: \n";
+
+	let flagData = document.getElementById("bubblelessInput").value;
+	// parse over other option filter
+	flagData = flagData.split("\n");
+	let label = "";
+	let expandedText = "";
+	for (let i = 0; i < flagData.length; i++) {
+		if (flagData[i].startsWith("**")) {
+			label = flagData[i].replace("**", "");
+			expandedText += flagData[i] + "\n";
+		} else if (flagData[i].toUpperCase().startsWith("OTHER\t")) {
+			// find flag with label
+			let flag = undefined;
+			for (let j = 0; j < SAMPLE.flagged_additions.length; j++) {
+				if (SAMPLE.flagged_additions[j].overrideName == label) {
+					// found the flag
+					flag = SAMPLE.flagged_additions[j];
+					break;
+				}
+			}
+			if (flag == undefined || flag.otherBreakdown.size == 0) {
+				// no flag found for this one, leave it alone
+				continue;
+			} else {
+				// expand other flag
+				repCode = "";
+				for (const [key, value] of flag.otherBreakdown.entries()) {
+					expandedText += key + ",";
+					repCode = value;
+				}
+				expandedText = expandedText.substring(0, expandedText.length - 1);
+				expandedText += "\t" + repCode + "\n";
+			}
+		} else {
+			expandedText += flagData[i] + "\n";
+		}
+	}
+	formData += expandedText + "\n";
+
+	hiddenElement.href = 'data:attachment/text,' + encodeURI(formData);
+	hiddenElement.target = '_blank';
+	hiddenElement.download = 'conversions.txt';
+	hiddenElement.click();
+}
+
+
 function ViewRawData() {
 	if (SAMPLE.deletedRecords.size > 0) {
 		// check how many deletes we have
@@ -523,6 +576,11 @@ function ViewRawData() {
 
 	if (SAMPLE_HEADER.length > 0) {
 		let buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-primary mb-2" id="continue3" onClick=SAMPLE.ExportHeader()>Download Headers</button>'
+		$("div#ButtonBuffer").append(buttonHTML);
+	}
+
+	if (SAMPLE_HEADER.length > 0) {
+		let buttonHTML = '&nbsp;&nbsp;<button type="submit" class="btn btn-primary mb-2" id="continue3" onClick=DownloadConversions()>Download Conversions</button>'
 		$("div#ButtonBuffer").append(buttonHTML);
 	}
 }

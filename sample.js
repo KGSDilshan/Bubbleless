@@ -35,6 +35,7 @@ class FlaggedColumn {
         this.invalids = [];
         this.cellRecords = [];
         this.overrideName = undefined;
+        this.otherBreakdown = new Map();
         if (NAME_OVERRIDE != undefined) {
             this.overrideName = NAME_OVERRIDE;
         }
@@ -175,8 +176,10 @@ class FlaggedColumn {
         }
         this.changes.push("ReplacementString" + replacementCode);
         this.originalValue.push({f:"Other", r:replacementCode});
+
         for (let i = 1; i < this.additions.length; i++) {
             if (this.additions[i] === undefined || !this.additions[i].includes("ReplacementString")) {
+                this.otherBreakdown.set(this.additions[i], replacementCode);
                 this.additions[i] = "ReplacementString" + replacementCode;
                 replaced = true;
             }
