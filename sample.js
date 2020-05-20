@@ -21,6 +21,15 @@ var TEXT_EMAIL_SAMPLE = [];
 var NAME_OVERRIDE = undefined;
 var CURRENT_COL = undefined;
 
+// CA Region short forms
+var ShortToLongRegions  = [["ALA","ALAMEDA"],["ALP","ALPINE"],["AMA","AMADOR"],["BUT","BUTTE"],["CAL","CALAVERAS"],["COL","COLUSA"],["CC","CONTRACOSTA"],["DN","DELNORTE"],["ED","ELDORADO"],["FRE","FRESNO"],["GLE","GLENN"],["HUM","HUMBOLDT"],["IMP","IMPERIAL"],["INY","INYO"],["KER","KERN"],["KIN","KINGS"],["LAK","LAKE"],["LAS","LASSEN"],["LA","LOSANGELES"],["MAD","MADERA"],["MRN","MARIN"],["MPA","MARIPOSA"],["MEN","MENDOCINO"],["MER","MERCED"],["MOD","MODOC"],["MNO","MONO"],["MON","MONTEREY"],["NAP","NAPA"],["NEV","NEVADA"],["ORA","ORANGE"],["PLA","PLACER"],["PLU","PLUMAS"],["RIV","RIVERSIDE"],["SAC","SACRAMENTO"],["SBT","SANBENITO"],["SBD","SANBERNARDINO"],["SD","SANDIEGO"],["SF","SANFRANCISCO"],["SJ","SANJOAQUIN"],["SLO","SANLUISOBISPO"],["SM","SANMATEO"],["SB","SANTABARBARA"],["SCL","SANTACLARA"],["SCR","SANTACRUZ"],["SHA","SHASTA"],["SIE","SIERRA"],["SIS","SISKIYOU"],["SOL","SOLANO"],["SON","SONOMA"],["STA","STANISLAUS"],["SUT","SUTTER"],["TEH","TEHAMA"],["TRI","TRINITY"],["TUL","TULARE"],["TUO","TUOLUMNE"],["VEN","VENTURA"],["YOL","YOLO"],["YUB","YUBA"]];
+
+var LongToShortRegions = [["ALAMEDA","ALA"],["ALPINE","ALP"],["AMADOR","AMA"],["BUTTE","BUT"],["CALAVERAS","CAL"],["COLUSA","COL"],["CONTRACOSTA","CC"],["DELNORTE","DN"],["ELDORADO","ED"],["FRESNO","FRE"],["GLENN","GLE"],["HUMBOLDT","HUM"],["IMPERIAL","IMP"],["INYO","INY"],["KERN","KER"],["KINGS","KIN"],["LAKE","LAK"],["LASSEN","LAS"],["LOSANGELES","LA"],["MADERA","MAD"],["MARIN","MRN"],["MARIPOSA","MPA"],["MENDOCINO","MEN"],["MERCED","MER"],["MODOC","MOD"],["MONO","MNO"],["MONTEREY","MON"],["NAPA","NAP"],["NEVADA","NEV"],["ORANGE","ORA"],["PLACER","PLA"],["PLUMAS","PLU"],["RIVERSIDE","RIV"],["SACRAMENTO","SAC"],["SANBENITO","SBT"],["SANBERNARDINO","SBD"],["SANDIEGO","SD"],["SANFRANCISCO","SF"],["SANJOAQUIN","SJ"],["SANLUISOBISPO","SLO"],["SANMATEO","SM"],["SANTABARBARA","SB"],["SANTACLARA","SCL"],["SANTACRUZ","SCR"],["SHASTA","SHA"],["SIERRA","SIE"],["SISKIYOU","SIS"],["SOLANO","SOL"],["SONOMA","SON"],["STANISLAUS","STA"],["SUTTER","SUT"],["TEHAMA","TEH"],["TRINITY","TRI"],["TULARE","TUL"],["TUOLUMNE","TUO"],["VENTURA","VEN"],["YOLO","YOL"],["YUBA","YUB"]];
+
+
+var REGION_MAPA = new Map(ShortToLongRegions);
+var REGION_MAPB = new Map(LongToShortRegions);
+
 class FlaggedColumn {
     constructor(columnName, index) {
         this.name = columnName.toUpperCase();
@@ -163,6 +172,25 @@ class FlaggedColumn {
         if (replaced == false) {
             WARNINGS.push("<b>WARNING:</b> In column '" + this.name + "' could not find value '" + find + "'");
             TEXTWARNINGS.push("WARNING: In column '" + this.name + "' could not find value '" + find + "'");
+        }
+    }
+
+    FindAndReplaceRegion(find, replace) {
+        let replaced = false;
+        this.changes.push("ReplacementString" + replace);
+        this.originalValue.push({f: find[0], r: replace});
+        for (let i = 0; i < this.additions.length; i++) {
+            for (let j = 0; j < find.length; j++) {
+                if (this.additions[i] !== undefined && this.additions[i].split(" ").join("").toUpperCase() == find[j]) {
+                    this.additions[i] = "ReplacementString" + replace;
+                    replaced = true;
+                    break;
+                }
+            }
+        }
+        if (replaced == false) {
+            WARNINGS.push("<b>WARNING:</b> In column '" + this.name + "' could not find value '" + find[0] + "'");
+            TEXTWARNINGS.push("WARNING: In column '" + this.name + "' could not find value '" + find[0] + "'");
         }
     }
 
@@ -348,7 +376,8 @@ class Sample {
             for (let j = 0; j < colData.length; j++) {
                 let current = SAMPLE.records[i][colData[j]];
                 // apply formatting
-                current = current.split("(").join("").split(")").join("").split("-").join("").split(" ").join("");
+                if (current)
+                    current = current.split("(").join("").split(")").join("").split("-").join("").split(" ").join("");
                 if (current != undefined && current.trim() !== '' && parseInt(current) != 0 && current.length > 1) {
                     set = true;
                     phoneFlag.additions[i] = "ReplacementString" + current;
@@ -518,6 +547,7 @@ class Sample {
         // in column X replace Item with Value for all records
         item = item.toString();
         value = value.toString();
+        let regionLabels = ["GEO", "AREA", "GEOGRAPHY", "DISTRICT", "REGION"];
         let flag = this.FlagExists(col).flag;
         if (flag === undefined) {
             // Flagged column doesn't exist, create one
@@ -528,7 +558,24 @@ class Sample {
         if (item.toUpperCase() == "OTHER") {
             flag.OtherReplace(value);
         } else {
-            flag.FindAndReplace(item, value);
+            // check if region replacement
+            let find = [];
+            if (regionLabels.includes(flag.overrideName.toUpperCase())) {
+                if (REGION_MAPA.get(item) !== undefined) {
+                    find.push(REGION_MAPA.get(item));
+                }
+                if (REGION_MAPB.get(item) !== undefined) {
+                    find.push(REGION_MAPB.get(item));
+                }
+                find.push(item);
+            }
+            console.log(find);
+            if (find.length == 0) {
+                find = item;
+                flag.FindAndReplace(item, value);
+            } else {
+                flag.FindAndReplaceRegion(find, value);
+            }
         }
     }
 

@@ -531,7 +531,7 @@ function DownloadConversions() {
 			// find flag with label
 			let flag = undefined;
 			for (let j = 0; j < SAMPLE.flagged_additions.length; j++) {
-				if (SAMPLE.flagged_additions[j].overrideName == label) {
+				if (SAMPLE.flagged_additions[j].overrideName.trim() == label.trim()) {
 					// found the flag
 					flag = SAMPLE.flagged_additions[j];
 					break;
@@ -539,12 +539,16 @@ function DownloadConversions() {
 			}
 			if (flag == undefined || flag.otherBreakdown.size == 0) {
 				// no flag found for this one, leave it alone
+				expandedText += flagData[i] + "\n";
 				continue;
 			} else {
 				// expand other flag
 				repCode = "";
 				for (const [key, value] of flag.otherBreakdown.entries()) {
-					expandedText += key + ",";
+					if (key == "")
+						expandedText += "BLANK,";
+					else
+						expandedText += key + ",";
 					repCode = value;
 				}
 				expandedText = expandedText.substring(0, expandedText.length - 1);
