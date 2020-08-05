@@ -232,6 +232,17 @@ function ProcessEntireSample(fdata, id) {
 	console.log("done");
 }
 
+function ThreeDigitFips(s) {
+	let padded = s.toString().trim();
+	if (s.length == 3)
+		return s;
+	if (s.length == 2)
+		return "0" + s;
+	if (s.length == 1)
+		return "00" + s;
+	return s.slice(s.length - 3);
+}
+
 function CalcColumnID(num) {
   for (var ret = '', a = 1, b = 26; (num -= a) >= 0; a = b, b *= 26) {
     ret = String.fromCharCode(parseInt((num % b) / a) + 65) + ret;

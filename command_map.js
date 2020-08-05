@@ -85,6 +85,24 @@ var Syntax = [
         callback: FipsCmdCallback,
     },
     {
+        name: "NeighborhoodDensity",
+        length: 1,
+        validation: IsNeighborhoodDensityCmd,
+        callback: NeighborhoodDensityCmdCallback,
+    },
+    {
+        name: "PartisanScore",
+        length: 1,
+        validation: IsPartisanCmd,
+        callback: PartisanCmdCallback,
+    },
+    {
+        name: "NCRegion",
+        length: 1,
+        validation: IsNCRegionCmd,
+        callback: NCRegionCmdCallback,
+    },
+    {
         name: "FindAndReplace",
         length: 1,
         validation: IsDefault,
@@ -97,8 +115,20 @@ function IsNameSet(line) {
     return line.toUpperCase().startsWith("**");
 }
 
+function IsPartisanCmd(line) {
+    return line.toUpperCase().includes("PARTISAN");
+}
+
 function IsFipsCmd(line) {
     return line.toUpperCase().includes("FIPS");
+}
+
+function IsNeighborhoodDensityCmd(line) {
+    return line.toUpperCase().includes("NDENSITY");
+}
+
+function IsNCRegionCmd(line) {
+    return line.toUpperCase().includes("NCREGION");
 }
 
 function IsFilterDuplicateCmd(line) {
@@ -208,15 +238,33 @@ function FilterDuplicateCmdCallback(contents, index) {
 function FipsCmdCallback(contents, index) {
     // FIPS/tState/tcol
     let line = contents[index].split("\t");
-    let state = undefined;
-    let propsedState = line[1].split(" ").join("").trim().toUpperCase()
-    for (let i = 0; i < FIP_STATE_CODE.length; i++) {
-        if (FIP_STATE_CODE[i].state == proposedState) {
-            state = FIP_STATE_CODE[i].code;
-            break;
-        }
-    }
-    SAMPLE.CodeFips(name);
+    let stateCol = line[1].split(" ").join("").trim();
+    let col = line[2].split(" ").join("").trim();
+    SAMPLE.CodeFips(stateCol, col);
+    return index;
+}
+
+function NeighborhoodDensityCmdCallback(contents, index) {
+    // NDensity/tcol
+    let line = contents[index].split("\t");
+    let col = line[1].split(" ").join("").trim();
+    SAMPLE.CodeNDensity(col);
+    return index;
+}
+
+function PartisanCmdCallback(contents, index) {
+    // PARTISAN/tcol
+    let line = contents[index].split("\t");
+    let col = line[1].split(" ").join("").trim();
+    SAMPLE.CodePartisanScore(col);
+    return index;
+}
+
+function NCRegionCmdCallback(contents, index) {
+    // NCREGION/tcol
+    let line = contents[index].split("\t");
+    let col = line[1].split(" ").join("").trim();
+    SAMPLE.CodeNCRegion(col);
     return index;
 }
 

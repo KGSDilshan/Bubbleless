@@ -487,6 +487,108 @@ class Sample {
     }
 
 
+    CodeFips(state, col) {
+        let flag = new FlaggedColumn(col, this.flagged_start);
+        let stateCol = CalcIndexColumn(state) - 1;
+        let changes = new Set()
+        for (let i = 1; i < this.records.length; i++) {
+            let foundState = false;
+            for (let j = 0; j < FIP_STATE_CODE.length; j++) {
+                if (FIP_STATE_CODE[j].state == this.records[i][stateCol]) {
+                    flag.additions[i] = "ReplacementString" + FIP_STATE_CODE[j].code + ThreeDigitFips(flag.additions[i]);
+                    changes.add(flag.additions[i]);
+                    foundState = true;
+                    break;
+                }
+            }
+            if (foundState == false)
+                console.log("Didn't find a state for: " + this.records[i][stateCol]);
+        }
+        flag.changes = [... changes];
+        this.flagged_start++;
+        this.flagged_additions.push(flag);
+    }
+
+    CodeNDensity(col) {
+        let flag = new FlaggedColumn(col, this.flagged_start);
+        let NDCol = CalcIndexColumn(col) - 1;
+        let changes = new Set();
+        for (let i = 1; i < this.records.length; i++) {
+            if (this.records[i][NDCol].trim() == '' || this.records[i][NDCol].trim().toLowerCase() == 'z') {
+                flag.additions[i] = 'ReplacementString12';
+            } else {
+                flag.additions[i] = 'ReplacementString' + flag.additions[i].toString().trim();
+            }
+            changes.add(flag.additions[i]);
+        }
+        flag.changes = [... changes];
+        this.flagged_start++;
+        this.flagged_additions.push(flag);
+    }
+
+    CodePartisanScore(col) {
+        let flag = new FlaggedColumn(col, this.flagged_start);
+        let changes = new Set();
+        for (let i = 1; i < flag.additions.length; i++) {
+            if (flag.additions[i].trim() == '') {
+                flag.additions[i] = 'ReplacementString11';
+            } else {
+                let partisanValue = parseInt(flag.additions[i]);
+                if (partisanValue < 11) {
+                    flag.additions[i] = 'ReplacementString1';
+                } else if (partisanValue < 21) {
+                    flag.additions[i] = 'ReplacementString2';
+                } else if (partisanValue < 31) {
+                    flag.additions[i] = 'ReplacementString3';
+                } else if (partisanValue < 41) {
+                    flag.additions[i] = 'ReplacementString4';
+                } else if (partisanValue < 51) {
+                    flag.additions[i] = 'ReplacementString5';
+                } else if (partisanValue < 61) {
+                    flag.additions[i] = 'ReplacementString6';
+                } else if (partisanValue < 71) {
+                    flag.additions[i] = 'ReplacementString7';
+                } else if (partisanValue < 81) {
+                    flag.additions[i] = 'ReplacementString8';
+                } else if (partisanValue < 90) {
+                    flag.additions[i] = 'ReplacementString9';
+                } else if (partisanValue < 101) {
+                    flag.additions[i] = 'ReplacementString10';
+                } else {
+                    flag.additions[i] = 'ReplacementString11';
+                }
+            }
+            changes.add(flag.additions[i]);
+        }
+        flag.changes = [... changes];
+        this.flagged_start++;
+        this.flagged_additions.push(flag);
+    }
+
+    CodeNCRegion(col) {
+        let flag = new FlaggedColumn(col, this.flagged_start);
+        let changes = new Set();
+        for (let i = 1; i < flag.additions.length; i++) {
+            let foundState = false;
+            for (let j = 0; j < NC_REGION_DICT.length; j++) {
+                if (NC_REGION_DICT[j].region == flag.additions[i].trim().toUpperCase()) {
+                    flag.additions[i] = "ReplacementString" + NC_REGION_DICT[j].conversion;
+                    changes.add(flag.additions[i]);
+                    foundState = true;
+                    break;
+                }
+            }
+            if (foundState == false) {    
+                console.log("Didn't region conversion for: " + flag.additions[i]);
+                flag.additions[i] = "ReplacementStringothers";
+                changes.add(flag.additions[i]);
+            }
+        }
+        flag.changes = [... changes];
+        this.flagged_start++;
+        this.flagged_additions.push(flag);
+    }
+
     DeleteRecords(col, name) {
         let colID = CalcIndexColumn(col) - 1;
         let colDeleted = false;
