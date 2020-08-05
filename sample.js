@@ -578,7 +578,7 @@ class Sample {
                     break;
                 }
             }
-            if (foundState == false) {    
+            if (foundState == false) {
                 console.log("Didn't region conversion for: " + flag.additions[i]);
                 flag.additions[i] = "ReplacementStringothers";
                 changes.add(flag.additions[i]);
@@ -686,6 +686,16 @@ class Sample {
         console.log("checking found for", colName, "with NAME_OVERRIDE:", NAME_OVERRIDE);
         for (let i = 0; i < this.flagged_additions.length; i++) {
             if (this.flagged_additions[i].name == colName && this.flagged_additions[i].overrideName == NAME_OVERRIDE) {
+                return {index : i, flag : this.flagged_additions[i]};
+            }
+        }
+        return {index : -1, flag: undefined};
+    }
+
+    FlagExistsOName(overridename) {
+        // console.log("checking found for flag with NAME_OVERRIDE:", overridename);
+        for (let i = 0; i < this.flagged_additions.length; i++) {
+            if (this.flagged_additions[i].overrideName == overridename) {
                 return {index : i, flag : this.flagged_additions[i]};
             }
         }

@@ -271,12 +271,19 @@ function NCRegionCmdCallback(contents, index) {
 
 function CountIfCmdCallback(contents, index) {
     // COUNTIF Max\tX,1\tY,2\tN,5...
-    let line = contents[index].toUpperCase().split(" ").join("").split("\t");
+    let line = contents[index].split(" ").join("").split("\t");
     let max = line.splice(0, 1)[0].split("COUNTIF")[1];
     for (let i = 0; i < line.length; i++) {
-        line[i] = [CalcIndexColumn(line[i].split(",")[0]) - 1,(line[i].split(",")[1]).toUpperCase()]
+        let col = line[i].split(",")[0].trim();
+        let value = (line[i].split(",")[1]).toUpperCase();
+        // check if there exists a flagged column with this override name
+        if (SAMPLE.FlagExistsOName(col).index > -1) {
+            line[i] = [col, value];
+        } else {
+            line[i] = [CalcIndexColumn(col.toUpperCase()) - 1, value];
+        }
     }
-    console.log(line);
+
     // create a new flag
     let name = "CountIfSeries";
     if (NAME_OVERRIDE) {
@@ -291,6 +298,9 @@ function CountIfCmdCallback(contents, index) {
         flag.changes.push("ReplacementString" + i);
 
     }
+
+    console.log(line, (SAMPLE.records[2][CalcIndexColumn('FD') - 1]).toUpperCase());
+
     for (let j = 0; j < SAMPLE.records.length; j++) {
         let counter = 0;
         for (let i = 0; i < line.length; i++) {
@@ -298,7 +308,12 @@ function CountIfCmdCallback(contents, index) {
             let col = line[i][0];
             let value = line[i][1];
             // loop through each record and check each
-            if ((SAMPLE.records[j][col]).toUpperCase() == value) {
+            if (isAlpha(col)) {
+                if ((SAMPLE.FlagExistsOName(col).flag.additions[j] == 'ReplacementString' + value) ||
+                    (SAMPLE.FlagExistsOName(col).flag.additions[j] == value)) {
+                    counter++;
+                }
+            } else if ((SAMPLE.records[j][col]).toUpperCase() == value) {
                 counter++;
             }
         }
@@ -314,10 +329,17 @@ function CountIfCmdCallback(contents, index) {
 
 function CountIfPlusOneCmdCallback(contents, index) {
     // COUNTIF+1 Max\tX,1\tY,2\tN,5...
-    let line = contents[index].toUpperCase().split(" ").join("").split("\t");
+    let line = contents[index].split(" ").join("").split("\t");
     let max = line.splice(0, 1)[0].split("COUNTIF+1")[1];
     for (let i = 0; i < line.length; i++) {
-        line[i] = [CalcIndexColumn(line[i].split(",")[0]) - 1,(line[i].split(",")[1]).toUpperCase()]
+        let col = line[i].split(",")[0].trim();
+        let value = (line[i].split(",")[1]).toUpperCase();
+        // check if there exists a flagged column with this override name
+        if (SAMPLE.FlagExistsOName(col).index > -1) {
+            line[i] = [col, value];
+        } else {
+            line[i] = [CalcIndexColumn(col.toUpperCase()) - 1, value];
+        }
     }
     // create a new flag
     let name = "CountIfSeries";
@@ -340,7 +362,12 @@ function CountIfPlusOneCmdCallback(contents, index) {
             let col = line[i][0];
             let value = line[i][1];
             // loop through each record and check each
-            if ((SAMPLE.records[j][col]).toUpperCase() == value) {
+            if (isAlpha(col)) {
+                if ((SAMPLE.FlagExistsOName(col).flag.additions[j] == 'ReplacementString' + value) ||
+                    (SAMPLE.FlagExistsOName(col).flag.additions[j] == value)) {
+                    counter++;
+                }
+            } else if ((SAMPLE.records[j][col]).toUpperCase() == value) {
                 counter++;
             }
         }
@@ -358,10 +385,17 @@ function CountIfPlusOneCmdCallback(contents, index) {
 
 function CountIf04CmdCallback(contents, index) {
     // COUNTIF+1 Max\tX,1\tY,2\tN,5...
-    let line = contents[index].toUpperCase().split(" ").join("").split("\t");
+    let line = contents[index].split(" ").join("").split("\t");
     let max = line.splice(0, 1)[0].split("COUNTIF04")[1];
     for (let i = 0; i < line.length; i++) {
-        line[i] = [CalcIndexColumn(line[i].split(",")[0]) - 1,(line[i].split(",")[1]).toUpperCase()]
+        let col = line[i].split(",")[0].trim().toUpperCase();
+        let value = (line[i].split(",")[1]).toUpperCase();
+        // check if there exists a flagged column with this override name
+        if (SAMPLE.FlagExistsOName(col).index > -1) {
+            line[i] = [col, value];
+        } else {
+            line[i] = [CalcIndexColumn(col) - 1, value];
+        }
     }
     // create a new flag if one doesn't exist
     let name = "CountIfSeries";
@@ -383,7 +417,12 @@ function CountIf04CmdCallback(contents, index) {
             let col = line[i][0];
             let value = line[i][1];
             // loop through each record and check each
-            if ((SAMPLE.records[j][col]).toUpperCase() == value) {
+            if (isAlpha(col)) {
+                if ((SAMPLE.FlagExistsOName(col).flag.additions[j] == 'ReplacementString' + value) ||
+                    (SAMPLE.FlagExistsOName(col).flag.additions[j] == value)) {
+                    counter++;
+                }
+            } else if ((SAMPLE.records[j][col]).toUpperCase() == value) {
                 counter++;
             }
         }
