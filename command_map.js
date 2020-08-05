@@ -79,6 +79,12 @@ var Syntax = [
         callback: FilterDuplicateCmdCallback,
     },
     {
+        name: "FIPS",
+        length: 1,
+        validation: IsFipsCmd,
+        callback: FipsCmdCallback,
+    },
+    {
         name: "FindAndReplace",
         length: 1,
         validation: IsDefault,
@@ -89,6 +95,10 @@ var Syntax = [
 
 function IsNameSet(line) {
     return line.toUpperCase().startsWith("**");
+}
+
+function IsFipsCmd(line) {
+    return line.toUpperCase().includes("FIPS");
 }
 
 function IsFilterDuplicateCmd(line) {
@@ -192,6 +202,21 @@ function FilterDuplicateCmdCallback(contents, index) {
     let line = contents[index].split("\t");
     let name = line[1].split(" ").join("").trim();
     SAMPLE.FilterDuplicate(name);
+    return index;
+}
+
+function FipsCmdCallback(contents, index) {
+    // FIPS/tState/tcol
+    let line = contents[index].split("\t");
+    let state = undefined;
+    let propsedState = line[1].split(" ").join("").trim().toUpperCase()
+    for (let i = 0; i < FIP_STATE_CODE.length; i++) {
+        if (FIP_STATE_CODE[i].state == proposedState) {
+            state = FIP_STATE_CODE[i].code;
+            break;
+        }
+    }
+    SAMPLE.CodeFips(name);
     return index;
 }
 
