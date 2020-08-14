@@ -299,8 +299,6 @@ function CountIfCmdCallback(contents, index) {
 
     }
 
-    console.log(line, (SAMPLE.records[2][CalcIndexColumn('FD') - 1]).toUpperCase());
-
     for (let j = 0; j < SAMPLE.records.length; j++) {
         let counter = 0;
         for (let i = 0; i < line.length; i++) {

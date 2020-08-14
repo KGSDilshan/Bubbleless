@@ -164,6 +164,7 @@ class FlaggedColumn {
         this.changes.push("ReplacementString" + replace);
         this.originalValue.push({f: find, r: replace});
         for (let i = 0; i < this.additions.length; i++) {
+            // console.log("Comparing: ", find, " to: ", this.additions[i].split(" ").join("").toUpperCase());
             if (this.additions[i] !== undefined && this.additions[i].split(" ").join("").toUpperCase() == find) {
                 this.additions[i] = "ReplacementString" + replace;
                 replaced = true;
